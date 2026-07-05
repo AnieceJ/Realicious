@@ -31,7 +31,7 @@ export default function RootLayout({
 								文章
 							</Link>
 							<Link
-								href="/shop"
+								href="/realicious/shop"
 								className="inline-block bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
 							>
 								商城
