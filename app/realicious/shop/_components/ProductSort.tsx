@@ -17,7 +17,7 @@ export default function SortDropdown() {
     { id: "popular", label: "銷量/熱門商品" },
     { id: "price_low", label: "價格：低 → 高" },
     { id: "price_high", label: "價格：高 → 低" },
-  ];
+  ];  
 
   const handleSelect = (label:string) => {
     setCurrentSort(label);
@@ -32,7 +32,7 @@ export default function SortDropdown() {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center justify-between w-44 px-4 py-2.5 
                   bg-white text-[#3D2419] font-bold text-base
-                  border-[3px] border-[#3D2419] rounded-xl
+                  border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419] 
                   hover:translate-x-[1px] hover:translate-y-[1px]hover:shadow-[3px_3px_0px_0px_#3D2419]
                   active:translate-x-[3px] active:translate-y-[3px]active:shadow-none

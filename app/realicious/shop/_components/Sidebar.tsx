@@ -48,7 +48,7 @@ export default function SidebarFilter() {
   ];
 
   return (
-    <div className="w-72 bg-[#FCE384] border-[3px] border-[#3D2419] rounded-xl p-5 shadow-[4px_4px_0px_0px_#3D2419] font-bold text-[#3D2419] select-none">
+    <div className="w-72 bg-[#FCE384] border-[3px] border-[#3D2419]  p-5 shadow-[4px_4px_0px_0px_#3D2419] font-bold text-[#3D2419] select-none">
       {/* 區塊一：商品分類 */}
       <div className="text-center text-xl tracking-wide mb-4">商品分類</div>
       <hr className="border-t-2 border-[#3D2419]/20 mb-5" />
