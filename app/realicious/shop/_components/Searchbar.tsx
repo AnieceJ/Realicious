@@ -3,7 +3,7 @@ import React from "react";
 export default function Searchbar() {
   return (
     <div
-      className="flex items-center justify-between w-315 h-13 px-4 py-2.5 
+      className="flex items-center justify-between w-280 h-13 px-4 py-2.5 
                   bg-white text-[#3D2419] font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419]

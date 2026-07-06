@@ -5,14 +5,15 @@ import CartIcon from "./_components/CartIcon";
 import SidebarFilter from "./_components/Sidebar";
 import Searchbar from "./_components/Searchbar";
 import CategoryFilter from "./_components/CategoryFilter";
+import FeaturedProductSection from "./_components/FeaturedProductSection";
 
 export default function ShopPage() {
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FCE384]" />
+      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl">
         {/* 上層麵包屑, 搜尋, 排序, 購物車 */}
-        <div className="flex flex-row grid-cols-6 gap-30 mb-10">
+        <div className="flex flex-row gap-4 mb-10 items-center">
           <p className="font-semibold text-center flex items-center w-120 ml-10">
             <span>首頁 / 商品列表</span>
           </p>
@@ -26,11 +27,14 @@ export default function ShopPage() {
             <SidebarFilter />
           </div>
           <div>
+          <div className="mb-5">
             {/* 標籤篩選 */}
             <CategoryFilter />
           </div>
           <div>
             {/* 推薦商品 */}
+            <FeaturedProductSection/>
+          </div>
           </div>
         </div>
       </div>
