@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 
+type SortOption = {
+  id: string;
+  label: string;
+  badge?: string;
+};
+
 export default function SortDropdown() {
   // 控制下拉選單是否開啟
   const [isOpen, setIsOpen] = useState(false);
@@ -7,13 +13,13 @@ export default function SortDropdown() {
   const [currentSort, setCurrentSort] = useState("排序方式");
 
   // 排序選項資料，方便未來擴充
-  const sortOptions = [
+  const sortOptions: SortOption[] = [
     { id: "popular", label: "銷量/熱門商品" },
     { id: "price_low", label: "價格：低 → 高" },
     { id: "price_high", label: "價格：高 → 低" },
   ];
 
-  const handleSelect = (label) => {
+  const handleSelect = (label:string) => {
     setCurrentSort(label);
     setIsOpen(false); // 選完自動關閉
   };
