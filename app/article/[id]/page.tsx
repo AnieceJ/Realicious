@@ -1,8 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Share2, Bookmark } from "lucide-react";
 
 const Articles = [
 	{
@@ -81,6 +80,21 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
 						</div>
 						<div className="first-letter:text-5xl first-letter:font-bold first-letter:text-red-500 first-letter:mr-2">
 							<p>{article.content}</p>
+						</div>
+						<div className="py-4 px-2 my-4 h-15 border-black border-2 relative">
+							<span>覺得這篇文章有幫助嗎？</span>
+							<span>\收藏或分享/</span>
+							<div className="absolute bottom-2.5 right-2.5">
+								<button className="p-1 mr-2 border-black border-2">
+									<Share2 />
+								</button>
+								<button className="p-1 ml-2 border-black border-2">
+									<Bookmark />
+								</button>
+							</div>
+						</div>
+						<div>
+							<div>留言區</div>
 						</div>
 					</div>
 				</article>
