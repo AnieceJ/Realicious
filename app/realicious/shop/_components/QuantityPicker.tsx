@@ -2,7 +2,7 @@ import React from "react";
 
 export default function QuantityPicker() {
   return (
-    <div className="bg-amber-400">
+    <div className="flex gap-2">
       <div
         className="inline-flex items-center gap-1.5 px-3 py-1 
                       bg-[#FCF9F6] text-[#3D2419] font-bold text-sm
@@ -10,7 +10,7 @@ export default function QuantityPicker() {
                       shadow-[2px_2px_0px_0px_#3D2419] select-none
                   "
       >
-        <span>-</span>
+        <button>-</button>
       </div>
       <div
         className="inline-flex items-center gap-1.5 px-3 py-1 
@@ -19,7 +19,7 @@ export default function QuantityPicker() {
                       shadow-[2px_2px_0px_0px_#3D2419] select-none
                   "
       >
-        <span>1</span>
+        <button>1</button>
       </div>
       <div
         className="inline-flex items-center gap-1.5 px-3 py-1 
@@ -28,7 +28,7 @@ export default function QuantityPicker() {
                       shadow-[2px_2px_0px_0px_#3D2419] select-none
                   "
       >
-        <span>+</span>
+        <button>+</button>
       </div>
     </div>
   );

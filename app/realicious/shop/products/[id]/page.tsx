@@ -38,7 +38,7 @@ export default function page() {
             </div>
             <div className="flex items-center ml-4 mb-4 mt-6 gap-3">
               <QuantityPicker/>
-              <span>可購買數量:</span>
+              <span>可購買數量: 99+</span>
             </div>
           </div>
         </div>

@@ -26,7 +26,7 @@ export default function ProductAddOns() {
                   "
         >
           <button>
-          口 冬瓜檸檬冰沙餐券(+＄價格)
+          口 木瓜檸檬冰沙餐券(+＄價格)
           </button>
         </div>
       </div>
