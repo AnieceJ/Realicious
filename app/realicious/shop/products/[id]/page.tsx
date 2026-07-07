@@ -4,6 +4,7 @@ import ProductPhoto from "./_component/ProductPhoto";
 import Hashtag from "./_component/Hashtag";
 import SpecSelector from "./_component/SpecSelector";
 import ProductAddOns from "./_component/ProductAddOns";
+import QuantityPicker from "../../_components/QuantityPicker";
 
 export default function page() {
   return (
@@ -34,6 +35,10 @@ export default function page() {
             </div>
             <div className="ml-4 mb-4 mt-6">
               <ProductAddOns/>
+            </div>
+            <div className="flex items-center ml-4 mb-4 mt-6 gap-3">
+              <QuantityPicker/>
+              <span>可購買數量:</span>
             </div>
           </div>
         </div>
