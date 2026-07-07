@@ -1,14 +1,14 @@
 "use client";
 import React from "react";
-import ProductPhoto from "./_component/ProductPhoto";
-import Hashtag from "./_component/Hashtag";
-import SpecSelector from "./_component/SpecSelector";
-import ProductAddOns from "./_component/ProductAddOns";
+import ProductPhoto from "./_components/ProductPhoto";
+import Hashtag from "./_components/Hashtag";
+import SpecSelector from "./_components/SpecSelector";
+import ProductAddOns from "./_components/ProductAddOns";
 import QuantityPicker from "../../_components/QuantityPicker";
 import CartButtons from "../../_components/CartButtons";
 import Favorite from "../../_components/Favorite";
-import PurchaseButton from "./_component/PurchaseButton";
-import ProductDescription from "./_component/ProductDescription";
+import PurchaseButton from "./_components/PurchaseButton";
+import ProductDescription from "./_components/ProductDescription";
 
 export default function page() {
   return (

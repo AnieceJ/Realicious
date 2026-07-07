@@ -20,7 +20,7 @@ export default function ProductDescription() {
         </p>
 
         {/* 假圖片預留位置 (Mockup Image) */}
-        <div className="w-full max-w-2xl aspect-[16/9] bg-[#EEE] border-[3px] border-[#3D2419] rounded-xl flex items-center justify-center text-gray-400 shadow-[3px_3px_0px_0px_#3D2419] overflow-hidden my-4">
+        <div className="w-full max-w-2xl aspect-video bg-[#EEE] border-[3px] border-[#3D2419] rounded-xl flex items-center justify-center text-gray-400 shadow-[3px_3px_0px_0px_#3D2419] overflow-hidden my-4">
           <span className="text-sm">
             商品介紹大圖 / 或是廣告 Banner 預留位置
           </span>
