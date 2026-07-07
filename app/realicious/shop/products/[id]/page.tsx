@@ -3,6 +3,7 @@ import React from "react";
 import ProductPhoto from "./_component/ProductPhoto";
 import Hashtag from "./_component/Hashtag";
 import SpecSelector from "./_component/SpecSelector";
+import ProductAddOns from "./_component/ProductAddOns";
 
 export default function page() {
   return (
@@ -30,6 +31,9 @@ export default function page() {
             </div>
             <div className="ml-4 mb-4 mt-6">
               <SpecSelector/>
+            </div>
+            <div className="ml-4 mb-4 mt-6">
+              <ProductAddOns/>
             </div>
           </div>
         </div>

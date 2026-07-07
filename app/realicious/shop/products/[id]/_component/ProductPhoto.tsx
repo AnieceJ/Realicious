@@ -3,7 +3,7 @@ import React from "react";
 export default function ProductPhoto() {
   return (
     // 左上商品圖片區塊含左右
-    <div className="flex flex-row w-150 h-130">
+    <div className="flex flex-row w-150 h-130 gap-3">
       <div className="flex flex-col items-center w-30 gap-3">
         <div className="bg-purple-300 w-20 h-20 px-4 py-2.5 
                   text-[#3D2419] font-bold text-base
