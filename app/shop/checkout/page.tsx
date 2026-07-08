@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
+import CheckoutOrderList from "./_components/CheckoutOrderList";
 
 export default function CheckoutPage() {
   return (
@@ -10,7 +11,12 @@ export default function CheckoutPage() {
       <div className="max-w-7xl">
         {/* 左側 */}
         <div className="w-[60%]">
-        <CheckoutContactInfo/>
+          <div className="mb-6">
+            <CheckoutContactInfo />
+          </div>
+          <div>
+            <CheckoutOrderList/>
+          </div>
         </div>
       </div>
     </div>
