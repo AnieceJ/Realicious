@@ -1,0 +1,102 @@
+/* 把 react-day-picker 刷成 Realicious 的粗黑邊像素風 */
+/* 這個檔案在 BudgetCalendar.tsx 裡於 react-day-picker/style.css 之後 import，
+   所以會蓋過套件預設樣式。 */
+
+.rdp-root {
+  margin: 0;
+  --rdp-day-width: 40px;
+  --rdp-day-height: 40px;
+  font-weight: 700;
+}
+
+/* 上方月份標題 + 左右換月按鈕 */
+.rdp-month_caption {
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+}
+.rdp-button_previous,
+.rdp-button_next {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #1a1a1a;
+  background: #fff;
+  box-shadow: 2px 2px 0 #1a1a1a;
+  border-radius: 0;
+}
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background: #ffde4d;
+}
+.rdp-chevron {
+  fill: #1a1a1a;
+}
+
+/* 星期列 */
+.rdp-weekday {
+  color: #6b6b6b;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* 每一格 */
+.rdp-day_button {
+  border-radius: 0;
+  border: 2px solid transparent;
+  font-weight: 700;
+}
+.rdp-day_button:hover {
+  border-color: #1a1a1a;
+  background: #ededed;
+}
+.rdp-outside .rdp-day_button {
+  color: #c9c9c9;
+}
+
+/* 今天：紅字 */
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: #c81e2e;
+}
+
+/* 被選到的那天：黃底、黑邊、硬陰影 */
+.rdp-selected .rdp-day_button {
+  background: #ffde4d !important;
+  color: #1a1a1a !important;
+  border: 2px solid #1a1a1a;
+  box-shadow: 2px 2px 0 #1a1a1a;
+}
+
+/* 有支出（紅點）/ 有收入（綠點）小圓點 */
+.day-spend,
+.day-income {
+  position: relative;
+}
+.day-spend::after,
+.day-income::after {
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  z-index: 1;
+}
+.day-spend::after {
+  background: #c81e2e;
+}
+.day-income::after {
+  background: #16a34a;
+}
+
+/* 鍵盤 focus 外框 */
+.rdp-day_button:focus-visible {
+  outline: 4px solid #3fa2f6;
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rdp * {
+    transition: none !important;
+  }
+}
