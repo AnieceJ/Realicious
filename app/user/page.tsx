@@ -1,7 +1,3 @@
-export default function Page() {
-	return (
-		<div>
-			<h1>頁面內容</h1>
-		</div>
-	);
+export default function User() {
+  return <div>會員</div>;
 }
