@@ -17,7 +17,7 @@ export default function CheckoutPaymentMethod() {
           <div>
             <button
               className="flex flex-row items-center justify-center w-full px-15 py-8
-                  bg-[#89502E] text-[#FFFFFF] font-bold text-base
+                  bg-slate-300 text-slate-600 font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419]
                   "
@@ -25,7 +25,7 @@ export default function CheckoutPaymentMethod() {
               <span className="flex items-center gap-2 text-2xl whitespace-nowrap">
                 {/* 💳 像素信用卡 SVG */}
                 <svg
-                  className="w-8 h-8 shrink-0 fill-[#FFFFFF]
+                  className="w-8 h-8 shrink-0 fill-slate-600
                 "
                   viewBox="0 0 24 24"
                 >
@@ -39,7 +39,7 @@ export default function CheckoutPaymentMethod() {
           <div>
             <button
               className="flex items-center justify-center w-full px-15 py-8
-                  bg-[#89502E] text-[#FFFFFF] font-bold text-base
+                  bg-slate-300 text-slate-600 font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419]
                   "
@@ -47,7 +47,7 @@ export default function CheckoutPaymentMethod() {
               <span className="flex items-center gap-2 text-2xl whitespace-nowrap">
                 {/* 📱 像素手機 SVG */}
                 <svg
-                  className="w-8 h-8 shrink-0 fill-[#FFFFFF]"
+                  className="w-8 h-8 shrink-0 fill-slate-600"
                   viewBox="0 0 24 24"
                 >
                   {/* 手機外殼、螢幕範圍與 Home 鍵、上方聽筒 */}
