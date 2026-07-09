@@ -10,7 +10,7 @@ import Favorite from "../../_components/Favorite";
 import PurchaseButton from "./_components/PurchaseButton";
 import ProductDescription from "./_components/ProductDescription";
 
-export default function page() {
+export default function ProductsPage() {
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
