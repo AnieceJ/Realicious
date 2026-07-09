@@ -1,9 +1,11 @@
 "use client";
 
-import { FaUserCircle, FaUser, FaBook, FaShoppingCart } from "react-icons/fa";
+import {  FaUser, FaBook, FaShoppingCart } from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { GiChicken } from "react-icons/gi";
 import { MdOutlineLogout } from "react-icons/md";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser } from "@fortawesome/free-regular-svg-icons";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -13,13 +15,10 @@ export default function UserSidebar() {
 
   return (
     <>
-      <button
-        onClick={() => {
+      <button  onClick={() => {
           setIsOpening(!isOpening);
-        }}
-        className="w-[40px] h-[40px] z-[40] text-[30px] border flex justify-center items-center cursor-pointer"
-      >
-        <FaUserCircle />
+        }} className="p-2">
+        <FontAwesomeIcon icon={faUser} className="text-xl" />
       </button>
 
       <div

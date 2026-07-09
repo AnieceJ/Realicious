@@ -6,13 +6,14 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faMessage } from "@fortawesome/free-regular-svg-icons";
 import {
 	faInstagram,
 	faXTwitter,
 	faFacebook,
 	faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
+import UserSidebar from "./_components/_components/userSidebar";
+import Chatroom from "./_components/_components/chatroom";
 
 export default function RootLayout({
 	children,
@@ -54,12 +55,8 @@ export default function RootLayout({
 							</Link>
 						</nav>
 						<div className="flex gap-x-2 items-center justify-end">
-							<button className="p-2">
-								<FontAwesomeIcon icon={faUser} className="text-xl" />
-							</button>
-							<button className="p-2">
-								<FontAwesomeIcon icon={faMessage} className="text-xl" />
-							</button>
+							<UserSidebar/>
+							<Chatroom/>
 						</div>
 					</div>
 				</header>

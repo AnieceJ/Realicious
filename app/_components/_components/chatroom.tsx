@@ -2,21 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { AiFillMessage } from "react-icons/ai";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMessage } from "@fortawesome/free-regular-svg-icons";
 
 export default function Chatroom() {
   const [isOpening, setIsOpening] = useState<boolean>(false);
 
   return (
     <>
-      <button
-        onClick={() => {
+    <button onClick={() => {
           setIsOpening(!isOpening);
-        }}
-        className="w-[40px] h-[40px] z-[40] text-[30px] border flex justify-center items-center cursor-pointer"
-      >
-        <AiFillMessage />
-      </button>
+        }} className="p-2">
+								<FontAwesomeIcon icon={faMessage} className="text-xl" />
+							</button>
 
       {/* 內容 */}
       <div
