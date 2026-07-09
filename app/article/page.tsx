@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
-import { ChevronLeft, SquarePen, Eye } from "lucide-react";
+import { ChevronLeft, Eye } from "lucide-react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -8,11 +9,9 @@ import Link from "next/link";
 import {
 	Menubar,
 	MenubarContent,
-	MenubarItem,
 	MenubarMenu,
 	MenubarRadioGroup,
 	MenubarRadioItem,
-	MenubarSeparator,
 	MenubarTrigger,
 } from "@/components/ui/menubar";
 
@@ -24,14 +23,19 @@ export default function ArticlePage() {
 		<>
 			<div className="max-w-7xl mx-auto w-full">
 				<div className="flex items-center lg:flex-row md:flex-row md:items-center justify-between gap-4 p-3 bg-white border border-black">
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-4 flex-1">
 						<Link href="/">
 							<ChevronLeft
 								size={30}
 								className="bg-slate-100 h-10 border border-black"
 							/>
 						</Link>
-						<Menubar className="h-10 bg-black text-slate-100 border border-slate-100 justify-start flex-shrink-0">
+						<Menubar className="h-10 bg-black text-slate-100 border border-slate-100 justify-start shrink-0">
+							<MenubarMenu>
+								<MenubarTrigger>
+									<Link href="/article/manage">我的文章</Link>
+								</MenubarTrigger>
+							</MenubarMenu>
 							<MenubarMenu>
 								<MenubarTrigger className="">麵類</MenubarTrigger>
 								<MenubarContent>
@@ -67,31 +71,83 @@ export default function ArticlePage() {
 								</MenubarContent>
 							</MenubarMenu>
 						</Menubar>
-						<Field orientation="horizontal">
-							<Input type="search" placeholder="Search..." />
-							<Button className=" border-0">Search</Button>
+						<Field orientation="horizontal" className="flex-1 max-w-md">
+							<Input
+								type="search"
+								placeholder="Search..."
+								className="border-b-gray-500 bg-gray-200"
+							/>
+							<Button className="border-0">Search</Button>
 						</Field>
 					</div>
-					<div className="flex items-center gap-2 flex-1 md:w-auto justify-end">
-						<div className="w-10 h-10 bg-black ml-2">
-							<Link
-								href="/article/edit"
-								className="flex w-full h-full items-center justify-center"
+					<div>
+						<nav aria-label="Pagination" className="inline-flex shadow-xs">
+							<a
+								href="#"
+								className="relative inline-flex items-center px-2 py-2 bg-red-700 text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
 							>
-								<SquarePen color="#FFFFFF" />
-							</Link>
-						</div>
+								<span className="sr-only">Previous</span>
+								<ChevronLeftIcon aria-hidden="true" className="size-5" />
+							</a>
+							<a
+								href="#"
+								aria-current="page"
+								className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+							>
+								1
+							</a>
+							<a
+								href="#"
+								className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+							>
+								2
+							</a>
+							<a
+								href="#"
+								className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
+							>
+								3
+							</a>
+							<span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 focus:outline-offset-0">
+								...
+							</span>
+							<a
+								href="#"
+								className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
+							>
+								8
+							</a>
+							<a
+								href="#"
+								className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+							>
+								9
+							</a>
+							<a
+								href="#"
+								className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
+							>
+								10
+							</a>
+							<a
+								href="#"
+								className="relative inline-flex items-center px-2 py-2 bg-red-700 text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
+							>
+								<span className="sr-only">Next</span>
+								<ChevronRightIcon aria-hidden="true" className="size-5" />
+							</a>
+						</nav>
 					</div>
 				</div>
 
 				{/* 文章列表 */}
-				<div className=" bg-white p-6 border border-black">
+				<div className="bg-white p-6 border border-black mt-6">
 					<div className="flex justify-between items-center">
 						<h1 className="text-2xl font-bold">所有文章</h1>
 					</div>
 					<div className="flex flex-col">
 						<div className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3">
-							<div className="flex justify-between item-start">
+							<div className="flex justify-between items-start">
 								<h3 className="font-bold text-lg text-slate-900">
 									這是一篇文章
 								</h3>
