@@ -22,13 +22,13 @@ export default function ArticlePage() {
 
 	return (
 		<>
-			<div className="max-w-7xl mx-auto w-full py-6">
+			<div className="max-w-7xl mx-auto w-full">
 				<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 bg-white border border-black">
 					<div className="flex items-center gap-2">
 						<Link href="/">
 							<ChevronLeft
 								size={30}
-								className="bg-slate-100 h-10 border border-black p-1"
+								className="bg-slate-100 h-10 border border-black"
 							/>
 						</Link>
 						<Menubar className="w-40 h-10 bg-black text-slate-100 border border-slate-100 justify-between">
