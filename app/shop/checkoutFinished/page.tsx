@@ -1,6 +1,7 @@
 import React from "react";
 import FinishedPhoto from "./_components/FinishedPhoto";
 import FinishedOrderList from "./_components/FinishedOrderList";
+import FinishedAction from "./_components/FinishedAction";
 
 export default function page() {
   return (
@@ -18,6 +19,11 @@ export default function page() {
       <div className="flex flex-col items-center justify-center ">
         <div className="w-[60%]">
           <FinishedOrderList />
+        </div>
+      </div>
+      <div className="flex flex-col items-center justify-center ">
+        <div className="w-[70%]">
+          <FinishedAction />
         </div>
       </div>
     </div>
