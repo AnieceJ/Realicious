@@ -17,14 +17,14 @@ export default function Left() {
   };
 
   return (
-    <div className="w-[380px] h-[720px] bg-[#FCF9F6] border flex flex-col items-center">
+    <div className="w-95 h-180 bg-[#FCF9F6] border flex flex-col items-center">
       <h2 className="text-[24px] my-4">個人中心</h2>
       <div className="w-full">
         <Link
           onClick={() => {
             setIsOpening(!isOpening);
           }}
-          className={` w-full h-[50px] text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account`)}`}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account`)}`}
           href={`/user/account`}
         >
           <FaUser />
@@ -34,7 +34,7 @@ export default function Left() {
           onClick={() => {
             setIsOpening(!isOpening);
           }}
-          className={` w-full h-[50px] text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/password`)}`}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/password`)}`}
           href={`/user/account/password`}
         >
           <AiFillSafetyCertificate />
@@ -44,7 +44,7 @@ export default function Left() {
           onClick={() => {
             setIsOpening(!isOpening);
           }}
-          className={` w-full h-[50px] text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/article`)}`}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/article`)}`}
           href={`/user/account/article`}
         >
           <FaBook />
@@ -54,7 +54,7 @@ export default function Left() {
           onClick={() => {
             setIsOpening(!isOpening);
           }}
-          className={` w-full h-[50px] text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/cart`)}`}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/cart`)}`}
           href={`/user/account/cart`}
         >
           <FaShoppingCart />
@@ -64,7 +64,7 @@ export default function Left() {
           onClick={() => {
             setIsOpening(!isOpening);
           }}
-          className={` w-full h-[50px] text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/pet`)}`}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/pet`)}`}
           href={`/user/account/pet`}
         >
           <GiChicken />

@@ -113,7 +113,6 @@ export default function Login() {
               type="submit"
               disabled={submit}
               className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit?`bg-gray-400 hover:bg-gray-400`:`bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
-
             >
               {submit?`loading`:`確認送出`}
             </button>
