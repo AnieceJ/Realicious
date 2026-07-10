@@ -9,10 +9,11 @@ import { faUser } from "@fortawesome/free-regular-svg-icons";
 
 import { useState } from "react";
 import Link from "next/link";
+import {useUser} from '@/app/context/user'
 
 export default function UserSidebar() {
   const [isOpening, setIsOpening] = useState<boolean>(false);
-
+  const {logout} = useUser()
   return (
     <>
       <button  onClick={() => {
@@ -85,6 +86,7 @@ export default function UserSidebar() {
           <Link
             onClick={() => {
               setIsOpening(!isOpening);
+              logout()
             }}
             className="w-full h-[50px] text-red-600 border-b-1 border-gray-700 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
             href={`/user/login`}

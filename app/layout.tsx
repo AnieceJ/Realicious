@@ -14,6 +14,8 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import UserSidebar from "./_components/_components/userSidebar";
 import Chatroom from "./_components/_components/chatroom";
+import LoginStatus from "./_components/_components/loginStatus";
+import {UserProvider} from '@/app/context//user'
 
 export default function RootLayout({
 	children,
@@ -23,7 +25,8 @@ export default function RootLayout({
 	return (
 		<html lang="zh-TW">
 			<body className="w-full min-h-screen bg-white flex flex-col">
-				{/* Header */}
+				<UserProvider>
+					{/* Header */}
 				<header className="w-full h-15 bg-red-700 text-slate-100">
 					<div className="max-w-7xl mx-auto h-full grid grid-cols-3 items-center">
 						<div className="flex justify-start">
@@ -54,10 +57,12 @@ export default function RootLayout({
 								記帳小雞
 							</Link>
 						</nav>
-						<div className="flex gap-x-2 items-center justify-end">
+
+						{/* <div className="flex gap-x-2 items-center justify-end">
 							<UserSidebar/>
 							<Chatroom/>
-						</div>
+						</div> */}
+						<LoginStatus></LoginStatus>
 					</div>
 				</header>
 				{/* Main */}
@@ -87,6 +92,8 @@ export default function RootLayout({
 						</span>
 					</div>
 				</footer>
+				</UserProvider>
+				
 			</body>
 		</html>
 	);
