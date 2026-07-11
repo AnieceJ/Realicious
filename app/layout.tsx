@@ -4,7 +4,7 @@ import Link from "next/link";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
-
+import { ShoppingBasket } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 	faInstagram,
@@ -55,8 +55,9 @@ export default function RootLayout({
 							</Link>
 						</nav>
 						<div className="flex gap-x-2 items-center justify-end">
-							<UserSidebar/>
-							<Chatroom/>
+							<ShoppingBasket className="h-6.25 w-7" />
+							<UserSidebar />
+							<Chatroom />
 						</div>
 					</div>
 				</header>
