@@ -4,6 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, Share2, Bookmark, Reply } from "lucide-react";
 
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
 const Articles = [
 	{
 		id: "1",
@@ -67,7 +76,7 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
 	const comment = Comments.find((item) => item.id === id);
 	const reply = Replies.find((item) => item.id === id);
 	return (
-		<div className="max-w-7xl mx-auto w-full py-6 space-y-6">
+		<div className="max-w-7xl mx-auto w-full p-3 ">
 			<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 bg-white border border-black">
 				<div className="flex items-center gap-2">
 					<Link href="/article">
@@ -80,6 +89,19 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
 				<div className="flex items-center gap-2 w-full md:w-auto justify-end">
 					2026 夏季刊//台北美食地圖
 				</div>
+			</div>
+			<div className="flex p-4">
+				<Breadcrumb>
+					<BreadcrumbList>
+						<BreadcrumbItem>
+							<BreadcrumbLink render={<Link href="/">Home</Link>} />
+						</BreadcrumbItem>
+						<BreadcrumbSeparator />
+						<BreadcrumbItem>
+							<BreadcrumbLink render={<Link href="/article">Article</Link>} />
+						</BreadcrumbItem>
+					</BreadcrumbList>
+				</Breadcrumb>
 			</div>
 
 			{!article ? (
@@ -109,7 +131,12 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
 							<hr className="border-black border" />
 						</div>
 						<div className="w-200 h-200 border text-center border-black m-6 shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] ">
-							<Image src="/image.png" alt="滷肉飯" width={2000} height={2000} />
+							<Image
+								src="/article/braised-pork.jpg"
+								alt="滷肉飯"
+								width={1000}
+								height={1000}
+							/>
 						</div>
 						<div className="first-letter:text-5xl first-letter:font-bold first-letter:text-red-500 first-letter:mr-2">
 							<p>{article.content}</p>
@@ -137,7 +164,7 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
 								<div className="flex gap-4">
 									<div className="shrink-0">
 										<Image
-											src="/image.png"
+											src="/article/braised-pork.jpg"
 											alt="profile"
 											height={50}
 											width={50}
@@ -162,7 +189,7 @@ export default function ArticleDetailPage({ params }: ArticleDetailPageProps) {
 								<div className="flex gap-4 mt-6 ml-14 border-l-2 border-l-gray-300 pl-4">
 									<div className="shrink-0">
 										<Image
-											src="/image.png"
+											src="/article/braised-pork.jpg"
 											alt="profile"
 											width={40}
 											height={40}

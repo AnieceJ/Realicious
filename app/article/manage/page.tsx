@@ -15,6 +15,15 @@ import {
 } from "@/components/ui/menubar";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
 export default function ArticlePage() {
 	const [noodle, setNoodle] = React.useState("pasta");
 	const [rice, setRice] = React.useState("curry");
@@ -147,9 +156,25 @@ export default function ArticlePage() {
 						</nav>
 					</div>
 				</div>
-
+				<div className="flex p-4">
+					<Breadcrumb>
+						<BreadcrumbList>
+							<BreadcrumbItem>
+								<BreadcrumbLink render={<Link href="/">Home</Link>} />
+							</BreadcrumbItem>
+							<BreadcrumbSeparator />
+							<BreadcrumbItem>
+								<BreadcrumbLink render={<Link href="/article">Article</Link>} />
+							</BreadcrumbItem>
+							<BreadcrumbSeparator />
+							<BreadcrumbItem>
+								<BreadcrumbPage>My Article</BreadcrumbPage>
+							</BreadcrumbItem>
+						</BreadcrumbList>
+					</Breadcrumb>
+				</div>
 				{/* 文章列表 */}
-				<div className=" bg-white p-6 border border-black mt-6">
+				<div className=" bg-white p-6 border border-black">
 					<div className="flex flex-col">
 						<div className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3">
 							<div className="flex justify-between item-start">
@@ -190,7 +215,7 @@ export default function ArticlePage() {
 									<Button
 										variant="outline"
 										size="sm"
-										className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs shadow-[0px_5px_0px_0px_#000000]"
+										className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs"
 									>
 										閱讀全文
 									</Button>

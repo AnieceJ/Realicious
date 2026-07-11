@@ -15,6 +15,15 @@ import {
 	MenubarTrigger,
 } from "@/components/ui/menubar";
 
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
 export default function ArticlePage() {
 	const [noodle, setNoodle] = React.useState("pasta");
 	const [rice, setRice] = React.useState("curry");
@@ -140,8 +149,24 @@ export default function ArticlePage() {
 					</div>
 				</div>
 
+				{/* breadcrumb */}
+				<div className="flex p-4">
+					<Breadcrumb>
+						<BreadcrumbList>
+							<BreadcrumbItem>
+								<BreadcrumbLink render={<Link href="/">Home</Link>} />
+							</BreadcrumbItem>
+							<BreadcrumbSeparator />
+							<BreadcrumbItem>
+								<BreadcrumbPage>Article</BreadcrumbPage>
+							</BreadcrumbItem>
+						</BreadcrumbList>
+					</Breadcrumb>
+				</div>
+				{/* breadcrumb */}
+
 				{/* 文章列表 */}
-				<div className="bg-white p-6 border border-black mt-6">
+				<div className="bg-white p-6 border border-black">
 					<div className="flex justify-between items-center">
 						<h1 className="text-2xl font-bold">所有文章</h1>
 					</div>
@@ -176,7 +201,7 @@ export default function ArticlePage() {
 									sint sunt!
 								</p>
 							</div>
-							<div className="flex justify-between items-end mt-1.5">
+							<div className="flex justify-between items-center mt-1.5">
 								<div className="flex items-center">
 									<Eye size={16} />
 									<div className="ml-1 text-sm">瀏覽次數</div>
@@ -185,7 +210,7 @@ export default function ArticlePage() {
 									<Button
 										variant="outline"
 										size="sm"
-										className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs shadow-[0px_5px_0px_0px_#000000]"
+										className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs"
 									>
 										閱讀全文
 									</Button>
