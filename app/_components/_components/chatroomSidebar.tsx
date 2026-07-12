@@ -13,24 +13,24 @@ export default function Chatroom() {
     <>
     <button onClick={() => {
           setIsOpening(!isOpening);
-        }} className="p-2">
+        }} className="p-2 text-white hover: cursor-pointer">
 								<FontAwesomeIcon icon={faMessage} className="text-xl" />
 							</button>
 
       {/* 內容 */}
       <div
-        className={`fixed z-50 top-[94px] right-0 w-[360px] bg-[#FCF9F6] h-full border ${isOpening ? "transform transition-transform duration-300 ease-in-out" : "transform translate-x-full transition-transform duration-300 ease-in-out"} `}
+        className={`fixed z-50 top-15 right-0 w-90 bg-[#FCF9F6] h-full ${isOpening ? "transform transition-transform duration-300 ease-in-out" : "transform translate-x-full transition-transform duration-300 ease-in-out"} `}
       >
         <h2 className="text-[24px] m-4">聊天室</h2>
-        <Link href="/" className="w-[330px] h-[60px] border-b flex items-center mx-4 mb-4 hover:bg-gray-100">
-          <div className="w-[40px] h-[40px] border mx-4"></div>
+        <Link href="/" className="w-82.5 h-15 border-b flex items-center mx-4 mb-4 hover:bg-gray-100">
+          <div className="w-10 h-10 border mx-4"></div>
           <div>
             <p>XXX</p>
             <p>今天天氣真好</p>
           </div>
         </Link>
-        <div className="w-[330px] h-[60px] border-b flex items-center mx-4 mb-4 hover:bg-gray-100">
-          <div className="w-[40px] h-[40px] border mx-4"></div>
+        <div className="w-82.5 h-15 border-b flex items-center mx-4 mb-4 hover:bg-gray-100">
+          <div className="w-10 h-10 border mx-4"></div>
           <div>
             <p>XXX</p>
             <p>今天天氣真好</p>

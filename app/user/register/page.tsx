@@ -171,7 +171,7 @@ export default function Register() {
           </form>
         </div>
         <div className="w-0 h-0 sm:w-150 sm:h-180">
-          <Image src={registerAd} alt="廣告" width={600} height={720} />
+          <Image className="h-auto w-149.5" src={registerAd} alt="廣告" width={600} height={720} priority/>
         </div>
       </div>
     </Container>

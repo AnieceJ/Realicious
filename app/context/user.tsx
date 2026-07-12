@@ -37,22 +37,31 @@ const UserContext = createContext<UserContextType | null>(null);
 UserContext.displayName = "UserContext";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
+  const router = useRouter();
   const [user, setUser] = useState<User>(FAKE_USER_INIT);
 
   const login = (account: string, password: string) => {
+    // 方便測試用，之後要加格式判斷，傳到後端驗證，後端回傳boolean
     if (account === "123" && password === "123") {
       Cookies.set("token", FAKE_TOKEN, { expires: 1 });
       Cookies.set("user", JSON.stringify(FAKE_USER), { expires: 1 });
       setUser(FAKE_USER);
+      router.refresh()
       return true;
     }
     return false;
   };
   const logout = () => {
-    Cookies.remove("token");
-    Cookies.remove("user");
-    router.refresh()
+    const result = confirm("確定要登出嗎？");
+    if (result) {
+      Cookies.remove("token");
+      Cookies.remove("user");
+      setUser(FAKE_USER_INIT);
+      router.push("/user/login");
+      router.refresh();
+    } else {
+      return;
+    }
   };
 
   return (

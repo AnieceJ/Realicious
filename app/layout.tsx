@@ -12,9 +12,8 @@ import {
 	faFacebook,
 	faYoutube,
 } from "@fortawesome/free-brands-svg-icons";
-import UserSidebar from "./_components/_components/userSidebar";
-import Chatroom from "./_components/_components/chatroom";
-import LoginStatus from "./_components/_components/loginStatus";
+
+import HeaderLoginBtn from "./_components/_components/headerLoginBtn";
 import {UserProvider} from '@/app/context//user'
 
 export default function RootLayout({
@@ -57,12 +56,7 @@ export default function RootLayout({
 								記帳小雞
 							</Link>
 						</nav>
-
-						{/* <div className="flex gap-x-2 items-center justify-end">
-							<UserSidebar/>
-							<Chatroom/>
-						</div> */}
-						<LoginStatus></LoginStatus>
+						<HeaderLoginBtn ></HeaderLoginBtn>
 					</div>
 				</header>
 				{/* Main */}

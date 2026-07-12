@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import UserSidebar from './_components/userSidebar';
-import Chatroom from './_components/chatroom';
+import Chatroom from './_components/chatroomSidebar';
 
 export default function Header (){
 return (

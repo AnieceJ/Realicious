@@ -8,6 +8,16 @@ import VerifyButton from "../_components/verifyButton";
 
 export default function ForgetPassword() {
 
+const handleSendCode = async (): Promise<boolean> => {
+
+    const isvaild = true
+    if (isvaild) {
+      console.log(`驗證碼發送`);
+      return true;
+    }
+    return false;
+  };
+
   return (
     <Container>
       <div className="flex justify-center items-center sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
@@ -25,7 +35,7 @@ export default function ForgetPassword() {
                   id="email"
                   placeholder="請輸入電子郵件"
                 />
-                <VerifyButton onClick={} child={`發送`}/>
+                <VerifyButton onClick={(handleSendCode)} child={`發送`}/>
               </div>
             </div>
             <div className="w-full mb-2.5">
