@@ -28,7 +28,7 @@ export default function HeaderLoginBtn({className}:HeaderLoginBtnProps) {
         </div>
       ) : (
         <div className="flex gap-x-2 items-center justify-end text-white font-medium ">
-          <Link href={"/user/login"} className="p-4 flex justify-center items-center hover:cursor-pointer hover:underline decoration-white underline-offset-5">
+          <Link href={"/user/login"} className="flex justify-center items-center hover:cursor-pointer hover:underline decoration-white underline-offset-5">
             <FontAwesomeIcon icon={faUser} className="text-xl mr-2" />
             <span>登入</span>
           </Link>

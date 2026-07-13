@@ -30,7 +30,8 @@ export function proxy(request: NextRequest) {
 // 4. 設定「哪些網址」需要經過這個 Middleware 檢查
 export const config = {
   matcher: [
-    '/user/login', // 登入頁本身也要檢查（防止重複登入）
+    // 登入頁本身也要檢查（防止重複登入）
+    '/user/login',
     '/user/account',
     '/user/chatroom',
   ],

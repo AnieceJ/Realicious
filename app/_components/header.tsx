@@ -1,42 +1,51 @@
-import Link from 'next/link'
-import UserSidebar from './_components/userSidebar';
-import Chatroom from './_components/chatroomSidebar';
+import Link from "next/link";
+
+import "@fortawesome/fontawesome-svg-core/styles.css";
+config.autoAddCss = false;
+
+import { config } from "@fortawesome/fontawesome-svg-core";
+import { ShoppingBasket } from "lucide-react";
+
+import HeaderLoginBtn from "./_components/headerLoginBtn";
 
 export default function Header (){
 return (
-  <header className="fixed w-full h-[94px] bg-[#BB0015] border-b border-amber-700  text-zinc-900">
-					<div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-						<Link
-							href="/"
-							className="font-bold text-xl hover:text-amber-900 "
-						>
-							Realicious
-						</Link>
-						<nav className="flex gap-4 items-center">
-							<Link
-								href="/article"
-								className="inline-block bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
-							>
-								文章
-							</Link>
-							<Link
-								href="/shop"
-								className="inline-block bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
-							>
-								商城
-							</Link>
-							<Link
-								href="/accounting"
-								className="inline-block bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
-							>
-								記帳小雞
-							</Link>
+  <header className="w-full h-15 bg-red-700 text-slate-100">
+            <div className="max-w-7xl mx-auto h-full grid grid-cols-3 items-center">
+              <div className="flex justify-start">
+                <Link
+                  href="/"
+                  className="font-bold text-xl hover:underline decoration-white underline-offset-5"
+                >
+                  Realicious
+                </Link>
+              </div>
+              <nav className="flex gap-x-2 items-center justify-center">
+                <Link
+                  href="/article"
+                  className="inline-block text-white px-4 py-3 font-medium hover:underline decoration-white underline-offset-5"
+                >
+                  文章
+                </Link>
+                <Link
+                  href="/shop"
+                  className="inline-block text-white px-4 py-3 font-medium hover:underline decoration-white underline-offset-5"
+                >
+                  商城
+                </Link>
+                <Link
+                  href="/accounting"
+                  className="inline-block text-white px-4 py-3 font-medium hover:underline decoration-white underline-offset-5"
+                >
+                  記帳小雞
+                </Link>
+              </nav>
 
-							<UserSidebar></UserSidebar>
-							<Chatroom></Chatroom>
-							
-						</nav>
-					</div>
-				</header>
+              <div className="flex items-center justify-end">
+                <ShoppingBasket className="h-6.25 w-7 mr-3" />
+                <HeaderLoginBtn></HeaderLoginBtn>
+              </div>
+            </div>
+          </header>
 )
 }

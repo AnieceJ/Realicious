@@ -45,6 +45,7 @@ export default function Login() {
 
   // 表單送出
   const onSubmit = (data: any) => {
+    alert(123)
     if (submit) return; // 防止快速重複點擊
     setLoginError(false); // 登入中特效
     setSubmit(true);
@@ -83,9 +84,7 @@ export default function Login() {
           <h1 className="text-[24px] my-10">登入</h1>
 
           <form
-            onSubmit={() => {
-              handleSubmit(onSubmit, onError);
-            }}
+            onSubmit={handleSubmit(onSubmit, onError)}
             className="flex flex-col items-center mb-5"
           >
             <div className="flex flex-col items-start mb-5">
