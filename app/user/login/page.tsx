@@ -19,6 +19,7 @@ export default function Login() {
   const { login } = useUser();
 
   const [loginError, setLoginError] = useState(false); // 登入錯誤處理
+  const [errorMessage, setErrorMesssage] =useState('')
 
   const [shakeAccount, setShakeAccount] = useState(false); // Email 欄位錯誤特效
   const [shakePassword, setShakePassword] = useState(false); // Password 欄位錯誤特效
@@ -54,15 +55,16 @@ export default function Login() {
     const account = data.account;
     const password = data.password;
 
-    // 模擬登入
+    // 模擬延遲登入
     setTimeout(async () => {
       const onLogin = await login(account, password);
-      if (onLogin) {
-        // alert(`登入成功`);
+      if (onLogin.success) {
+        alert(onLogin.message);
         router.replace("/");
       } else {
         setLoginError(true); // 登入失敗，回復原狀
         setSubmit(false);
+        setErrorMesssage(onLogin.message)
       }
     }, 1000);
   };
@@ -127,7 +129,7 @@ export default function Login() {
               <p
                 className={`${loginError ? "animate-shake" : "invisible"} text-red-500`}
               >
-                帳號或密碼錯誤
+                {errorMessage}
               </p>
               <Link
                 className=" text-[16px] text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
