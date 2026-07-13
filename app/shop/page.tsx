@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Sort from "./_components/ProductSort";
 import CartIcon from "./_components/CartIcon";
 import SidebarFilter from "./_components/Sidebar";
@@ -7,8 +7,17 @@ import Searchbar from "./_components/Searchbar";
 import CategoryFilter from "./_components/CategoryFilter";
 import FeaturedProductSection from "./_components/FeaturedProductSection";
 import ProductCard from "./_components/ProductCard";
+import { getProducts, type Product } from "@/lib/shop/product";
 
 export default function ShopPage() {
+  const [products, setProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    getProducts().then((res) => {
+      if (res.success) setProducts(res.data);
+    });
+  }, []);
+
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />

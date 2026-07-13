@@ -1,5 +1,16 @@
 const API_BASE = "http://localhost:3001/api";
 
+export type Product = {
+  id: number;
+  name: string;
+  price: number;
+  discount: number;
+  stock_qty: number;
+  category_name: string;
+  description?: string;
+  image?: string;
+};
+
 export async function getProducts(params?: {
   page?: number;
   category_id?: string;
