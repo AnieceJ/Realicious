@@ -3,27 +3,25 @@ import type { Product } from "@/lib/shop/product";
 
 export default function ProductCard({ product }: { product: Product }) {
   return (
-    // ⭕ 這裡把 w-70 改成了 w-full，讓它完全填滿 grid 分配給它的格子
-    <div className="flex flex-col text-center w-full h-80 px-4 py-2.5 bg-[#FFF9E6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
-      
-      {/* 商品圖背景預覽(hover切換預覽圖) */}
-      {/* 加上 relative 方便你未來做 hover 蓋板效果 */}
-      <div className="relative flex items-end justify-center flex-1 bg-amber-100 overflow-hidden">
-        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-        {/* 名字用絕對定位或維持原樣，這裡先幫你補上相對好整體的排版 */}
-        <span className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-white/80 px-2 py-0.5 rounded text-sm">
+    <div className="relative w-full h-80 overflow-hidden border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] group">
+      {/* 商品圖片 */}
+      <img
+        src={`http://localhost:3001${product.main_img}`}
+        alt={product.name}
+        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+      />
+
+      {/* 飄浮字卡：使用 bg-white/90 (90%不透明白)，既能隱約看到後方圖片，又能給文字極佳的閱讀背景 */}
+      <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left rounded-sm ">
+        {/* 商品名稱 */}
+        <p className="text-[#3D2419] font-black text-base truncate tracking-wide">
           {product.name}
-        </span>
+        </p>
+        {/* 價格 */}
+        <p className="text-[#8C5230] font-black text-lg tracking-wider">
+          ${product.price}
+        </p>
       </div>
-
-      {/* 購物車&收藏按鈕 */}
-      <div className="mt-2">
-        <div className="flex flex-col items-center justify-center w-full h-20 bg-purple-300">
-          <span>hover出現加入購物車&收藏</span>
-          <span>${product.price}</span>
-        </div>
-      </div>
-
     </div>
   );
 }

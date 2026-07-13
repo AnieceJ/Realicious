@@ -8,7 +8,7 @@ export type Product = {
   stock_qty: number;
   category_name: string;
   description?: string;
-  image?: string;
+  main_img?: string;
 };
 
 export async function getProducts(params?: {
