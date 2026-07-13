@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import BudgetCalendar from "./BudgetCalendar";
-import PetStage from "./pixel/PetStage";
+import ChickGround, { groundClearance } from "./pixel/ChickGround";
 import AmbientBackground from "./pixel/AmbientBackground";
 import CoinBurst, { useCountUp } from "./pixel/CoinBurst";
 import type { PetMood } from "./pixel/PixelSpriteSheet";
@@ -25,7 +25,12 @@ const HP_GAIN = 20; // 有記帳 +20
 const HP_LOSS = 34; // 斷一天 -34（3 天歸零）
 const REVIVE_DAYS = 3; // 死後連續記帳 3 天復活
 const OUTFIT_MILESTONES = [3, 7, 14, 30]; // 連續簽到服裝獎勵
-const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"]; // 對應 PixelSprite 裡的配件圖層
+const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"]; // 對應 sprite 裡的配件圖層
+
+// 小雞的尺寸。SPRITE 必須是 64 的整數倍（128 = 2x, 192 = 3x）。
+// 非整數倍會讓瀏覽器把你的硬邊補成半透明鬼影。
+const SPRITE = 128;
+const GROUND_H = 44;
 
 type Tx = {
   id: string;
@@ -231,7 +236,10 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const delTx = (id: string) => setTxs((p) => p.filter((t) => t.id !== id));
 
   return (
-    <div className="max-w-[980px] mx-auto flex flex-col gap-6">
+    <div
+      className="max-w-[1100px] mx-auto flex flex-col gap-5"
+      style={{ paddingBottom: groundClearance(SPRITE, GROUND_H) }}
+    >
       {/* ============ 背景氛圍層（會跟著小雞的狀態變） ============ */}
       <AmbientBackground
         mood={!pet.alive ? "dead" : junkMode ? "junk" : "normal"}
@@ -240,10 +248,10 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
       />
       <CoinBurst fire={burst} originRef={stageRef} />
 
-      {/* ============ HERO：小雞是主角，滿版置中 ============
-           這個 app 不是記帳工具，是一隻要靠記帳養活的寵物。
-           版面必須說出同一件事。 */}
-      <section className="card-hero bg-[#FCF9F6] p-5 md:p-7" aria-label="小雞狀態">
+      {/* ============ 狀態卡（橫的、薄的）============
+           小雞本人不在這裡 —— 她住在畫面底部的地面上。
+           這張卡只放「數字」：HP、連續天數、今天記了沒。 */}
+      <section className={`${CARD} p-4 md:p-5`} aria-label="小雞狀態">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-[3px] bg-black" />
             {editingName ? (
@@ -276,22 +284,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             <div className="flex-1 h-[3px] bg-black" />
           </div>
 
-          {/* 遊戲畫面 —— sprite 放大到 192px（64 的 3 倍，整數才不會糊） */}
-          <PetStage
-            ref={stageRef}
-            mood={mood}
-            streak={pet.streak}
-            hp={pet.hp}
-            hpMax={HP_MAX}
-            reviveProgress={pet.reviveProgress}
-            reviveDays={REVIVE_DAYS}
-            height={320}
-            spriteSize={192}
-          />
-
-
-          {/* 狀態列 */}
-          <div className="flex flex-col gap-2.5 my-4">
+          {/* HP 與 STREAK 並排，不再上下堆疊 —— 省一半高度 */}
+          <div className="grid md:grid-cols-2 gap-3 mb-3">
             <Bar label="HP" val={`${pet.hp}/${HP_MAX}`} pct={pet.hp} color="bg-[#BB0015]" pixel={pixel} />
             <Bar
               label="STREAK"
@@ -302,29 +296,29 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             />
           </div>
 
-          {/* 今日打卡狀態 */}
-          <div
-            className={`border-[3px] border-black px-3 py-2 mb-3 text-[12px] font-bold text-center ${
-              pet.loggedToday ? "bg-[#FFD45C]" : "bg-white"
-            }`}
-          >
-            {!pet.alive
-              ? `${petName}變成幽靈了！連續記帳 ${REVIVE_DAYS} 天可復活`
-              : junkMode
-                ? `預算超支，${petName}正陪你一起吃土…`
-                : pet.loggedToday
-                  ? `✓ 今天已記帳，${petName}很滿足`
-                  : `今天還沒記帳，${petName}餓了…`}
-          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* 今日打卡狀態 */}
+            <div
+              className={`flex-1 min-w-[220px] border-[3px] border-black px-3 py-2 text-[12px] font-bold text-center ${
+                pet.loggedToday ? "bg-[#FFD45C]" : "bg-white"
+              }`}
+            >
+              {!pet.alive
+                ? `${petName}變成幽靈了！連續記帳 ${REVIVE_DAYS} 天可復活`
+                : junkMode
+                  ? `預算超支，${petName}正陪你一起吃土…`
+                  : pet.loggedToday
+                    ? `✓ 今天已記帳，${petName}很滿足`
+                    : `今天還沒記帳，${petName}餓了…`}
+            </div>
 
-          {/* 服裝里程碑 */}
-          <div className="flex gap-1.5 flex-wrap">
+            {/* 服裝里程碑 */}
             {OUTFIT_MILESTONES.map((m, i) => {
               const got = pet.streak >= m;
               return (
                 <span
                   key={m}
-                  className={`text-[10px] font-bold px-2 py-1 border-2 border-black ${
+                  className={`text-[10px] font-bold px-2 py-1.5 border-2 border-black ${
                     got ? "bg-[#FFD45C]" : "bg-[#E3E3E3] text-black/40"
                   }`}
                   title={got ? `已解鎖：${OUTFIT_NAMES[i]}` : `連續 ${m} 天解鎖`}
@@ -336,8 +330,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
           </div>
       </section>
 
-      {/* ============ 底下兩欄：日曆 + 明細（都是配角，收窄） ============ */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      {/* ============ 日曆 + 明細，左右並排，一眼看完 ============ */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* 日曆 */}
         <section className={`lg:col-span-5 ${CARD} p-5`} aria-label="消費日曆">
           <BudgetCalendar
@@ -430,8 +424,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
           </span>
         </div>
 
-        {/* 明細 */}
-        <div className="flex flex-col gap-2.5">
+        {/* 明細。內部捲動 —— 頁面本身不捲，所以小雞永遠不會蓋到你的內容。
+            記帳一天頂多幾筆，超過就在這個框裡捲。 */}
+        <div className="flex flex-col gap-2.5 max-h-[300px] overflow-y-auto pr-1">
           {dayTxs.length === 0 ? (
             <div className="border-[3px] border-dashed border-black/25 p-10 text-center text-[13px] font-bold text-black/40">
               這天還沒有記錄，按右上角 ＋ 記一筆
@@ -617,6 +612,24 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
           </div>
         </div>
       )}
+
+      {/* ============ 小雞住在這裡 ============
+           滿版地面，釘在視窗底部。沒有邊框、沒有自己的天空 ——
+           頁面就是天空，她從地上站起來，身體伸進你的內容區。
+           x 是她站的位置（視窗寬度的 %）。之後畫了走路循環，
+           把 x 接上動畫，她就會走。 */}
+      <ChickGround
+        ref={stageRef}
+        mood={mood}
+        streak={pet.streak}
+        hp={pet.hp}
+        hpMax={HP_MAX}
+        reviveProgress={pet.reviveProgress}
+        reviveDays={REVIVE_DAYS}
+        spriteSize={SPRITE}
+        groundHeight={GROUND_H}
+        x={12}
+      />
     </div>
   );
 }

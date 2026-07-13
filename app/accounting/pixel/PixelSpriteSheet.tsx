@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
+import { useReducedMotion } from "./useReducedMotion";
 
 /* ============================================================
    吃 Aseprite 匯出的 PNG sprite sheet。
@@ -58,18 +59,6 @@ const DURATION: Record<PetMood, number> = {
 
 const BASE = "/pixel";
 
-function useReducedMotion() {
-  const [reduce, setReduce] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduce(mq.matches);
-    const on = () => setReduce(mq.matches);
-    mq.addEventListener("change", on);
-    return () => mq.removeEventListener("change", on);
-  }, []);
-  return reduce;
-}
-
 /* ---------- 單一圖層（身體 or 一件配件） ---------- */
 
 function SheetLayer({
@@ -88,6 +77,8 @@ function SheetLayer({
   const px = CELL * scale;
 
   const style: CSSProperties = {
+    // span 預設是 display:inline，而 inline 元素會「忽略 width / height」。
+    // 少了這一行，這個圖層的尺寸是 0×0，背景圖什麼都不會顯示 —— 小雞會消失。
     display: "block",
     position: z === 0 ? "relative" : "absolute",
     inset: z === 0 ? undefined : 0,
