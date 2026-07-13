@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:3001/api";
+const API_BASE = "http://localhost:3001";
 
 export type Product = {
   id: number;
@@ -21,6 +21,6 @@ export async function getProducts(params?: {
   if (params?.category_id) query.set("category_id", params.category_id);
   if (params?.keyword) query.set("keyword", params.keyword);
 
-  const res = await fetch(`${API_BASE}/shop/products?${query}`);
+  const res = await fetch(`${API_BASE}/products?${query}`);
   return res.json();
 }

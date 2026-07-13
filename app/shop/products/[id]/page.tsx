@@ -23,7 +23,7 @@ export default function ProductsPage() {
           </div>
           {/* 右上購買區塊 */}
           <div className="flex flex-col items-center justify-center w-full">
-            <div className="flex items-center justify-center w-full h-20">
+            <div className="flex items-center justify-center w-fit bg-amber-400">
               <span className="text-2xl">
                 川媽臭臭鍋 - 臭到要他命套裝餐券(待確認風格)
               </span>

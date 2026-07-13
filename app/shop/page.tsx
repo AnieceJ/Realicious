@@ -37,7 +37,7 @@ export default function ShopPage() {
             <SidebarFilter />
           </div>
           {/* 右側 - 商品列 */}
-          <div>
+          <div className="flex-1">
             {/* 標籤篩選 */}
             <div className="mb-5">
               <CategoryFilter />
@@ -47,27 +47,10 @@ export default function ShopPage() {
               <FeaturedProductSection />
             </div>
             {/* 商品卡片 */}
-            <div className="flex flex-row gap-4 justify-between mb-4">
-              <div>
-                <ProductCard />
-              </div>
-              <div>
-                <ProductCard />
-              </div>
-              <div>
-                <ProductCard />
-              </div>
-            </div>
-            <div className="flex flex-row gap-4 justify-between">
-              <div>
-                <ProductCard />
-              </div>
-              <div>
-                <ProductCard />
-              </div>
-              <div>
-                <ProductCard />
-              </div>
+            <div className="grid grid-cols-3 gap-4">
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
             </div>
           </div>
         </div>
