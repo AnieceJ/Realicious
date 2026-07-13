@@ -43,8 +43,8 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
       {/* 【左側切換箭頭 — 整塊左邊都可點】 */}
       <div className="absolute left-0 top-0 bottom-0 w-16 z-10 flex items-center justify-center cursor-pointer" onClick={handlePrev}>
         <span className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl rounded-sm
-                         border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
-                         hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                        border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
+                        hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
           ◀
         </span>
       </div>
@@ -52,8 +52,8 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
       {/* 【右側切換箭頭 — 整塊右邊都可點】 */}
       <div className="absolute right-0 top-0 bottom-0 w-16 z-10 flex items-center justify-center cursor-pointer" onClick={handleNext}>
         <span className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl rounded-sm
-                         border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
-                         hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+                        border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
+                        hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
           ▶
         </span>
       </div>
