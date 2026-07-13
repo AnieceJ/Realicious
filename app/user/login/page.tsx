@@ -1,34 +1,40 @@
 "use client";
+
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useUser } from "@/app/context/user";
 
 import Link from "next/link";
 import Image from "next/image";
+
 import Container from "../_components/container";
 import loginAd from "@/public/user/login.png";
 
 export default function Login() {
-  const [loginError, setLoginError] = useState(false);
 
-  // 1. 為每個 Input 準備一個「晃動開關」狀態
+  const router = useRouter();
+  const { login } = useUser();
 
-  const [shakeEmail, setShakeEmail] = useState(false);
-  const [shakePassword, setShakePassword] = useState(false);
-  const [submit, setSubmit] = useState(false);
+  const [loginError, setLoginError] = useState(false); // 登入錯誤處理
 
+  const [shakeEmail, setShakeEmail] = useState(false); // Email 欄位錯誤特效
+  const [shakePassword, setShakePassword] = useState(false); // Password 欄位錯誤特效
+  const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
+
+  // RHF有錯誤訊息時觸發晃動
   const onError = (errors: any) => {
-    // 如果 Email 有錯誤，觸發晃動
     if (errors.email) {
       setShakeEmail(true);
       setTimeout(() => setShakeEmail(false), 400); // 0.4秒動畫跑完後，關掉開關
     }
-    // 如果 密碼 有錯誤，觸發晃動
     if (errors.password) {
       setShakePassword(true);
       setTimeout(() => setShakePassword(false), 400); // 0.4秒後關掉
     }
   };
 
+  // 使用 RHF
   const {
     register,
     handleSubmit,
@@ -37,15 +43,23 @@ export default function Login() {
     defaultValues: { email: "", password: "" },
   });
 
+  // 表單送出
   const onSubmit = (data: any) => {
-    setLoginError(false);
+    alert(123)
+    if (submit) return; // 防止快速重複點擊
+    setLoginError(false); // 登入中特效
     setSubmit(true);
-    console.log(123);
-    setTimeout(() => {
-    if(data.email === "123" && data.password === "123") {
-        alert(`登入成功`);
+    const account = data.email;
+    const password = data.password;
+
+    // 模擬登入
+    setTimeout(async () => {
+      const onLogin = await login(account, password);
+      if (onLogin) {
+        // alert(`登入成功`);
+        router.replace("/");
       } else {
-        setLoginError(true);
+        setLoginError(true); // 登入失敗，回復原狀
         setSubmit(false);
       }
     }, 1000);
@@ -57,11 +71,12 @@ export default function Login() {
         {/* 廣告 */}
         <div className="w-0 h-0 sm:w-150 sm:h-180">
           <Image
-            className=" object-contain object-bottom"
+            className=" object-contain object-bottom h-180"
             src={loginAd}
             alt="廣告"
             width={600}
             height={720}
+            priority
           />
         </div>
 
@@ -110,12 +125,13 @@ export default function Login() {
               </Link>
             </div>
             <button
+              onClick={() => {
+              }}
               type="submit"
               disabled={submit}
-              className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit?`bg-gray-400 hover:bg-gray-400`:`bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
-
+              className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
             >
-              {submit?`loading`:`確認送出`}
+              {submit ? `登入中...` : `確認送出`}
             </button>
           </form>
 

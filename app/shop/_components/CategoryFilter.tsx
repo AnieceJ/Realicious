@@ -2,7 +2,8 @@ import React from "react";
 
 export default function CategoryFilter() {
   return (
-    <div className="flex items-center grid-cols-3 gap-6 w-230 h-17 px-4 py-2.5 bg-white text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
+    // ⭕ 這裡把 w-230 改成了 w-full，並移除了沒用到的 grid-cols-3
+    <div className="flex items-center gap-6 w-full h-17 px-4 py-2.5 bg-white text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
       <div
         className="inline-flex items-center gap-1.5 px-3 py-1
                       bg-[#FFD3B6] text-[#3D2419] font-bold text-sm
