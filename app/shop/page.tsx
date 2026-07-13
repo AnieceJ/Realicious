@@ -19,34 +19,45 @@ export default function ShopPage() {
   }, []);
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen p-4"> {/* 加點 p-4 避免貼邊 */}
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
-      <div className="max-w-7xl">
-        {/* 上層麵包屑, 搜尋, 排序, 購物車 */}
-        <div className="flex flex-row gap-4 mb-10 items-center">
-          <p className="font-semibold text-center flex items-center w-120 ml-10 text-black">
-            <span>首頁 / 商品列表</span>
-          </p>
-          <Searchbar />
-          <Sort />
-          <CartIcon />
+      <div className="max-w-7xl mx-auto">
+        
+        {/* 頂層 2 欄：麵包屑與搜尋欄 */}
+        <div className="flex gap-10 mb-4">
+          <div className="w-64 flex-shrink-0">
+            <p className="font-semibold text-black pt-2">首頁 / 商品列表</p>
+          </div>
+          {/* 確保這一塊的寬度和下方的 flex-1 完全同步 */}
+          <div className="flex-1 flex items-center gap-4">
+            <div className="flex-1">
+              <Searchbar />
+            </div>
+            <div className="flex-shrink-0">
+              <Sort />
+            </div>
+          </div>
         </div>
-        <div className="flex flex-row gap-10">
-          <div>
-            {/* 左側 - 側邊欄 */}
+
+        {/* 主內容 2 欄 */}
+        <div className="flex gap-10">
+          {/* 修正了原先 flex-shrink:0 的語法錯誤 */}
+          <div className="w-64 flex-shrink-0">
             <SidebarFilter />
           </div>
-          {/* 右側 - 商品列 */}
-          <div className="flex-1">
-            {/* 標籤篩選 */}
-            <div className="mb-5">
+          
+          {/* 右側主內容區 */}
+          <div className="flex-1 flex flex-col gap-4">
+            <div>
               <CategoryFilter />
             </div>
-            {/* 推薦商品 */}
-            <div className="mb-4">
+            
+            {/* 推薦商品區塊：外層強制撐滿寬度 */}
+            <div className="w-full">
               <FeaturedProductSection />
             </div>
-            {/* 商品卡片 */}
+            
+            {/* 商品網格 */}
             <div className="grid grid-cols-3 gap-4">
               {products.map((p) => (
                 <ProductCard key={p.id} product={p} />
@@ -54,6 +65,7 @@ export default function ShopPage() {
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
