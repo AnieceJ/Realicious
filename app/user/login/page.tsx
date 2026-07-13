@@ -7,22 +7,11 @@ import { useUser } from "@/app/context/user";
 
 import Link from "next/link";
 import Image from "next/image";
-import Cookies from "js-cookie";
 
 import Container from "../_components/container";
 import loginAd from "@/public/user/login.png";
 
-const FAKE_USER = {
-  id: 1,
-  account: "test@example.com",
-  role: "11",
-  nick_name: "福利熊",
-  avatar: "123",
-};
-const FAKE_TOKEN = "mock-jwt-token-xyz";
-
 export default function Login() {
-  console.log("Login Render");
 
   const router = useRouter();
   const { login } = useUser();
@@ -94,13 +83,8 @@ export default function Login() {
           <h1 className="text-[24px] my-10">登入</h1>
 
           <form
-            // onSubmit={(e) => {
-            //   alert("React Submit");
-            //   e.preventDefault();
-            // }}
-            onSubmit={(e) => {
-              console.log("React Submit");
-              handleSubmit(onSubmit, onError)(e);
+            onSubmit={() => {
+              handleSubmit(onSubmit, onError);
             }}
             className="flex flex-col items-center mb-5"
           >
@@ -143,7 +127,6 @@ export default function Login() {
             </div>
             <button
               onClick={() => {
-                console.log("button click")
               }}
               type="submit"
               disabled={submit}

@@ -33,7 +33,7 @@ export default function VerifyButton({ onClick , child }: VerifyButtonProps) {
       onClick={(e) => {
         e.preventDefault();
         handleSend();
-        onClick();
+        // onClick();
       }}
       type="button"
     >
