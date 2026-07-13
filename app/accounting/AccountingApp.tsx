@@ -5,7 +5,7 @@ import BudgetCalendar from "./BudgetCalendar";
 import PetStage from "./pixel/PetStage";
 import AmbientBackground from "./pixel/AmbientBackground";
 import CoinBurst, { useCountUp } from "./pixel/CoinBurst";
-import type { PetMood } from "./pixel/PixelSprite";
+import type { PetMood } from "./pixel/PixelSpriteSheet";
 
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
@@ -231,7 +231,7 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const delTx = (id: string) => setTxs((p) => p.filter((t) => t.id !== id));
 
   return (
-    <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div className="max-w-[980px] mx-auto flex flex-col gap-6">
       {/* ============ 背景氛圍層（會跟著小雞的狀態變） ============ */}
       <AmbientBackground
         mood={!pet.alive ? "dead" : junkMode ? "junk" : "normal"}
@@ -240,10 +240,10 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
       />
       <CoinBurst fire={burst} originRef={stageRef} />
 
-      {/* ============ 左欄：小雞 + 日曆 ============ */}
-      <div className="lg:col-span-4 flex flex-col gap-6">
-        {/* 小雞 */}
-        <section className={`${CARD} p-5`} aria-label="小雞狀態">
+      {/* ============ HERO：小雞是主角，滿版置中 ============
+           這個 app 不是記帳工具，是一隻要靠記帳養活的寵物。
+           版面必須說出同一件事。 */}
+      <section className="card-hero bg-[#FCF9F6] p-5 md:p-7" aria-label="小雞狀態">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-[3px] bg-black" />
             {editingName ? (
@@ -276,7 +276,7 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             <div className="flex-1 h-[3px] bg-black" />
           </div>
 
-          {/* 遊戲畫面 —— 抖色天空 + 飄雲 + 地面，小雞是真的像素圖 */}
+          {/* 遊戲畫面 —— sprite 放大到 192px（64 的 3 倍，整數才不會糊） */}
           <PetStage
             ref={stageRef}
             mood={mood}
@@ -285,6 +285,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             hpMax={HP_MAX}
             reviveProgress={pet.reviveProgress}
             reviveDays={REVIVE_DAYS}
+            height={320}
+            spriteSize={192}
           />
 
 
@@ -332,10 +334,12 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               );
             })}
           </div>
-        </section>
+      </section>
 
+      {/* ============ 底下兩欄：日曆 + 明細（都是配角，收窄） ============ */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* 日曆 */}
-        <section className={`${CARD} p-5`} aria-label="消費日曆">
+        <section className={`lg:col-span-5 ${CARD} p-5`} aria-label="消費日曆">
           <BudgetCalendar
             selected={selected}
             onSelect={(d) => d && setSelected(d)}
@@ -354,13 +358,14 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             </span>
           </div>
         </section>
-      </div>
 
-      {/* ============ 右欄：記帳明細 ============ */}
-      <aside
-        className={`lg:col-span-8 ${CARD} p-6 flex flex-col min-h-[calc(100dvh-4rem)]`}
-        aria-label="記帳明細"
-      >
+        {/* 明細。拿掉 min-h-[calc(100dvh-4rem)] ——
+            那一行把卡片強制撐成整個螢幕高，不管裡面有幾筆。
+            大部分時候只有一兩列，所以撐出來的全是空白。 */}
+        <aside
+          className={`lg:col-span-7 ${CARD} p-5 flex flex-col`}
+          aria-label="記帳明細"
+        >
         <div className="flex items-center justify-between mb-4">
           <h2 className={`${pixel} text-[15px]`}>記帳明細</h2>
           <button
@@ -462,8 +467,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               </div>
             ))
           )}
-        </div>
-      </aside>
+          </div>
+        </aside>
+      </div>
 
       {/* ============ 新增記帳 Modal ============ */}
       {showAdd && (

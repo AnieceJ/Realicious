@@ -4,17 +4,24 @@ import { forwardRef, useMemo, type CSSProperties } from "react";
 import PetSprite, { type PetMood } from "./PixelSpriteSheet";
 
 /* ============================================================
-   寵物舞台 —— 最終版
+   寵物舞台 —— hero 版
 
-   跟前一版的差別：
-   ‧ 小雞改吃 sprite sheet（PixelSpriteSheet），不再是字串點陣圖
-   ‧ 拿掉 pixel-bob / happy-hop / junk-slump —— sprite 自己會動了，
-     外掛的 CSS 位移只會跟畫好的動作打架
-   ‧ 只留 ghost-float：dead 的兩格只有 1px 起伏，而且下緣 y=57
-     會陷進地面。CSS 把它整個抬起來飄著，比重畫省事
-   ‧ dead 的天空改成夜色 —— 灰幽靈配灰天空對比只有 1.07:1，
-     會整隻消失。夜色之後拉到 6~9:1
+   新增 height / spriteSize 兩個 prop。
+
+   ★ spriteSize 必須是 64 的整數倍（128 / 192 / 256）。
+     3.5 倍會讓每兩個像素就有一個被拉成 1.5px，邊緣長出半透明鬼影，
+     你花了一整晚清掉的那 9 個半透明像素會全部回來 —— 只是這次是
+     瀏覽器幫你加的。
+
+   地面對位的算法（不要憑感覺調）：
+     ‧ 小雞的腳底畫在 cell 的 y=55，下面還有 8px 空白（y=56~63）
+     ‧ 放大 scale 倍之後，那段空白是 8 × scale px
+     ‧ 所以 sprite 容器的 bottom 要設成「地面高度 − 那段空白」
+       腳才會剛好踩在地面線上
    ============================================================ */
+
+const CELL = 64;
+const FOOT_ROW_GAP = 8; // 腳底(y=55)到 cell 底部(y=63)的空白列數
 
 type Props = {
   mood: PetMood;
@@ -23,14 +30,33 @@ type Props = {
   hpMax: number;
   reviveProgress?: number;
   reviveDays?: number;
+  height?: number;
+  spriteSize?: number;
 };
 
 const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
-  { mood, streak, hp, hpMax, reviveProgress = 0, reviveDays = 3 },
+  {
+    mood,
+    streak,
+    hp,
+    hpMax,
+    reviveProgress = 0,
+    reviveDays = 3,
+    height = 200,
+    spriteSize = 128,
+  },
   ref,
 ) {
   const junk = mood === "junk";
   const dead = mood === "dead";
+
+  // 倍率鎖成整數。傳 150 進來會被吃成 128，不會讓像素糊掉。
+  const scale = Math.max(1, Math.round(spriteSize / CELL));
+  const sprite = CELL * scale;
+
+  const groundH = Math.max(30, Math.round(height * 0.13));
+  const footGap = FOOT_ROW_GAP * scale; // sprite 容器底部到腳底的空白
+  const spriteBottom = groundH - footGap; // 讓腳踩在地面線上
 
   // 天空跟著心情走。你一眼就知道今天過得好不好，不用讀數字。
   const sky = dead
@@ -44,9 +70,9 @@ const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
 
   const clouds = useMemo(
     () => [
-      { top: 14, dur: 46, delay: 0, scale: 1 },
-      { top: 32, dur: 68, delay: -22, scale: 0.75 },
-      { top: 8, dur: 92, delay: -55, scale: 0.55 },
+      { top: 0.09, dur: 46, delay: 0, scale: 1 },
+      { top: 0.22, dur: 68, delay: -22, scale: 0.72 },
+      { top: 0.05, dur: 92, delay: -55, scale: 0.52 },
     ],
     [],
   );
@@ -54,8 +80,8 @@ const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
   return (
     <div
       ref={ref}
-      className="pet-stage relative border-[3px] border-black h-[200px] overflow-hidden select-none"
-      style={{ background: sky.low }}
+      className="pet-stage relative border-[3px] border-black overflow-hidden select-none"
+      style={{ height, background: sky.low }}
     >
       {/* 天空：三條抖色帶。像素遊戲沒有漸層，只有棋盤格混色。 */}
       <div
@@ -69,12 +95,16 @@ const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
 
       {/* 太陽 / 月亮 */}
       <div
-        className="absolute right-4 top-4 w-6 h-6 border-[3px] border-black"
+        className="absolute border-[3px] border-black"
         style={{
+          right: 24,
+          top: 24,
+          width: 12 * scale,
+          height: 12 * scale,
           background: dead ? "#EDEDEF" : junk ? "#C7502A" : "#BB0015",
           boxShadow: dead
-            ? "0 0 0 3px rgba(237,237,239,0.14)"
-            : "0 0 0 3px rgba(187,0,21,0.12)",
+            ? "0 0 0 4px rgba(237,237,239,0.14)"
+            : "0 0 0 4px rgba(187,0,21,0.12)",
         }}
         aria-hidden
       />
@@ -85,7 +115,7 @@ const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
           key={i}
           className="pixel-cloud absolute"
           style={{
-            top: c.top,
+            top: Math.round(height * c.top),
             animationDuration: `${c.dur}s`,
             animationDelay: `${c.delay}s`,
             transform: `scale(${c.scale})`,
@@ -93,7 +123,12 @@ const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
           }}
           aria-hidden
         >
-          <svg viewBox="0 0 12 5" width={72} height={30} shapeRendering="crispEdges">
+          <svg
+            viewBox="0 0 12 5"
+            width={12 * scale * 2}
+            height={5 * scale * 2}
+            shapeRendering="crispEdges"
+          >
             {[
               "..kkk.kk....",
               ".kwwwkwwk...",
@@ -120,37 +155,49 @@ const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
 
       {/* 地面 */}
       <div
-        className="dither absolute inset-x-0 bottom-0 h-[30px] border-t-[3px] border-black"
-        style={{ "--dither-a": groundShade, "--dither-b": ground } as CSSProperties}
+        className="dither absolute inset-x-0 bottom-0 border-t-[3px] border-black"
+        style={
+          {
+            height: groundH,
+            "--dither-a": groundShade,
+            "--dither-b": ground,
+          } as CSSProperties
+        }
       />
 
       {/* 吃土：地上揚起的塵 */}
       {junk &&
-        [0, 1, 2, 3, 4].map((i) => (
+        [0, 1, 2, 3, 4, 5, 6].map((i) => (
           <span
             key={i}
-            className="dust-mote absolute bottom-[26px] w-[4px] h-[4px] bg-[#6B5430]"
-            style={{ left: `${16 + i * 17}%`, animationDelay: `${i * 0.55}s` }}
+            className="dust-mote absolute w-[4px] h-[4px] bg-[#6B5430]"
+            style={{
+              bottom: groundH - 4,
+              left: `${12 + i * 12}%`,
+              animationDelay: `${i * 0.42}s`,
+            }}
             aria-hidden
           />
         ))}
 
-      {/* 小雞。腳底畫在 y=55（cell 64px、2 倍放大 → 底部空 16px），
-          所以 bottom 用 -16px 讓她真的踩在地面線上。 */}
-      <div className="absolute inset-x-0 bottom-[14px] flex justify-center">
+      {/* 小雞。bottom 是算出來的，不是喬出來的 —— 見檔頭。 */}
+      <div
+        className="absolute inset-x-0 flex justify-center"
+        style={{ bottom: spriteBottom }}
+      >
         <div className="relative">
           {!dead && (
             <span
-              className="absolute left-1/2 -translate-x-1/2 bottom-[16px] w-[60px] h-[6px] bg-black/25"
+              className="absolute left-1/2 -translate-x-1/2 bg-black/25"
+              style={{ bottom: footGap - 4, width: sprite * 0.48, height: 6 }}
               aria-hidden
             />
           )}
 
-          {/* dead 的兩格只有 1px 起伏、而且下緣會陷進地面 →
-              用 ghost-float 把她抬起來飄。其他狀態一律不加 CSS 位移，
-              免得跟畫好的動作打架。 */}
+          {/* 只有 dead 加 CSS 位移：那兩格只有 1px 起伏，而且下緣會陷進地面。
+              其他狀態你都畫好動作了，外掛的位移只會跟畫好的打架。 */}
           <div className={dead ? "ghost-float" : undefined}>
-            <PetSprite mood={mood} streak={streak} size={128} />
+            <PetSprite mood={mood} streak={streak} size={sprite} />
           </div>
         </div>
       </div>
@@ -162,12 +209,12 @@ const PetStage = forwardRef<HTMLDivElement, Props>(function PetStage(
 
       {/* 角標 */}
       {junk && (
-        <div className="absolute top-2 left-2 text-[10px] font-black px-2 py-1 bg-[#BB0015] text-white border-2 border-black">
+        <div className="absolute top-3 left-3 text-[11px] font-black px-2.5 py-1 bg-[#BB0015] text-white border-2 border-black">
           吃土中…
         </div>
       )}
       {dead && (
-        <div className="absolute top-2 left-2 text-[10px] font-black px-2 py-1 bg-white text-black border-2 border-black">
+        <div className="absolute top-3 left-3 text-[11px] font-black px-2.5 py-1 bg-white text-black border-2 border-black">
           復活進度 {reviveProgress}/{reviveDays}
         </div>
       )}
