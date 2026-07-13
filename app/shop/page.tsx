@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Sort from "./_components/ProductSort";
-import CartIcon from "./_components/CartIcon";
 import SidebarFilter from "./_components/Sidebar";
 import Searchbar from "./_components/Searchbar";
 import CategoryFilter from "./_components/CategoryFilter";
@@ -25,8 +24,8 @@ export default function ShopPage() {
         
         {/* 頂層 2 欄：麵包屑與搜尋欄 */}
         <div className="flex gap-10 mb-4">
-          <div className="w-64 flex-shrink-0">
-            <p className="font-semibold text-black pt-2">首頁 / 商品列表</p>
+          <div className="flex w-64 flex-shrink-0 items-center justify-center">
+            <p className="text-xl font-semibold text-black pt-2">首頁 / 商品列表</p>
           </div>
           {/* 確保這一塊的寬度和下方的 flex-1 完全同步 */}
           <div className="flex-1 flex items-center gap-4">
