@@ -11,28 +11,30 @@ import Image from "next/image";
 import Container from "../_components/container";
 import loginAd from "@/public/user/login.png";
 
-export default function Login() {
+import { loginSchema } from "@/validations/validate";
+import { zodResolver } from "@hookform/resolvers/zod";
 
+export default function Login() {
   const router = useRouter();
   const { login } = useUser();
 
   const [loginError, setLoginError] = useState(false); // 登入錯誤處理
 
-  const [shakeEmail, setShakeEmail] = useState(false); // Email 欄位錯誤特效
+  const [shakeAccount, setShakeAccount] = useState(false); // Email 欄位錯誤特效
   const [shakePassword, setShakePassword] = useState(false); // Password 欄位錯誤特效
   const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
 
   // RHF有錯誤訊息時觸發晃動
   const onError = (errors: any) => {
-    if (errors.email) {
-      setShakeEmail(true);
-      setTimeout(() => setShakeEmail(false), 400); // 0.4秒動畫跑完後，關掉開關
+    if (errors.account) {
+      setShakeAccount(true);
+      setTimeout(() => setShakeAccount(false), 400); // 0.4秒動畫跑完後，關掉開關
     }
     if (errors.password) {
       setShakePassword(true);
       setTimeout(() => setShakePassword(false), 400); // 0.4秒後關掉
     }
-  };
+  }
 
   // 使用 RHF
   const {
@@ -40,16 +42,16 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: { email: "", password: "" },
+    resolver: zodResolver(loginSchema),
+    defaultValues: { account: "", password: "" },
   });
 
   // 表單送出
   const onSubmit = (data: any) => {
-    alert(123)
     if (submit) return; // 防止快速重複點擊
     setLoginError(false); // 登入中特效
     setSubmit(true);
-    const account = data.email;
+    const account = data.account;
     const password = data.password;
 
     // 模擬登入
@@ -92,24 +94,34 @@ export default function Login() {
                 電子郵件
               </label>
               <input
-                {...register("email", { required: "這是必填欄位" })}
-                className={`${errors.email ? "border-red-500" : ""} ${shakeEmail ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
+                {...register("account")}
+                className={`${errors.account ? "border-red-500" : ""} ${shakeAccount ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
                 type="text"
                 id="email"
                 placeholder="請輸入電子郵件"
               />
+              {errors.account && (
+                <p className="text-red-500 text-sm mt-1 w-90 text-left">
+                  {String(errors.account.message)}
+                </p>
+              )}
             </div>
             <div className="flex flex-col items-start mb-5">
               <label className="text-[20px] mb-2" htmlFor="password">
                 密碼
               </label>
               <input
-                {...register("password", { required: "必填" })}
+                {...register("password")}
                 className={`${errors.password ? "border-red-500" : ""} ${shakePassword ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
                 type="password"
                 id="password"
-                placeholder="請輸入密碼"
+                placeholder="密碼需要 6 個字元以上，且包含數字與英文"
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1 w-90 text-left">
+                  {String(errors.password.message)}
+                </p>
+              )}
             </div>
             <div className="flex justify-between w-90 mb-5">
               <p
@@ -125,8 +137,7 @@ export default function Login() {
               </Link>
             </div>
             <button
-              onClick={() => {
-              }}
+              onClick={() => {}}
               type="submit"
               disabled={submit}
               className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}

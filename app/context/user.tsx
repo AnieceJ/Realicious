@@ -42,7 +42,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const login = (account: string, password: string) => {
     // 方便測試用，之後要加格式判斷，傳到後端驗證，後端回傳boolean
-    if (account === "123" && password === "123") {
+    if (account === "123@gmail.com" && password === "zxc123") {
       Cookies.set("token", FAKE_TOKEN, { expires: 1 });
       Cookies.set("user", JSON.stringify(FAKE_USER), { expires: 1 });
       setUser(FAKE_USER);
