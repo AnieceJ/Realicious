@@ -4,22 +4,6 @@ import { createContext, useContext, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
-const FAKE_USER = {
-  id: "1",
-  account: "test@example.com",
-  role: "11",
-  nick_name: "福利熊",
-  avatar: "123",
-};
-const FAKE_USER_INIT = {
-  id: "",
-  account: "",
-  role: "",
-  nick_name: "",
-  avatar: "",
-};
-const FAKE_TOKEN = "mock-jwt-token-xyz";
-
 interface User {
   id: string;
   account: string;
@@ -27,40 +11,90 @@ interface User {
   nick_name: string;
   avatar: string;
 }
+
 interface UserContextType {
   user: User;
-  login: (account: string, password: string) => boolean;
+  login: (account: string, password: string) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 }
+
+const FAKE_USER_INIT: User = {
+  id: "",
+  account: "",
+  role: "",
+  nick_name: "",
+  avatar: "",
+};
 
 const UserContext = createContext<UserContextType | null>(null);
 UserContext.displayName = "UserContext";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user";
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [user, setUser] = useState<User>(FAKE_USER_INIT);
 
-  const login = (account: string, password: string) => {
-    // 方便測試用，之後要加格式判斷，傳到後端驗證，後端回傳boolean
-    if (account === "123@gmail.com" && password === "zxc123") {
-      Cookies.set("token", FAKE_TOKEN, { expires: 1 });
-      Cookies.set("user", JSON.stringify(FAKE_USER), { expires: 1 });
-      setUser(FAKE_USER);
-      router.refresh()
-      return true;
+  // 🔄 改用 Lazy Initial State：只在組件掛載時執行一次
+  const [user, setUser] = useState<User>(() => {
+    // 因為在 Next.js (SSR) 環境下，伺服器端渲染時沒有 window 或 document (Cookie)
+    // 所以要先確保這段代碼是在瀏覽器端執行
+    if (typeof window !== "undefined") {
+      const savedUser = Cookies.get("user");
+      if (savedUser) {
+        try {
+          return JSON.parse(savedUser);
+        } catch (e) {
+          console.error("解析 Cookie 中的使用者資料失敗", e);
+        }
+      }
     }
-    return false;
+    return FAKE_USER_INIT; // 如果沒有 Cookie 或解析失敗，就用初始值
+  });
+
+  // 🟢 登入 (純粹負責發送 fetch 給後端)
+  const login = async (account: string, password: string) => {
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ account, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // 驗證成功：寫入 Cookie 並更新狀態
+        Cookies.set("token", data.token, { expires: 1 });
+        Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+        
+        setUser(data.user);
+        
+        router.refresh(); 
+        return { success: true, message: "登入成功" };
+      } else {
+        // 後端驗證失敗（由後端決定錯誤訊息，例如：密碼錯誤、帳號不存在）
+        return { success: false, message: data.message || "登入失敗" };
+      }
+    } catch (error) {
+      console.error("登入 API 串接失敗:", error);
+      return { success: false, message: "伺服器連線失敗，請稍後再試" };
+    }
   };
+
+  // 🔴 登出
   const logout = () => {
     const result = confirm("確定要登出嗎？");
     if (result) {
       Cookies.remove("token");
       Cookies.remove("user");
       setUser(FAKE_USER_INIT);
+      
+      fetch(`${API_URL}/logout`, { method: "POST" }).catch(console.error);
+
       router.push("/user/login");
       router.refresh();
-    } else {
-      return;
     }
   };
 
@@ -70,11 +104,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     </UserContext.Provider>
   );
 }
+
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
     throw Error("it must be used within UserProvider");
   }
-
   return context;
 };
