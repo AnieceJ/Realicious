@@ -24,3 +24,8 @@ export async function getProducts(params?: {
   const res = await fetch(`${API_BASE}/products?${query}`);
   return res.json();
 }
+
+export async function getProductById(id: string) {
+  const res = await fetch(`${API_BASE}/products/${id}`);
+  return res.json();
+}

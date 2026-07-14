@@ -17,15 +17,25 @@ export default function ShopPage() {
   const [sortId, setSortId] = useState("")
   const [minPrice, setMinPrice] = useState(0)
   const [maxPrice, setMaxPrice] = useState(5000)
+  const [filters, setFilters] = useState<Record<string, boolean>>({ onSale: false, inStock: false })
 
   const sortedProducts = useMemo(() => {
-    const list = [...filteredProducts].filter(
-      (p) => p.price >= minPrice && p.price <= maxPrice
-    );
+    let list = [...filteredProducts];
+
+    // 價格過濾
+    list = list.filter((p) => p.price >= minPrice && p.price <= maxPrice);
+
+    // 特價中
+    if (filters.onSale) list = list.filter((p) => p.discount < 1);
+
+    // 只顯示有貨
+    if (filters.inStock) list = list.filter((p) => p.stock_qty > 0);
+
+    // 排序
     if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
     if (sortId === "price_high") list.sort((a, b) => b.price - a.price);
     return list;
-  }, [filteredProducts, sortId, minPrice, maxPrice]);
+  }, [filteredProducts, sortId, minPrice, maxPrice, filters]);
 
 // 初次載入全部商品
   useEffect(() => {
@@ -73,7 +83,7 @@ export default function ShopPage() {
         {/* 主內容 2 欄 */}
         <div className="flex gap-15">
           <div className="w-64 flex-shrink-0">
-            <SidebarFilter activeCategory={categoryId} onCategoryChange={(id)=>{ setCategoryId(id)}} onPriceChange={(min, max) => { setMinPrice(min); setMaxPrice(max) }}/>
+            <SidebarFilter activeCategory={categoryId} onCategoryChange={(id)=>{ setCategoryId(id)}} onPriceChange={(min, max) => { setMinPrice(min); setMaxPrice(max) }} onFilterChange={(f) => setFilters(f)}/>
           </div>
 
           {/* 右側主內容區 */}

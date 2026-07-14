@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type SidebarFilterProps = {
   activeCategory: string;
   onCategoryChange: (categoryId: string) => void;
   onPriceChange: (min: number, max: number) => void;
+  onFilterChange: (filters: Record<string, boolean>) => void;
 };
 
-export default function SidebarFilter({ activeCategory, onCategoryChange, onPriceChange }: SidebarFilterProps) {
+export default function SidebarFilter({ activeCategory, onCategoryChange, onPriceChange, onFilterChange }: SidebarFilterProps) {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
   const [minPriceStr, setMinPriceStr] = useState("0");
@@ -16,8 +17,11 @@ export default function SidebarFilter({ activeCategory, onCategoryChange, onPric
   const [filters, setFilters] = useState<Record<string, boolean>>({
     onSale: false,
     inStock: false,
-    isFavorite: false,
   });
+
+  useEffect(() => {
+    onFilterChange(filters);
+  }, [filters]);
 
   const toggleFilter = (key: string) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -221,25 +225,6 @@ export default function SidebarFilter({ activeCategory, onCategoryChange, onPric
             )}
           </div>
           <span className="group-hover:text-[#3D2419]/80">只顯示有貨</span>
-        </label>
-
-        {/* 只顯示收藏 */}
-        <label className="flex items-center gap-4 text-lg cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={filters.isFavorite}
-            onChange={() => toggleFilter("isFavorite")}
-            className="sr-only"
-          />
-          <div
-            className={`w-6 h-6 border-[3px] border-[#3D2419] rounded-md transition-all flex items-center justify-center shadow-[2px_2px_0px_0px_#3D2419]
-            ${filters.isFavorite ? "bg-[#A8E6CF]" : "bg-white"}`}
-          >
-            {filters.isFavorite && (
-              <div className="w-2 h-2 bg-[#3D2419] rounded-sm" />
-            )}
-          </div>
-          <span className="group-hover:text-[#3D2419]/80">只顯示收藏</span>
         </label>
       </div>
     </div>
