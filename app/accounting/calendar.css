@@ -1,0 +1,139 @@
+/* react-day-picker 換上 Realicious 設計規範
+   白底 ｜ #E3E3E3 ｜ 主紅 #BB0015 ｜ 主黃 #FFD45C ｜ 純黑邊
+   在 BudgetCalendar.tsx 於 react-day-picker/style.css 之後 import，會蓋過預設 */
+
+.rdp-root {
+  margin: 0;
+  --rdp-day-width: 38px;
+  --rdp-day-height: 38px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* 標題列：左右箭頭貼兩側、月份置中，中間留白 */
+.rdp-nav {
+  position: static;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+}
+.rdp-month_caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 15px;
+  margin: 0;
+  height: 32px;
+}
+.rdp-months,
+.rdp-month {
+  width: 100%;
+}
+.rdp-month_grid {
+  width: 100%;
+  margin-top: 14px;
+}
+/* 讓 caption 的絕對定位有參考點 */
+.rdp-month > .rdp-month_caption,
+.rdp-month {
+  position: relative;
+}
+.rdp-button_previous,
+.rdp-button_next {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #000;
+  background: #fff;
+  box-shadow: 0 4px 0 #000;
+  border-radius: 0;
+  transition: transform 0.08s;
+}
+.rdp-button_previous:hover,
+.rdp-button_next:hover {
+  background: #ffd45c;
+}
+.rdp-button_previous:active,
+.rdp-button_next:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+.rdp-chevron {
+  fill: #000;
+}
+
+/* 星期列 */
+.rdp-weekday {
+  color: #bb0015;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* 每一格 */
+.rdp-day_button {
+  border-radius: 0;
+  border: 2px solid transparent;
+  font-weight: 700;
+  color: #000;
+}
+.rdp-day_button:hover {
+  border-color: #000;
+  background: #e3e3e3;
+}
+.rdp-outside .rdp-day_button {
+  color: rgba(0, 0, 0, 0.25);
+}
+
+/* 今天：紅字 */
+.rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: #bb0015;
+}
+
+/* 已選取：黃底黑邊 */
+.rdp-selected .rdp-day_button {
+  background: #ffd45c !important;
+  color: #000 !important;
+  border: 2px solid #000;
+}
+
+/* 有支出（紅點）/ 有收入（黑點） */
+.day-spend,
+.day-income {
+  position: relative;
+}
+.day-spend::after,
+.day-income::after {
+  content: "";
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border: 1px solid #000;
+  z-index: 1;
+}
+.day-spend::after {
+  background: #bb0015;
+}
+.day-income::after {
+  background: #000;
+}
+
+/* 鍵盤 focus */
+.rdp-day_button:focus-visible {
+  outline: 4px solid #ffd45c;
+  outline-offset: -2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rdp * {
+    transition: none !important;
+  }
+}

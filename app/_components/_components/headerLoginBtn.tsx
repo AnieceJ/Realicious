@@ -1,7 +1,6 @@
 "use client";
 
 import Cookies from "js-cookie";
-import {useRouter} from 'next/navigation'
 
 import UserSidebar from "./userSidebar";
 import ChatroomSidebar from "./chatroomSidebar";
@@ -11,13 +10,14 @@ import { faUser } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link"
 
 interface HeaderLoginBtnProps{
-  className?:string
+  token:boolean
+  className?:string,
 }
 
-export default function HeaderLoginBtn({className}:HeaderLoginBtnProps) {
+
+export default function HeaderLoginBtn({className ,token}:HeaderLoginBtnProps) {
 // 用有沒有token來判斷是否登入，接後端後是需求或安全性可能需要更改判斷條件
-  const token = (Cookies.get("token") ? true :false)
-  const router = useRouter()
+  // const token = (Cookies.get("token") ? true :false)
 
   return (
     <div className={`text-black ${className}`}>
