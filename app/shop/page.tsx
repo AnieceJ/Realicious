@@ -10,22 +10,28 @@ import ProductCard from "./_components/ProductCard";
 import { getProducts, type Product } from "@/lib/shop/product";
 
 export default function ShopPage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categoryId, setCategoryId] = useState("")
   const [keyword, setKeyword] = useState("")
 
-// 取得商品資料副作用
+// 初次載入全部商品
   useEffect(() => {
     getProducts().then((res) => {
       console.log("API 回傳:", res);
       console.log("第一筆:", res.data?.[0]);
-      if (res.success) setProducts(res.data);
+      if (res.success) {
+        setAllProducts(res.data);
+        setFilteredProducts(res.data);
+      }
     });
   }, []);
 
-// 篩選分類副作用
+// 篩選時重新撈資料
   useEffect(()=>{
-    getProducts({category_id: categoryId, keyword}).then((res)=>{if(res.success) setProducts(res.data)})
+    getProducts({category_id: categoryId, keyword}).then((res)=>{
+      if(res.success) setFilteredProducts(res.data)
+    })
   }, [categoryId, keyword])
 
   return (
@@ -41,7 +47,7 @@ export default function ShopPage() {
           </div>
           <div className="flex-1 flex items-center gap-4">
             <div className="flex-1">
-              <Searchbar />
+              <Searchbar onSearch={(keyword) => setKeyword(keyword)} />
             </div>
             <div className="flex-shrink-0">
               <Sort />
@@ -63,14 +69,14 @@ export default function ShopPage() {
 
             {/* 推薦商品區塊：外層強制撐滿寬度 */}
             <div className="w-full">
-              {products.length > 0 && (
-                <FeaturedProductSection products={products} />
+              {allProducts.length > 0 && (
+                <FeaturedProductSection products={allProducts} />
               )}
             </div>
 
             {/* 商品網格 */}
             <div className="grid grid-cols-3 gap-8">
-              {products.map((p) => (
+              {filteredProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
