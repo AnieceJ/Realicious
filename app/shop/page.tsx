@@ -59,7 +59,10 @@ export default function ShopPage() {
               <Searchbar onSearch={(keyword) => setKeyword(keyword)} />
             </div>
             <div className="flex-shrink-0">
-              <Sort onSort={(id) => setSortId(id)} />
+              <Sort onSort={(id) => {
+                setSortId(id);
+                if (id === "") setKeyword("");
+              }} />
             </div>
           </div>
         </div>
@@ -73,7 +76,7 @@ export default function ShopPage() {
           {/* 右側主內容區 */}
           <div className="flex-1 flex flex-col gap-4">
             <div>
-              <CategoryFilter />
+              <CategoryFilter activeKeyword={keyword} onTagClick={(kw) => setKeyword(kw)} />
             </div>
 
             {/* 推薦商品區塊：外層強制撐滿寬度 */}
