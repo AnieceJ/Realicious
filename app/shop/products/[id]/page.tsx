@@ -54,7 +54,7 @@ export default function ProductsPage() {
             </div>
             <div className="w-[80%]">
               <div className="ml-4 mb-4 mt-4">
-                <Hashtag />
+              <Hashtag productName={product.name} />
               </div>
               <div className="ml-4 mb-4 mt-6">
                 <span className="text-3xl">${product.price}</span>

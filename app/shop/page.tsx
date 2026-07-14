@@ -20,18 +20,11 @@ export default function ShopPage() {
   const [filters, setFilters] = useState<Record<string, boolean>>({ onSale: false, inStock: false })
 
   const sortedProducts = useMemo(() => {
-    let list = [...filteredProducts];
-
-    // 價格過濾
-    list = list.filter((p) => p.price >= minPrice && p.price <= maxPrice);
-
-    // 特價中
+    let list = [...filteredProducts].filter(
+      (p) => p.price >= minPrice && p.price <= maxPrice
+    );
     if (filters.onSale) list = list.filter((p) => p.discount < 1);
-
-    // 只顯示有貨
     if (filters.inStock) list = list.filter((p) => p.stock_qty > 0);
-
-    // 排序
     if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
     if (sortId === "price_high") list.sort((a, b) => b.price - a.price);
     return list;
@@ -39,7 +32,9 @@ export default function ShopPage() {
 
 // 初次載入全部商品
   useEffect(() => {
-    getProducts().then((res) => {
+    const urlKeyword = new URLSearchParams(window.location.search).get("keyword") || "";
+    setKeyword(urlKeyword);
+    getProducts({ keyword: urlKeyword }).then((res) => {
       console.log("API 回傳:", res);
       console.log("第一筆:", res.data?.[0]);
       if (res.success) {
