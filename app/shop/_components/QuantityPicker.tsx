@@ -30,7 +30,7 @@ export default function QuantityPicker({ max = 99, value, onChange }: { max?: nu
   return (
     <div className="flex items-center">
       <div className={btnClass} onClick={dec}>-</div>
-      <div className={numClass}>{qty}</div>
+      <div className={numClass}>{current}</div>
       <div className={btnClass} onClick={inc}>+</div>
     </div>
   );

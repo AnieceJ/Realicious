@@ -64,7 +64,7 @@ export default function ProductsPage() {
                 <SpecSelector />
               </div>
               <div className="flex items-center ml-4 mb-4 mt-6 gap-3">
-                <QuantityPicker value={qty} onChange={setQty} />
+                <QuantityPicker value={qty} onChange={setQty} max={product.stock_qty} />
                 <span>可購買數量: {product.stock_qty}</span>
               </div>
               <div className="flex ml-4 mb-4 mt-6 gap-3">
