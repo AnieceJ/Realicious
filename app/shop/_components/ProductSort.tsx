@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type SortOption = {
   id: string;
@@ -6,31 +6,44 @@ type SortOption = {
   badge?: string;
 };
 
-export default function SortDropdown() {
-  // 控制下拉選單是否開啟
-  const [isOpen, setIsOpen] = useState(false);
-  // 記錄當前選擇的排序方式
-  const [currentSort, setCurrentSort] = useState("排序方式");
+type ProductSortProps = {
+  onSort: (sortId: string) => void;
+};
 
-  // 排序選項資料，方便未來擴充
+export default function SortDropdown({ onSort }: ProductSortProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentSort, setCurrentSort] = useState("全部商品");
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const sortOptions: SortOption[] = [
+    { id: "", label: "全部商品" },
     { id: "popular", label: "銷量/熱門商品" },
     { id: "price_low", label: "價格：低 → 高" },
     { id: "price_high", label: "價格：高 → 低" },
   ];  
 
-  const handleSelect = (label:string) => {
-    setCurrentSort(label);
-    setIsOpen(false); // 選完自動關閉
+  const handleSelect = (option: SortOption) => {
+    setCurrentSort(option.label);
+    onSort(option.id);
+    setIsOpen(false);
   };
 
   return (
-    /* 排序按鈕與下拉選單容器 (需為 relative 方便定位) */
-    <div className="relative inline-block text-left">
+    <div ref={dropdownRef} className="relative inline-block text-left">
       {/* 排序主按鈕 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-44 px-4 py-2.5 
+        className="flex items-center justify-between w-44 px-4 py-2.5 whitespace-nowrap
                   bg-white text-[#3D2419] font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419] 
@@ -60,7 +73,7 @@ export default function SortDropdown() {
             {sortOptions.map((option) => (
               <button
                 key={option.id}
-                onClick={() => handleSelect(option.label)}
+                onClick={() => handleSelect(option)}
                 className="px-4 py-3 text-sm text-left hover:bg-[#FFD3B6] 
                           transition-colors border-b-2 border-[#3D2419]/10 
                           last:border-b-0 flex items-center justify-between cursor-pointer"

@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
 			},
 		];
 	},
+
+	// 手機測試用，允許某IP連接
+
+	allowedDevOrigins: ["192.168.63.112"],
 };
 
 export default nextConfig;

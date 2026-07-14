@@ -21,11 +21,16 @@ export default function CheckoutOrderList() {
           >
             <div className="flex flex-row items-center">
               <div className="bg-pink-300 w-20 h-20 flex items-center justify-center text-sm shrink-0">
-                  <span>商品照片</span>
+                <span>商品照片</span>
               </div>
-              <div className="ml-6">
-                <span className="font-bold text-xl">{item.name}</span>
-                <span className="text-gray-500 ml-2">x{item.qty}</span>
+              <div className="flex flex-col">
+                <div className="ml-6">
+                  <span className="font-bold text-xl">{item.name}</span>
+                  <span className="text-gray-500 ml-2">x{item.qty}</span>
+                </div>
+                <div className="ml-6">
+                  <span className="text-gray-700 text-sm">方案:[item.方案]</span>
+                </div>
               </div>
             </div>
             <span className="text-xl">${item.price}</span>
