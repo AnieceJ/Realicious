@@ -15,14 +15,17 @@ export default function ShopPage() {
   const [categoryId, setCategoryId] = useState("")
   const [keyword, setKeyword] = useState("")
   const [sortId, setSortId] = useState("")
+  const [minPrice, setMinPrice] = useState(0)
+  const [maxPrice, setMaxPrice] = useState(5000)
 
   const sortedProducts = useMemo(() => {
-    const list = [...filteredProducts];
+    const list = [...filteredProducts].filter(
+      (p) => p.price >= minPrice && p.price <= maxPrice
+    );
     if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
     if (sortId === "price_high") list.sort((a, b) => b.price - a.price);
-    // "popular" 或其他值保持 API 回傳順序（最新優先）
     return list;
-  }, [filteredProducts, sortId]);
+  }, [filteredProducts, sortId, minPrice, maxPrice]);
 
 // 初次載入全部商品
   useEffect(() => {
@@ -70,7 +73,7 @@ export default function ShopPage() {
         {/* 主內容 2 欄 */}
         <div className="flex gap-15">
           <div className="w-64 flex-shrink-0">
-            <SidebarFilter activeCategory={categoryId} onCategoryChange={(id)=>{ setCategoryId(id)}}/>
+            <SidebarFilter activeCategory={categoryId} onCategoryChange={(id)=>{ setCategoryId(id)}} onPriceChange={(min, max) => { setMinPrice(min); setMaxPrice(max) }}/>
           </div>
 
           {/* 右側主內容區 */}
