@@ -43,7 +43,7 @@ export default function SortDropdown({ onSort }: ProductSortProps) {
       {/* 排序主按鈕 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full px-4 py-2.5 
+        className="flex items-center justify-between w-44 px-4 py-2.5 whitespace-nowrap
                   bg-white text-[#3D2419] font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419] 

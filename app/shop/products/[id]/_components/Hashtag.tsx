@@ -22,12 +22,13 @@ export default function Hashtag({ productName }: HashtagProps) {
     productName.includes(tag.keyword)
   );
 
-  // 如果完全沒匹配，至少顯示預設標籤（例如第一個分類）
-  const displayTags = matchedTags.length > 0 ? matchedTags : keywordMap.slice(0, 2);
+  if (matchedTags.length === 0) {
+    return <div className="h-[38px]" />;
+  }
 
   return (
     <div className="flex gap-3">
-      {displayTags.map((tag) => (
+      {matchedTags.map((tag) => (
         <div key={tag.label}
           onClick={() => router.push(`/shop?keyword=${encodeURIComponent(tag.keyword)}`)}
           className="inline-flex items-center gap-1.5 px-3 py-1
