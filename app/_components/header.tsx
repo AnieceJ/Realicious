@@ -6,7 +6,11 @@ import Chatroom from "./_components/chatroom";
 
 export default function Header() {
 	return (
+<<<<<<< Updated upstream
 		<header className=" w-full h-15 bg-[#BB0015] text-white ">
+=======
+		<header className="w-full h-15 bg-page-red text-white">
+>>>>>>> Stashed changes
 			<div className="max-w-7xl mx-auto h-full px-5 flex items-center justify-between">
 				{/* Logo */}
 
@@ -26,14 +30,20 @@ export default function Header() {
 					>
 						文章
 					</Link>
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 					<Link
 						href="/shop"
 						className="px-4 py-3 font-medium hover:underline underline-offset-4"
 					>
 						商城
 					</Link>
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 					<Link
 						href="/accounting"
 						className="px-4 py-3 font-medium hover:underline underline-offset-4"

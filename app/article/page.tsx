@@ -163,9 +163,6 @@ export default function ArticlePage() {
 
 				{/* 文章列表 */}
 				<div className="bg-white p-6 border border-black">
-					<div className="flex justify-between items-center">
-						<h1 className="text-2xl font-bold">所有文章</h1>
-					</div>
 					<div className="flex flex-col">
 						{articles.length === 0 ? (
 							<p className="text-black text-center py-6">目前沒有任何文章。</p>
@@ -173,7 +170,7 @@ export default function ArticlePage() {
 							articles.map((art, idx) => (
 								<div
 									key={idx}
-									className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3"
+									className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3 first:-mt-3"
 								>
 									<div className="flex justify-between items-start">
 										<h3 className="font-bold text-lg text-slate-900">
@@ -214,7 +211,7 @@ export default function ArticlePage() {
 				<nav aria-label="Pagination" className="inline-flex shadow-xs">
 					<a
 						href="#"
-						className="relative inline-flex items-center px-2 py-2 bg-red-700 text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
+						className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
 					>
 						<span className="sr-only">Previous</span>
 						<ChevronLeftIcon aria-hidden="true" className="size-5" />
@@ -261,7 +258,7 @@ export default function ArticlePage() {
 					</a>
 					<a
 						href="#"
-						className="relative inline-flex items-center px-2 py-2 bg-red-700 text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
+						className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
 					>
 						<span className="sr-only">Next</span>
 						<ChevronRightIcon aria-hidden="true" className="size-5" />

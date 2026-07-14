@@ -42,6 +42,7 @@
 	--color-article-gray: #e8e8e8;
 	--color-button-yellow: #ffd45c;
 	--color-button-white: #fcf9f6;
+	--color-page-red: #bb0015;
 	--radius-sm: calc(var(--radius) * 0.6);
 	--radius-md: calc(var(--radius) * 0.8);
 	--radius-lg: var(--radius);

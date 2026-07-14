@@ -6,7 +6,7 @@ import ClientSideCustomEditor from "@/components/client-side-custom-editor";
 export default function Home() {
 	return (
 		<>
-			<div className="max-w-7xl mx-auto w-full flex flex-col bg-white border-black border-3">
+			<div className="mt-6 max-w-7xl mx-auto w-full flex flex-col bg-white border-black border-3">
 				<div className="w-full h-10 items-center bg-black"></div>
 				<div className="article-editor">
 					<ClientSideCustomEditor />
@@ -25,10 +25,10 @@ export default function Home() {
 			</div>
 			<div className="max-w-7xl mx-auto w-full flex gap-4 bg-white">
 				<div className="ml-auto flex gap-4">
-					<button className="mt-6 w-40 h-16 border-black border-2 bg-button-yellow text-2xl shadow-[4px_5px_0px_-1px_#000]">
+					<button className="mt-3 w-40 h-16 border-black border-2 bg-button-yellow text-2xl shadow-[4px_5px_0px_-1px_#000]">
 						➤ 捨棄
 					</button>
-					<button className="mt-6 w-40 h-16 border-black border-2 bg-red-700 text-white text-2xl shadow-[4px_5px_0px_-1px_#000]">
+					<button className="mt-3 w-40 h-16 border-black border-2 bg-page-red text-white text-2xl shadow-[4px_5px_0px_-1px_#000]">
 						➤ 發布
 					</button>
 				</div>
