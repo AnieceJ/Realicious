@@ -33,6 +33,12 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
             <QuantityPicker
               value={item.qty}
               onChange={(qty) => { updateQty(item.id, qty); onUpdate(); }}
+              onReachMin={() => {
+                if (window.confirm(`確定移除 ${item.name} 嗎？`)) {
+                  removeFromCart(item.id);
+                  onUpdate();
+                }
+              }}
             />
           </div>
           <div className="ml-15 mt-3">
@@ -44,7 +50,7 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
                 }
               }}
               className="flex flex-row w-fit items-center justify-between cursor-pointer
-                         active:translate-x-[1px] active:translate-y-[1px] transition-all duration-75"
+                        active:translate-x-[1px] active:translate-y-[1px] transition-all duration-75"
             >
               <svg
                 className="w-6 h-6 fill-[#3D2419] transition-colors hover:fill-red-500 mb-1"

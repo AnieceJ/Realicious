@@ -1,28 +1,27 @@
 import React from "react";
-import { useToast } from "../../../_components/Toast";
+import { useRouter } from "next/navigation";
+import { addToCart } from "@/lib/shop/cart";
 
 type PurchaseButtonProps = {
-  productName?: string;
-  qty?: number;
-  price?: number;
+  product: { id: number; name: string; price: number; main_img?: string };
+  qty: number;
 };
 
-export default function PurchaseButton({ productName = "商品", qty = 1, price = 0 }: PurchaseButtonProps) {
-  const { toastComponent, showToast } = useToast();
+export default function PurchaseButton({ product, qty }: PurchaseButtonProps) {
+  const router = useRouter();
 
   const handleClick = () => {
-    const total = qty * price;
+    const total = qty * product.price;
     const confirmed = window.confirm(
-      `確認購買以下商品？\n\n商品：${productName}\n數量：${qty}\n單價：$${price}\n總計：$${total}\n\n確定要前往結帳嗎？`
+      `確認購買以下商品？\n\n商品：${product.name}\n數量：${qty}\n單價：$${product.price}\n總計：$${total}\n\n確定要前往結帳嗎？`
     );
     if (confirmed) {
-      showToast(`已導向結帳頁面（總計 $${total}）`);
+      addToCart(product, qty);
+      router.push("/shop/checkout");
     }
   };
 
   return (
-    <>
-      {toastComponent}
     <div
       onClick={handleClick}
       className="flex items-center justify-center w-full h-14 px-4
@@ -35,6 +34,5 @@ export default function PurchaseButton({ productName = "商品", qty = 1, price 
     >
       立即購買
     </div>
-    </>
   );
 }

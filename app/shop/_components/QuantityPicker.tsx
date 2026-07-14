@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 
-export default function QuantityPicker({ max = 99, value, onChange }: { max?: number; value?: number; onChange?: (val: number) => void }) {
+export default function QuantityPicker({ max = 99, value, onChange, onReachMin }: { max?: number; value?: number; onChange?: (val: number) => void; onReachMin?: () => void }) {
   const [qty, setQty] = useState(1);
 
   const current = value ?? qty;
 
   const dec = () => {
-    const next = Math.max(1, current - 1);
+    if (current <= 1) {
+      if (onReachMin) onReachMin();
+      return;
+    }
+    const next = current - 1;
     if (onChange) onChange(next);
     else setQty(next);
   };

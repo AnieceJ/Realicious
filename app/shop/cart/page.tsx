@@ -54,7 +54,7 @@ export default function CartPage() {
           </div>
 
           <div className="w-[40%]">
-            <OrderSummary />
+            <OrderSummary items={items} />
           </div>
         </div>
       </div>
