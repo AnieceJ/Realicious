@@ -1,10 +1,26 @@
-import Link from "next/link";
+import Hero from "./_components/HeroSection";
+import ProductSection from "./_components/ProductSection";
+import AccountingSection from "./_components/AccountingSection";
+import ArticleSection from "./_components/ArticleSection";
 
 export default function HomePage() {
 	return (
-		<div className="space-y-6">
-			<h1 className="text-4xl font-extrabold tracking-tight">專案首頁</h1>
-			<p className="text-lg text-slate-600">首頁內容...待寫</p>
-		</div>
+		<>
+			<Hero />
+
+			<section className="py-24 bg-white">
+				<div className="max-w-7xl mx-auto px-5">
+					<ProductSection />
+				</div>
+			</section>
+
+			<AccountingSection />
+
+			<section className="py-24  bg-white">
+				<div className="max-w-7xl mx-auto px-5">
+					<ArticleSection />
+				</div>
+			</section>
+		</>
 	);
 }

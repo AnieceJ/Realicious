@@ -92,7 +92,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 
 	return (
 		<>
-			<div className="max-w-7xl mx-auto w-full p-3 ">
+			<div className="max-w-7xl mx-auto w-full p-3">
 				<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 bg-white border border-black">
 					<div className="flex items-center gap-2">
 						<Link href="/article">
