@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 type SortOption = {
   id: string;
@@ -11,13 +11,22 @@ type ProductSortProps = {
 };
 
 export default function SortDropdown({ onSort }: ProductSortProps) {
-  // 控制下拉選單是否開啟
   const [isOpen, setIsOpen] = useState(false);
-  // 記錄當前選擇的排序方式
-  const [currentSort, setCurrentSort] = useState("排序方式");
+  const [currentSort, setCurrentSort] = useState("全部商品");
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 排序選項資料，方便未來擴充
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const sortOptions: SortOption[] = [
+    { id: "", label: "全部商品" },
     { id: "popular", label: "銷量/熱門商品" },
     { id: "price_low", label: "價格：低 → 高" },
     { id: "price_high", label: "價格：高 → 低" },
@@ -30,8 +39,7 @@ export default function SortDropdown({ onSort }: ProductSortProps) {
   };
 
   return (
-    /* 排序按鈕與下拉選單容器 (需為 relative 方便定位) */
-    <div className="relative inline-block text-left">
+    <div ref={dropdownRef} className="relative inline-block text-left">
       {/* 排序主按鈕 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
