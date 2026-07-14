@@ -1,9 +1,18 @@
 import React from "react";
+import { addToCart } from "@/lib/shop/cart";
 
-export default function CartButtons({ productName = "商品" }: { productName?: string }) {
+type CartButtonsProps = {
+  product: { id: number; name: string; price: number; main_img?: string };
+  qty: number;
+};
+
+export default function CartButtons({ product, qty }: CartButtonsProps) {
   return (
     <div
-      onClick={() => alert(`已將 ${productName} 加入購物車`)}
+      onClick={() => {
+        addToCart(product, qty);
+        alert(`已將 ${product.name} x${qty} 加入購物車`);
+      }}
       className="flex items-center justify-center w-full h-14 px-4
                   bg-[#3D2419] text-white font-black text-lg tracking-wide
                   border-[3px] border-[#3D2419]

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
+import { addToCart } from "@/lib/shop/cart";
 
 interface FeaturedProductSectionProps {
   products: Product[];
@@ -110,7 +111,7 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
             ${currentProduct.price}
           </div>
           <button 
-            onClick={(e) => { e.stopPropagation(); alert(`已將 ${currentProduct.name} 加入購物車`); }}
+            onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); alert(`已將 ${currentProduct.name} 加入購物車`); }}
             className="px-4 py-2 bg-purple-400 hover:bg-purple-500 active:translate-x-[1px] active:translate-y-[1px] text-[#3D2419] font-bold border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] rounded-sm cursor-pointer"
           >
             加入購物車

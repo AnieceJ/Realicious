@@ -100,7 +100,7 @@ export default function ProductsPage() {
               <div className="flex flex-row items-center gap-3 w-full">
                 {/* 讓加入購物車按鈕完全延伸填滿左側 */}
                 <div className="flex-1">
-                  <CartButtons productName={product.name} />
+                  <CartButtons product={product} qty={qty} />
                 </div>
                 {/* 愛心按鈕保持方形緊貼在旁 */}
                 <div className="shrink-0">
