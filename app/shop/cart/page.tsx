@@ -1,17 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import OrderItem from "./_components/OrderItem";
 import OrderSummary from "./_components/OrderSummary";
 import EmptyCart from "./_components/EmptyCart";
 import { clearCart, getCartItems, type CartItem } from "@/lib/shop/cart";
 
-export default function page() {
-  const [items, setItems] = useState<CartItem[]>([]);
+export default function CartPage() {
+  const [items, setItems] = useState<CartItem[]>(() => getCartItems());
 
   const refresh = () => setItems([...getCartItems()]);
-
-  useEffect(() => { refresh(); }, []);
 
   return (
     <div className="relative min-h-screen">
@@ -37,8 +35,8 @@ export default function page() {
                   <button
                     onClick={() => { clearCart(); refresh(); }}
                     className="flex items-center gap-2 px-4 py-2 bg-white text-[#3D2419] font-bold text-sm
-                               border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
-                               hover:bg-red-50 transition-colors cursor-pointer"
+                              border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
+                              hover:bg-red-50 transition-colors cursor-pointer"
                   >
                     <svg className="w-5 h-5 fill-[#3D2419]" viewBox="0 0 24 24">
                       <path d="M9 3h6v2H9V3zm-4 4h14v2H5V7zm2 4h10v10H7V11zm2 2v5h2v-5H9zm4 0v5h2v-5h-2z" />
