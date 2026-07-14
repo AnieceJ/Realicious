@@ -8,7 +8,11 @@ import { ShoppingBasket } from "lucide-react";
 
 import HeaderLoginBtn from "./_components/headerLoginBtn";
 
-export default function Header (){
+interface HeaderProps{
+	token:boolean
+}
+
+export default function Header ({token}:HeaderProps){
 return (
   <header className="w-full h-15 bg-red-700 text-slate-100">
             <div className="max-w-7xl mx-auto h-full grid grid-cols-3 items-center">
@@ -43,7 +47,7 @@ return (
 
               <div className="flex items-center justify-end">
                 <ShoppingBasket className="h-6.25 w-7 mr-3" />
-                <HeaderLoginBtn></HeaderLoginBtn>
+                <HeaderLoginBtn token={token}></HeaderLoginBtn>
               </div>
             </div>
           </header>

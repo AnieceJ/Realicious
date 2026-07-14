@@ -1,24 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-
-const FAKE_USER = {
-  id: "1",
-  account: "test@example.com",
-  role: "11",
-  nick_name: "福利熊",
-  avatar: "123",
-};
-const FAKE_USER_INIT = {
-  id: "",
-  account: "",
-  role: "",
-  nick_name: "",
-  avatar: "",
-};
-const FAKE_TOKEN = "mock-jwt-token-xyz";
 
 interface User {
   id: string;
@@ -27,54 +11,154 @@ interface User {
   nick_name: string;
   avatar: string;
 }
+
 interface UserContextType {
   user: User;
-  login: (account: string, password: string) => boolean;
+  loading: boolean; // 🆕 增加一個 loading 狀態，避免後端驗證完前畫面閃爍
+  login: (
+    account: string,
+    password: string,
+  ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 }
+
+const FAKE_USER_INIT: User = {
+  id: "",
+  account: "",
+  role: "",
+  nick_name: "",
+  avatar: "",
+};
 
 const UserContext = createContext<UserContextType | null>(null);
 UserContext.displayName = "UserContext";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user";
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<User>(FAKE_USER_INIT);
+  const [loading, setLoading] = useState(true); // 🆕 預設為載入中
 
-  const login = (account: string, password: string) => {
-    // 方便測試用，之後要加格式判斷，傳到後端驗證，後端回傳boolean
-    if (account === "123" && password === "123") {
-      Cookies.set("token", FAKE_TOKEN, { expires: 1 });
-      Cookies.set("user", JSON.stringify(FAKE_USER), { expires: 1 });
-      setUser(FAKE_USER);
-      router.refresh()
-      return true;
-    }
-    return false;
+  // 封裝一個清除本地狀態的輔助函式
+  const handleLocalLogout = () => {
+    Cookies.remove("token");
+    Cookies.remove("user");
+    setUser(FAKE_USER_INIT);
   };
+
+  // 🆕 當網頁初始化、刷新時，主動去後端驗證 Token
+  useEffect(() => {
+    const checkAuth = async () => {
+      // 1. 🌟 新增：先檢查網址列上有沒有 Google 帶過來的 token
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenFromUrl = urlParams.get("token");
+
+        if (tokenFromUrl) {
+          // 有的話，立刻寫入 Cookie
+          Cookies.set("token", tokenFromUrl, { expires: 1 });
+          
+          // 清除網址列上的 ?token=xxx，保持網址美觀
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+          router.refresh()
+        }
+      }
+
+      // 2. 接著走你原本寫得非常棒的驗證邏輯
+      const token = Cookies.get("token");
+
+      // 如果連 Token Cookie 都沒有，代表根本沒登入，直接結束 loading
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // 🔄 向後端驗證當前 Token 是否有效
+        const res = await fetch(`${API_URL}/profile`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setUser(data.user);
+          Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+        } else {
+          handleLocalLogout();
+        }
+      } catch (error) {
+        console.error("驗證使用者狀態失敗:", error);
+        handleLocalLogout();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // 🟢 登入 (保持你原本的優良邏輯，微調 Authorization 的部分)
+  const login = async (account: string, password: string) => {
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ account, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        // 驗證成功：寫入 Cookie 並更新狀態
+        Cookies.set("token", data.token, { expires: 1 });
+        Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+
+        setUser(data.user);
+
+        router.refresh();
+        return { success: true, message: "登入成功" };
+      } else {
+        return { success: false, message: data.message || "登入失敗" };
+      }
+    } catch (error) {
+      console.error("登入 API 串接失敗:", error);
+      return { success: false, message: "伺服器連線失敗，請稍後再試" };
+    }
+  };
+
+  // 🔴 登出
   const logout = () => {
     const result = confirm("確定要登出嗎？");
     if (result) {
-      Cookies.remove("token");
-      Cookies.remove("user");
-      setUser(FAKE_USER_INIT);
+      handleLocalLogout();
+
+      fetch(`${API_URL}/logout`, { method: "POST" }).catch(console.error);
+
       router.push("/user/login");
       router.refresh();
-    } else {
-      return;
     }
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    // 🆕 把 loading 一併傳下去，讓切換路由或頂層組件可以判斷是否正在驗證中
+    <UserContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </UserContext.Provider>
   );
 }
+
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
     throw Error("it must be used within UserProvider");
   }
-
   return context;
 };

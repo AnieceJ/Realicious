@@ -99,29 +99,8 @@ export default function Account() {
               placeholder=""
             />
           </div>
-          <div className="flex flex-col items-start mb-5">
-            <label className="text-[20px] mb-2.5" htmlFor="email">
-              測試
-            </label>
-            <input
-              className="border w-90 h-10 text-[16px] px-2"
-              type="text"
-              id=""
-              placeholder=""
-            />
-          </div>
-          <div className="flex flex-col items-start mb-5">
-            <label className="text-[20px] mb-2.5" htmlFor="email">
-              測試
-            </label>
-            <input
-              className="border w-90 h-10 text-[16px] px-2"
-              type="text"
-              id=""
-              placeholder=""
-            />
-          </div>
-          <div className="flex w-full justify-end mt-8">
+          
+          <div className="flex w-full justify-start mt-8">
             <button className="border w-25 h-10 mr-8">修改</button>
             <button className="border w-25 h-10">送出</button>
           </div>
