@@ -17,6 +17,7 @@ export default function ProductsPage() {
   const params = useParams();
   const id = params.id as string;
   const [product, setProduct] = useState<Product | null>(null);
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     getProductById(id).then((res) => {
@@ -63,17 +64,17 @@ export default function ProductsPage() {
                 <SpecSelector />
               </div>
               <div className="flex items-center ml-4 mb-4 mt-6 gap-3">
-                <QuantityPicker />
+                <QuantityPicker value={qty} onChange={setQty} />
                 <span>可購買數量: {product.stock_qty}</span>
               </div>
               <div className="flex ml-4 mb-4 mt-6 gap-3">
-                <CartButtons />
+                <CartButtons productName={product.name} />
                 <div className="w-fit">
                 <Favorite />
                 </div>
               </div>
               <div className="flex ml-4 mb-4 mt-6 gap-3">
-                <PurchaseButton />
+                <PurchaseButton productName={product.name} qty={qty} price={product.price} />
               </div>
             </div>
           </div>
