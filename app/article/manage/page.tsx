@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/breadcrumb";
 
 interface SubCategory {
+	id: string;
 	sub_category_name: string;
 }
 
@@ -56,6 +57,17 @@ export default function ArticleManagePage() {
 	const [selectedSubCategory, setSelectedSubCategory] =
 		React.useState<string>("");
 
+	const fetchUserArticles = async (subCategoryId?: string) => {
+		const url = subCategoryId
+			? `/api/article/user-articles?user_id=1&sub_cat_id=${subCategoryId}`
+			: `/api/article/user-articles?user_id=1`;
+
+		const res = await fetch(url);
+		if (!res.ok) throw new Error("Fetch failed");
+		const data: UserArticlesResponse = await res.json();
+		setUserArticles(data.articles);
+	};
+
 	React.useEffect(() => {
 		const initAllData = async () => {
 			try {
@@ -63,13 +75,15 @@ export default function ArticleManagePage() {
 
 				const catResponse = await fetch("/api/article/categories");
 				if (!catResponse.ok) throw new Error("Fetch failed");
+
 				const catData: CategoriesResponse = await catResponse.json();
 				setCategories(catData.category);
 
-				const artResponse = await fetch(`/api/article/user-articles?user_id=1`);
-				if (!artResponse.ok) throw new Error("Fetch failed");
-				const artData: UserArticlesResponse = await artResponse.json();
-				setUserArticles(artData.articles);
+				await fetchUserArticles();
+				// const artResponse = await fetch(`/api/article/user-articles?user_id=1`);
+				// if (!artResponse.ok) throw new Error("Fetch failed");
+				// const artData: UserArticlesResponse = await artResponse.json();
+				// setUserArticles(artData.articles);
 			} catch (error) {
 				console.error("Error fetching categories:", error);
 			} finally {
@@ -85,7 +99,7 @@ export default function ArticleManagePage() {
 
 	return (
 		<>
-			<div className="max-w-7xl mx-auto w-full">
+			<div className="max-w-7xl mx-auto w-full pt-3">
 				<div className="flex items-center md:flex-row md:items-center justify-between gap-4 p-3 bg-white border border-black">
 					<div className="flex gap-4">
 						<Link href="/article">
@@ -96,8 +110,13 @@ export default function ArticleManagePage() {
 						</Link>
 						<Menubar className="h-10 bg-black text-slate-100 border border-slate-100 justify-start shrink-0">
 							<MenubarMenu>
-								<MenubarTrigger>
-									<Link href="/article/manage">我的全部文章</Link>
+								<MenubarTrigger
+									onClick={async () => {
+										setSelectedSubCategory("");
+										await fetchUserArticles();
+									}}
+								>
+									全部
 								</MenubarTrigger>
 							</MenubarMenu>
 							{loading ? (
@@ -111,13 +130,13 @@ export default function ArticleManagePage() {
 										<MenubarContent>
 											<MenubarRadioGroup
 												value={selectedSubCategory}
-												onValueChange={(value) => setSelectedSubCategory(value)}
+												onValueChange={async (value) => {
+													setSelectedSubCategory(value);
+													await fetchUserArticles(value);
+												}}
 											>
 												{cat.sub_category.map((sub) => (
-													<MenubarRadioItem
-														key={sub.sub_category_name}
-														value={sub.sub_category_name}
-													>
+													<MenubarRadioItem key={sub.id} value={sub.id}>
 														{sub.sub_category_name}
 													</MenubarRadioItem>
 												))}

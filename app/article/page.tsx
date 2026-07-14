@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/breadcrumb";
 
 interface SubCategory {
+	id: number;
 	sub_category_name: string;
 }
 
@@ -55,20 +56,26 @@ export default function ArticlePage() {
 	const [selectedSubCategory, setSelectedSubCategory] =
 		React.useState<string>("");
 
+	const fetchArticles = async (subCatId?: number) => {
+		let url = "/api/article/articles";
+		if (subCatId !== undefined) {
+			url += `?sub_cat_id=${subCatId}`;
+		}
+		const artResponse = await fetch(url);
+		const artData: ArticlesResponse = await artResponse.json();
+		setArticles(artData.article);
+	};
+
 	React.useEffect(() => {
 		const initAllData = async () => {
 			try {
 				setLoading(true);
-
 				const catResponse = await fetch("/api/article/categories");
 				if (!catResponse.ok) throw new Error("Fetch failed");
 				const catData: CategoriesResponse = await catResponse.json();
 				setCategories(catData.category);
 
-				const artResponse = await fetch("/api/article/articles");
-				if (!artResponse.ok) throw new Error("Fetch failed");
-				const artData: ArticlesResponse = await artResponse.json();
-				setArticles(artData.article);
+				await fetchArticles();
 			} catch (error) {
 				console.error("Error fetching categories:", error);
 			} finally {
@@ -78,13 +85,9 @@ export default function ArticlePage() {
 		initAllData();
 	}, []);
 
-	if (loading) {
-		return <div className="p-6 text-center">資料載入中，請稍候...</div>;
-	}
-
 	return (
 		<>
-			<div className="max-w-7xl mx-auto w-full">
+			<div className="max-w-7xl mx-auto w-full pt-4">
 				<div className="flex items-center w-full justify-between lg:flex-row md:flex-row md:items-center gap-4 p-3 bg-white border border-black">
 					<div className="flex gap-4 items-center">
 						<Link href="/">
@@ -95,8 +98,13 @@ export default function ArticlePage() {
 						</Link>
 						<Menubar className="h-10 bg-black text-slate-100 border border-slate-100 justify-start shrink-0">
 							<MenubarMenu>
-								<MenubarTrigger>
-									<Link href="/article">全部</Link>
+								<MenubarTrigger
+									onClick={() => {
+										setSelectedSubCategory("");
+										fetchArticles();
+									}}
+								>
+									全部
 								</MenubarTrigger>
 							</MenubarMenu>
 							{loading ? (
@@ -110,13 +118,13 @@ export default function ArticlePage() {
 										<MenubarContent>
 											<MenubarRadioGroup
 												value={selectedSubCategory}
-												onValueChange={(value) => setSelectedSubCategory(value)}
+												onValueChange={(value) => {
+													setSelectedSubCategory(value);
+													fetchArticles(Number(value));
+												}}
 											>
 												{cat.sub_category.map((sub) => (
-													<MenubarRadioItem
-														key={sub.sub_category_name}
-														value={sub.sub_category_name}
-													>
+													<MenubarRadioItem key={sub.id} value={String(sub.id)}>
 														{sub.sub_category_name}
 													</MenubarRadioItem>
 												))}
