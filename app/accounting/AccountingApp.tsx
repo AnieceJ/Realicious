@@ -80,40 +80,63 @@ function calcPet(txs: Tx[]) {
     return { hp: HP_MAX, streak: 0, alive: true, reviveProgress: 0, loggedToday: false };
   }
 
-  let hp = HP_MAX;
+let hp = HP_MAX;
+  let dead = false;   // 現在是不是死的
+  let run = 0;        // 死後連續記帳幾天（復活進度）
   let prev: Date | null = null;
 
   for (const k of logged) {
     const d = keyToDate(k);
+
     if (prev) {
       const gap = daysBetween(prev, d) - 1; // 中間斷了幾天
-      hp -= gap * HP_LOSS;
+      if (gap > 0) {
+        hp = Math.max(0, hp - gap * HP_LOSS);
+        run = 0;                   // 斷了 → 復活進度歸零
+        if (hp === 0) dead = true;
+      }
     }
-    hp = Math.min(HP_MAX, Math.max(0, hp) + HP_GAIN);
+
+    if (dead) {
+      // 死掉的時候 HP 卡在 0，要連續記帳 REVIVE_DAYS 天才復活
+      run++;
+      if (run >= REVIVE_DAYS) {
+        dead = false;
+        hp = HP_GAIN * REVIVE_DAYS; // 復活，HP 回到 60
+        run = 0;
+      }
+    } else {
+      hp = Math.min(HP_MAX, hp + HP_GAIN);
+    }
+
+    prev = d;
   }
 
   // 從最後一次記帳到今天，中間斷掉的天數也要扣
   const last = keyToDate(logged[logged.length - 1]);
   const gapToToday = daysBetween(last, today);
-  if (gapToToday > 0) hp -= gapToToday * HP_LOSS;
-  hp = Math.max(0, Math.min(HP_MAX, hp));
+  if (gapToToday > 0) {
+    hp = Math.max(0, hp - gapToToday * HP_LOSS);
+    if (gapToToday >= 2) run = 0; // 昨天也沒記 → 復活進度歸零（今天還沒過完，不算）
+    if (hp === 0) dead = true;
+  }
 
   // 連續天數（從今天或昨天往回數）
   let streak = 0;
   const set = new Set(logged);
   const cur = new Date(today);
-  if (!set.has(toKey(cur))) cur.setDate(cur.getDate() - 1); // 今天沒記就從昨天算
+  if (!set.has(toKey(cur))) cur.setDate(cur.getDate() - 1);
   while (set.has(toKey(cur))) {
     streak++;
     cur.setDate(cur.getDate() - 1);
   }
 
-  const alive = hp > 0;
+  const alive = !dead;
   return {
     hp,
     streak,
     alive,
-    reviveProgress: alive ? 0 : Math.min(streak, REVIVE_DAYS),
+    reviveProgress: dead ? Math.min(run, REVIVE_DAYS) : 0,
     loggedToday: set.has(toKey(today)),
   };
 }
@@ -507,10 +530,7 @@ const addTx = async () => {
                   ✎
                 </button>
                 <button
-                  onClick={() => {
-                    setShowAdd(false);
-                    setEditingId(null);
-                  }}
+                  onClick={() => delTx(tx.id)}
                   aria-label="刪除"
                   className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-[#BB0015] text-[16px]"
                 >
