@@ -4,12 +4,13 @@ export default function CartButtons({ productName = "商品" }: { productName?: 
   return (
     <div
       onClick={() => alert(`已將 ${productName} 加入購物車`)}
-      className="flex items-center justify-center px-4 py-3 h-12 w-full
-                  bg-[#3D2419] text-white font-bold text-sm
+      className="flex items-center justify-center w-full h-14 px-4
+                  bg-[#3D2419] text-white font-black text-lg tracking-wide
                   border-[3px] border-[#3D2419]
-                  shadow-[3px_3px_0px_0px_#3D2419]
+                  shadow-[3px_3px_0px_0px_rgba(61,36,25,0.4)]
+                  hover:bg-[#523324]
                   active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
-                  transition-all duration-75 cursor-pointer select-none"
+                  transition-all duration-100 cursor-pointer select-none text-center"
     >
       加入購物車
     </div>
