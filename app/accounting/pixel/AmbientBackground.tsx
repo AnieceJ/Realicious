@@ -38,8 +38,10 @@ export default function AmbientBackground({
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // 用 ref 讀 props，動畫迴圈就不用因為 props 變動而重啟
-  const props = useRef({ mood, intensity, danger });
+const props = useRef({ mood, intensity, danger });
+useEffect(() => {
   props.current = { mood, intensity, danger };
+}, [mood, intensity, danger]);
 
   useEffect(() => {
     const canvas = canvasRef.current;

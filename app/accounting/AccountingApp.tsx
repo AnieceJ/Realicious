@@ -6,6 +6,16 @@ import ChickGround, { groundClearance } from "./pixel/ChickGround";
 import AmbientBackground from "./pixel/AmbientBackground";
 import CoinBurst, { useCountUp } from "./pixel/CoinBurst";
 import type { PetMood } from "./pixel/PixelSpriteSheet";
+import {
+  type Tx,
+  fetchTxs,
+  fetchBudget,
+  fetchPet,
+  createTx,
+  deleteTx,
+  saveBudget,
+  savePet,
+} from "./api";
 
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
@@ -32,15 +42,6 @@ const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"]; // 對應 s
 const SPRITE = 128;
 const GROUND_H = 44;
 
-type Tx = {
-  id: string;
-  date: string; // "2025-05-15"
-  category: string;
-  name: string;
-  amount: number;
-  type: "income" | "expense";
-};
-
 const CATS: Record<string, { emoji: string; type: "income" | "expense" }> = {
   餐飲: { emoji: "🍔", type: "expense" },
   飲品: { emoji: "☕", type: "expense" },
@@ -51,10 +52,6 @@ const CATS: Record<string, { emoji: string; type: "income" | "expense" }> = {
   薪資: { emoji: "💰", type: "income" },
   其他收入: { emoji: "🧧", type: "income" },
 };
-
-const TX_KEY = "realicious-tx";
-const BUDGET_KEY = "realicious-budget";
-const NAME_KEY = "realicious-petname";
 const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
 
 const toKey = (d: Date) =>
@@ -146,38 +143,40 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [budgetInput, setBudgetInput] = useState("500");
 
   useEffect(() => {
-    try {
-      const t = localStorage.getItem(TX_KEY);
-      if (t) setTxs(JSON.parse(t));
-      const b = localStorage.getItem(BUDGET_KEY);
-      if (b) {
-        setBudget(Number(b));
-        setBudgetInput(b);
+    (async () => {
+      try {
+        const [t, b, p] = await Promise.all([fetchTxs(), fetchBudget(), fetchPet()]);
+        setTxs(t);
+        setBudget(b.budget);
+        setBudgetInput(String(b.budget));
+        setJunkMode(b.junkMode);
+        setPetName(p.petName);
+        setNameInput(p.petName);
+      } catch (e) {
+        console.error("[lia] 載入失敗", e);
+      } finally {
+        setLoaded(true);
       }
-      const n = localStorage.getItem(NAME_KEY);
-      if (n) {
-        setPetName(n);
-        setNameInput(n);
-      }
-    } catch {}
-    setLoaded(true);
+    })();
   }, []);
 
-  useEffect(() => {
-    if (loaded) localStorage.setItem(TX_KEY, JSON.stringify(txs));
-  }, [txs, loaded]);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(BUDGET_KEY, String(budget));
-  }, [budget, loaded]);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(NAME_KEY, petName);
-  }, [petName, loaded]);
 
-  const saveName = () => {
+const saveName = async () => {
     const n = nameInput.trim().slice(0, 8);
-    if (n) setPetName(n);
-    else setNameInput(petName);
+    if (!n) {
+      setNameInput(petName);
+      setEditingName(false);
+      return;
+    }
+    setPetName(n);          // 先改畫面
     setEditingName(false);
+    try {
+      await savePet(n);
+    } catch (e) {
+      console.error("[lia] 改名失敗", e);
+      setPetName(petName);  // 失敗就回復
+      setNameInput(petName);
+    }
   };
 
   const pet = useMemo(() => calcPet(txs), [txs]);
@@ -211,20 +210,25 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
 
   const catsOfType = Object.keys(CATS).filter((k) => CATS[k].type === fType);
 
-  const addTx = () => {
+const addTx = async () => {
     const amt = Number(fAmt);
     if (!amt || amt <= 0) return;
-    setTxs((p) => [
-      {
-        id: uid(),
+
+    try {
+      const created = await createTx({
         date: selKey,
         category: fCat,
         name: fNote.trim() || fCat,
         amount: amt,
         type: fType,
-      },
-      ...p,
-    ]);
+      });
+      setTxs((p) => [created, ...p]);
+    } catch (e) {
+      console.error("[lia] 新增失敗", e);
+      alert("新增失敗");
+      return;
+    }
+
     setFAmt("");
     setFNote("");
     setShowAdd(false);
@@ -233,7 +237,18 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
     setJustFed(true);
     setTimeout(() => setJustFed(false), 1300);
   };
-  const delTx = (id: string) => setTxs((p) => p.filter((t) => t.id !== id));
+
+  const delTx = async (id: string) => {
+    const backup = txs;
+    setTxs((p) => p.filter((t) => t.id !== id)); // 先在畫面上拿掉，不要等
+    try {
+      await deleteTx(id);
+    } catch (e) {
+      console.error("[lia] 刪除失敗", e);
+      setTxs(backup); // 失敗就放回去
+      alert("刪除失敗");
+    }
+  };
 
   return (
     <div
@@ -405,6 +420,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               <button
                 onClick={() => {
                   setJunkMode(false);
+                  saveBudget({ junkMode: false }).catch((e) =>
+                    console.error("[lia] 吃土模式儲存失敗", e),
+                  );
                   setJunkDismissed(true);
                 }}
                 className="text-[11px] font-bold underline underline-offset-2 text-black/50"
@@ -575,8 +593,13 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               </button>
               <button
                 onClick={() => {
-                  const n = Number(budgetInput);
-                  if (n > 0) setBudget(n);
+              const n = Number(budgetInput);
+                if (n > 0) {
+                  setBudget(n);
+                  saveBudget({ budget: n }).catch((e) =>
+                    console.error("[lia] 預算儲存失敗", e),
+                  );
+                }
                   setShowBudget(false);
                   setJunkDismissed(false);
                 }}
@@ -604,7 +627,12 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               先不用
             </button>
             <button
-              onClick={() => setJunkMode(true)}
+              onClick={() => {
+                setJunkMode(true);
+                saveBudget({ junkMode: true }).catch((e) =>
+                  console.error("[lia] 吃土模式儲存失敗", e),
+                );
+              }}
               className="flex-1 border-2 border-black bg-[#BB0015] text-white py-2 text-[12px] font-black"
             >
               開啟
