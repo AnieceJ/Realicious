@@ -6,7 +6,11 @@ type SortOption = {
   badge?: string;
 };
 
-export default function SortDropdown() {
+type ProductSortProps = {
+  onSort: (sortId: string) => void;
+};
+
+export default function SortDropdown({ onSort }: ProductSortProps) {
   // 控制下拉選單是否開啟
   const [isOpen, setIsOpen] = useState(false);
   // 記錄當前選擇的排序方式
@@ -19,9 +23,10 @@ export default function SortDropdown() {
     { id: "price_high", label: "價格：高 → 低" },
   ];  
 
-  const handleSelect = (label:string) => {
-    setCurrentSort(label);
-    setIsOpen(false); // 選完自動關閉
+  const handleSelect = (option: SortOption) => {
+    setCurrentSort(option.label);
+    onSort(option.id);
+    setIsOpen(false);
   };
 
   return (
@@ -60,7 +65,7 @@ export default function SortDropdown() {
             {sortOptions.map((option) => (
               <button
                 key={option.id}
-                onClick={() => handleSelect(option.label)}
+                onClick={() => handleSelect(option)}
                 className="px-4 py-3 text-sm text-left hover:bg-[#FFD3B6] 
                           transition-colors border-b-2 border-[#3D2419]/10 
                           last:border-b-0 flex items-center justify-between cursor-pointer"

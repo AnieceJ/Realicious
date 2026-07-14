@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Breadcrumbs from "./_components/Breadcrumbs";
 import Sort from "./_components/ProductSort";
 import SidebarFilter from "./_components/Sidebar";
@@ -14,6 +14,15 @@ export default function ShopPage() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categoryId, setCategoryId] = useState("")
   const [keyword, setKeyword] = useState("")
+  const [sortId, setSortId] = useState("")
+
+  const sortedProducts = useMemo(() => {
+    const list = [...filteredProducts];
+    if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
+    if (sortId === "price_high") list.sort((a, b) => b.price - a.price);
+    // "popular" 或其他值保持 API 回傳順序（最新優先）
+    return list;
+  }, [filteredProducts, sortId]);
 
 // 初次載入全部商品
   useEffect(() => {
@@ -50,7 +59,7 @@ export default function ShopPage() {
               <Searchbar onSearch={(keyword) => setKeyword(keyword)} />
             </div>
             <div className="flex-shrink-0">
-              <Sort />
+              <Sort onSort={(id) => setSortId(id)} />
             </div>
           </div>
         </div>
@@ -76,7 +85,7 @@ export default function ShopPage() {
 
             {/* 商品網格 */}
             <div className="grid grid-cols-3 gap-8">
-              {filteredProducts.map((p) => (
+              {sortedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
