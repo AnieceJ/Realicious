@@ -150,8 +150,7 @@ export default function Login() {
 
           <h2 className="text-[26px]">--OR--</h2>
           <div className="mt-5">
-            <button className="w-40 h-12 mx-2 border">google</button>
-            <button className="w-40 h-12 mx-2 border">其他</button>
+            <Link href={'http://localhost:3001/user/auth/google'} className="w-40 h-12 mx-2 border">google</Link>
           </div>
           <Link
             className=" text-[20px] text-blue-600 mt-10 hover:bg-blue-100 active:bg-blue-800 active:text-white"

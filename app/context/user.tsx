@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +14,11 @@ interface User {
 
 interface UserContextType {
   user: User;
-  login: (account: string, password: string) => Promise<{ success: boolean; message: string }>;
+  loading: boolean; // 🆕 增加一個 loading 狀態，避免後端驗證完前畫面閃爍
+  login: (
+    account: string,
+    password: string,
+  ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
 }
 
@@ -33,25 +37,73 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const [user, setUser] = useState<User>(FAKE_USER_INIT);
+  const [loading, setLoading] = useState(true); // 🆕 預設為載入中
 
-  // 🔄 改用 Lazy Initial State：只在組件掛載時執行一次
-  const [user, setUser] = useState<User>(() => {
-    // 因為在 Next.js (SSR) 環境下，伺服器端渲染時沒有 window 或 document (Cookie)
-    // 所以要先確保這段代碼是在瀏覽器端執行
-    if (typeof window !== "undefined") {
-      const savedUser = Cookies.get("user");
-      if (savedUser) {
-        try {
-          return JSON.parse(savedUser);
-        } catch (e) {
-          console.error("解析 Cookie 中的使用者資料失敗", e);
+  // 封裝一個清除本地狀態的輔助函式
+  const handleLocalLogout = () => {
+    Cookies.remove("token");
+    Cookies.remove("user");
+    setUser(FAKE_USER_INIT);
+  };
+
+  // 🆕 當網頁初始化、刷新時，主動去後端驗證 Token
+  useEffect(() => {
+    const checkAuth = async () => {
+      // 1. 🌟 新增：先檢查網址列上有沒有 Google 帶過來的 token
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenFromUrl = urlParams.get("token");
+
+        if (tokenFromUrl) {
+          // 有的話，立刻寫入 Cookie
+          Cookies.set("token", tokenFromUrl, { expires: 1 });
+          
+          // 清除網址列上的 ?token=xxx，保持網址美觀
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+          router.refresh()
         }
       }
-    }
-    return FAKE_USER_INIT; // 如果沒有 Cookie 或解析失敗，就用初始值
-  });
 
-  // 🟢 登入 (純粹負責發送 fetch 給後端)
+      // 2. 接著走你原本寫得非常棒的驗證邏輯
+      const token = Cookies.get("token");
+
+      // 如果連 Token Cookie 都沒有，代表根本沒登入，直接結束 loading
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // 🔄 向後端驗證當前 Token 是否有效
+        const res = await fetch(`${API_URL}/profile`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setUser(data.user);
+          Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+        } else {
+          handleLocalLogout();
+        }
+      } catch (error) {
+        console.error("驗證使用者狀態失敗:", error);
+        handleLocalLogout();
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // 🟢 登入 (保持你原本的優良邏輯，微調 Authorization 的部分)
   const login = async (account: string, password: string) => {
     try {
       const res = await fetch(`${API_URL}/login`, {
@@ -68,13 +120,12 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         // 驗證成功：寫入 Cookie 並更新狀態
         Cookies.set("token", data.token, { expires: 1 });
         Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
-        
+
         setUser(data.user);
-        
-        router.refresh(); 
+
+        router.refresh();
         return { success: true, message: "登入成功" };
       } else {
-        // 後端驗證失敗（由後端決定錯誤訊息，例如：密碼錯誤、帳號不存在）
         return { success: false, message: data.message || "登入失敗" };
       }
     } catch (error) {
@@ -87,10 +138,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     const result = confirm("確定要登出嗎？");
     if (result) {
-      Cookies.remove("token");
-      Cookies.remove("user");
-      setUser(FAKE_USER_INIT);
-      
+      handleLocalLogout();
+
       fetch(`${API_URL}/logout`, { method: "POST" }).catch(console.error);
 
       router.push("/user/login");
@@ -99,7 +148,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    // 🆕 把 loading 一併傳下去，讓切換路由或頂層組件可以判斷是否正在驗證中
+    <UserContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </UserContext.Provider>
   );
