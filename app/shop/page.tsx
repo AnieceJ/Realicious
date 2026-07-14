@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Breadcrumbs from "./_components/Breadcrumbs";
 import Sort from "./_components/ProductSort";
 import SidebarFilter from "./_components/Sidebar";
@@ -10,10 +11,11 @@ import ProductCard from "./_components/ProductCard";
 import { getProducts, type Product } from "@/lib/shop/product";
 
 export default function ShopPage() {
+  const searchParams = useSearchParams();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categoryId, setCategoryId] = useState("")
-  const [keyword, setKeyword] = useState("")
+  const [keyword, setKeyword] = useState(searchParams.get("keyword") || "")
   const [sortId, setSortId] = useState("")
   const [minPrice, setMinPrice] = useState(0)
   const [maxPrice, setMaxPrice] = useState(5000)
@@ -30,17 +32,12 @@ export default function ShopPage() {
     return list;
   }, [filteredProducts, sortId, minPrice, maxPrice, filters]);
 
-// 初次載入全部商品
+// 初次載入
   useEffect(() => {
-    const urlKeyword = new URLSearchParams(window.location.search).get("keyword") || "";
-    setKeyword(urlKeyword);
-    getProducts({ keyword: urlKeyword }).then((res) => {
+    // 抓全部商品（推薦區用）
+    getProducts().then((res) => {
       console.log("API 回傳:", res);
-      console.log("第一筆:", res.data?.[0]);
-      if (res.success) {
-        setAllProducts(res.data);
-        setFilteredProducts(res.data);
-      }
+      if (res.success) setAllProducts(res.data);
     });
   }, []);
 
