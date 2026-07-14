@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Breadcrumbs from "./_components/Breadcrumbs";
 import Sort from "./_components/ProductSort";
@@ -9,6 +9,8 @@ import CategoryFilter from "./_components/CategoryFilter";
 import FeaturedProductSection from "./_components/FeaturedProductSection";
 import ProductCard from "./_components/ProductCard";
 import { getProducts, type Product } from "@/lib/shop/product";
+
+const PAGE_LIMIT = 9;
 
 export default function ShopPage() {
   const searchParams = useSearchParams();
@@ -20,6 +22,10 @@ export default function ShopPage() {
   const [minPrice, setMinPrice] = useState(0)
   const [maxPrice, setMaxPrice] = useState(5000)
   const [filters, setFilters] = useState<Record<string, boolean>>({ onSale: false, inStock: false })
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const sortedProducts = useMemo(() => {
     let list = [...filteredProducts].filter(
@@ -32,21 +38,51 @@ export default function ShopPage() {
     return list;
   }, [filteredProducts, sortId, minPrice, maxPrice, filters]);
 
-// 初次載入
+  // 初次載入全部商品（推薦區用）
   useEffect(() => {
-    // 抓全部商品（推薦區用）
     getProducts().then((res) => {
-      console.log("API 回傳:", res);
       if (res.success) setAllProducts(res.data);
     });
   }, []);
 
-// 篩選時重新撈資料
-  useEffect(()=>{
-    getProducts({category_id: categoryId, keyword}).then((res)=>{
-      if(res.success) setFilteredProducts(res.data)
-    })
-  }, [categoryId, keyword])
+  // 篩選/搜尋時 → 重設 page = 1，取代商品列表
+  useEffect(() => {
+    getProducts({ category_id: categoryId, keyword, page: 1 }).then((res) => {
+      if (res.success) {
+        setPage(1);
+        setHasMore(true);
+        setFilteredProducts(res.data);
+        if (res.pagination && 1 >= res.pagination.totalPages) setHasMore(false);
+      }
+    });
+  }, [categoryId, keyword]);
+
+  // 載入更多（下一頁）
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    getProducts({ category_id: categoryId, keyword, page: nextPage }).then((res) => {
+      if (res.success) {
+        setFilteredProducts((prev) => [...prev, ...res.data]);
+        setPage(nextPage);
+        if (res.pagination && nextPage >= res.pagination.totalPages) setHasMore(false);
+      }
+      setLoadingMore(false);
+    });
+  }, [page, hasMore, loadingMore, categoryId, keyword]);
+
+  // IntersectionObserver：偵測到底部
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => { if (entries[0].isIntersecting) loadMore(); },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [loadMore]);
 
   return (
     <div className="relative min-h-screen p-4">
@@ -97,6 +133,15 @@ export default function ShopPage() {
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
+
+            {/* 無限滾動哨兵 + 載入中 */}
+            <div ref={sentinelRef} className="h-10" />
+            {loadingMore && (
+              <div className="text-center py-4 text-[#3D2419] font-bold">載入更多商品...</div>
+            )}
+            {!hasMore && filteredProducts.length > 0 && (
+              <div className="text-center py-4 text-gray-500 text-sm">已顯示全部商品</div>
+            )}
           </div>
         </div>
       </div>

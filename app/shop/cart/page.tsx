@@ -40,8 +40,8 @@ export default function CartPage() {
                       }
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-white text-[#3D2419] font-bold text-sm
-                               border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
-                               hover:bg-red-50 active:translate-x-[1px] active:translate-y-[1px] transition-all duration-75 cursor-pointer"
+                              border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
+                              hover:bg-red-50 active:translate-x-[1px] active:translate-y-[1px] transition-all duration-75 cursor-pointer"
                   >
                     <svg className="w-5 h-5 fill-[#3D2419]" viewBox="0 0 24 24">
                       <path d="M9 3h6v2H9V3zm-4 4h14v2H5V7zm2 4h10v10H7V11zm2 2v5h2v-5H9zm4 0v5h2v-5h-2z" />
