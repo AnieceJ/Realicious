@@ -42,7 +42,7 @@ return (
               </nav>
 
               <div className="flex items-center justify-end">
-                <ShoppingBasket className="h-6.25 w-7 mr-3" />
+                <Link href="/shop/cart" title="購物車"><ShoppingBasket className="h-6.25 w-7 mr-3 cursor-pointer" /></Link>
                 <HeaderLoginBtn></HeaderLoginBtn>
               </div>
             </div>
