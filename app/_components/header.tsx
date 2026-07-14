@@ -4,9 +4,9 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 
 import { config } from "@fortawesome/fontawesome-svg-core";
-import { ShoppingBasket } from "lucide-react";
 
 import HeaderLoginBtn from "./_components/headerLoginBtn";
+import CartBadge from "../shop/_components/CartBadge";
 
 interface HeaderProps{
 	token:boolean
@@ -46,7 +46,7 @@ return (
               </nav>
 
               <div className="flex items-center justify-end">
-                <ShoppingBasket className="h-6.25 w-7 mr-3" />
+                <CartBadge />
                 <HeaderLoginBtn token={token}></HeaderLoginBtn>
               </div>
             </div>

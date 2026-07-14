@@ -1,27 +1,64 @@
-import React from "react";
+import React, { useState } from "react";
+import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
+import { addToCart } from "@/lib/shop/cart";
+import { useToast } from "./Toast";
 
 export default function ProductCard({ product }: { product: Product }) {
-  return (
-    <div className="relative w-full h-80 overflow-hidden border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] group">
-      {/* 商品圖片 */}
-      <img
-        src={`http://localhost:3001${product.main_img}`}
-        alt={product.name}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-      />
+  const [favorited, setFavorited] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const { toastComponent, showToast } = useToast();
 
-      {/* 飄浮字卡：使用 bg-white/90 (90%不透明白)，既能隱約看到後方圖片，又能給文字極佳的閱讀背景 */}
-      <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left rounded-sm ">
-        {/* 商品名稱 */}
+  return (
+    <>
+      {toastComponent}
+    <div className="relative block w-full h-80 overflow-hidden border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] group cursor-pointer"
+      onMouseEnter={() => setShowCart(true)}
+      onMouseLeave={() => setShowCart(false)}
+    >
+      {/* 點圖片跳轉詳細頁 */}
+      <Link href={`/shop/products/${product.id}`} className="absolute inset-0 block cursor-pointer">
+        <img
+          src={`http://localhost:3001${product.main_img}`}
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+      </Link>
+
+      {/* 飄浮字卡 */}
+      <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left rounded-sm pointer-events-none">
         <p className="text-[#3D2419] font-black text-base truncate tracking-wide">
           {product.name}
         </p>
-        {/* 價格 */}
         <p className="text-[#8C5230] font-black text-lg tracking-wider">
           ${product.price}
         </p>
       </div>
+
+      {/* Hover 時出現的購物車 + 收藏按鈕 */}
+      {showCart && (
+        <div className="absolute bottom-20 left-3 right-3 flex items-center justify-between transition-opacity duration-200">
+          <button
+            onClick={(e) => { e.stopPropagation(); addToCart(product, 1); showToast(`${product.name} 已加入購物車`); }}
+            className="px-4 py-2 bg-[#3D2419] text-white font-bold text-sm border-2 border-white rounded-md shadow-md hover:bg-[#5a3a2a] transition-colors cursor-pointer"
+          >
+            加入購物車
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setFavorited(!favorited); }}
+            className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#3D2419] rounded-full shadow-md hover:bg-red-50 transition-colors cursor-pointer"
+          >
+            <svg className="w-5 h-5 transition-all" viewBox="0 0 24 24"
+              fill={favorited ? "#ef4444" : "none"}
+              stroke={favorited ? "#ef4444" : "#3D2419"}
+              strokeWidth="2"
+            >
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
+    </>
   );
 }

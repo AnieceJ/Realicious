@@ -1,20 +1,27 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type SidebarFilterProps = {
   activeCategory: string;
   onCategoryChange: (categoryId: string) => void;
+  onPriceChange: (min: number, max: number) => void;
+  onFilterChange: (filters: Record<string, boolean>) => void;
 };
 
-export default function SidebarFilter({ activeCategory, onCategoryChange }: SidebarFilterProps) {
+export default function SidebarFilter({ activeCategory, onCategoryChange, onPriceChange, onFilterChange }: SidebarFilterProps) {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
+  const [minPriceStr, setMinPriceStr] = useState("0");
+  const [maxPriceStr, setMaxPriceStr] = useState("5000");
   const PRICE_MAX = 5000;
   const PRICE_STEP = 100;
   const [filters, setFilters] = useState<Record<string, boolean>>({
     onSale: false,
     inStock: false,
-    isFavorite: false,
   });
+
+  useEffect(() => {
+    onFilterChange(filters);
+  }, [filters]);
 
   const toggleFilter = (key: string) => {
     setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -89,7 +96,11 @@ export default function SidebarFilter({ activeCategory, onCategoryChange }: Side
           value={minPrice}
           onChange={(e) => {
             const v = Number(e.target.value);
-            if (v <= maxPrice - PRICE_STEP) setMinPrice(v);
+            if (v <= maxPrice - PRICE_STEP) {
+              setMinPrice(v);
+              setMinPriceStr(String(v));
+              onPriceChange(v, maxPrice);
+            }
           }}
           className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
                      [&::-webkit-slider-thumb]:pointer-events-auto
@@ -113,7 +124,11 @@ export default function SidebarFilter({ activeCategory, onCategoryChange }: Side
           value={maxPrice}
           onChange={(e) => {
             const v = Number(e.target.value);
-            if (v >= minPrice + PRICE_STEP) setMaxPrice(v);
+            if (v >= minPrice + PRICE_STEP) {
+              setMaxPrice(v);
+              setMaxPriceStr(String(v));
+              onPriceChange(minPrice, v);
+            }
           }}
           className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
                      [&::-webkit-slider-thumb]:pointer-events-auto
@@ -129,26 +144,44 @@ export default function SidebarFilter({ activeCategory, onCategoryChange }: Side
         />
       </div>
 
-      {/* 價格輸入框（手機友善） */}
+      {/* 價格輸入框（手機友善） — 可自由輸入刪除，Enter / 離開時同步 */}
       <div className="flex items-center justify-between gap-3 mb-8">
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="最低"
-          value={minPrice}
-          onChange={(e) => {
-            const v = Number(e.target.value);
-            if (v >= 0 && v <= maxPrice - PRICE_STEP) setMinPrice(v);
+          value={minPriceStr}
+          onChange={(e) => setMinPriceStr(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+          }}
+          onBlur={() => {
+            const v = Number(minPriceStr);
+            if (isNaN(v) || v < 0) { setMinPriceStr("0"); setMinPrice(0); onPriceChange(0, maxPrice); return }
+            const clamped = Math.min(v, maxPrice - 100);
+            setMinPriceStr(String(clamped));
+            setMinPrice(clamped);
+            onPriceChange(clamped, maxPrice);
           }}
           className="w-full h-10 text-center bg-white border-[3px] border-[#3D2419] rounded-xl focus:outline-none placeholder-[#3D2419]/40"
         />
         <span className="text-lg text-[#3D2419] font-bold">—</span>
         <input
-          type="number"
+          type="text"
+          inputMode="numeric"
           placeholder="最高"
-          value={maxPrice}
-          onChange={(e) => {
-            const v = Number(e.target.value);
-            if (v <= PRICE_MAX && v >= minPrice + PRICE_STEP) setMaxPrice(v);
+          value={maxPriceStr}
+          onChange={(e) => setMaxPriceStr(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") (e.target as HTMLInputElement).blur();
+          }}
+          onBlur={() => {
+            const v = Number(maxPriceStr);
+            if (isNaN(v) || v > 5000) { setMaxPriceStr("5000"); setMaxPrice(5000); onPriceChange(minPrice, 5000); return }
+            const clamped = Math.max(v, minPrice + 100);
+            setMaxPriceStr(String(clamped));
+            setMaxPrice(clamped);
+            onPriceChange(minPrice, clamped);
           }}
           className="w-full h-10 text-center bg-white border-[3px] border-[#3D2419] rounded-xl focus:outline-none placeholder-[#3D2419]/40"
         />
@@ -192,25 +225,6 @@ export default function SidebarFilter({ activeCategory, onCategoryChange }: Side
             )}
           </div>
           <span className="group-hover:text-[#3D2419]/80">只顯示有貨</span>
-        </label>
-
-        {/* 只顯示收藏 */}
-        <label className="flex items-center gap-4 text-lg cursor-pointer group">
-          <input
-            type="checkbox"
-            checked={filters.isFavorite}
-            onChange={() => toggleFilter("isFavorite")}
-            className="sr-only"
-          />
-          <div
-            className={`w-6 h-6 border-[3px] border-[#3D2419] rounded-md transition-all flex items-center justify-center shadow-[2px_2px_0px_0px_#3D2419]
-            ${filters.isFavorite ? "bg-[#A8E6CF]" : "bg-white"}`}
-          >
-            {filters.isFavorite && (
-              <div className="w-2 h-2 bg-[#3D2419] rounded-sm" />
-            )}
-          </div>
-          <span className="group-hover:text-[#3D2419]/80">只顯示收藏</span>
         </label>
       </div>
     </div>
