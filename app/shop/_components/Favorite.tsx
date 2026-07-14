@@ -1,16 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function Favorite() {
+  const [favorited, setFavorited] = useState(false);
+
   return (
-    <div className="w-full">
-      <div
-        className="flex items-center gap-1.5 px-3 py-1 h-12 justify-center
-                      bg-[#FCF9F6] text-[#3D2419] font-bold text-sm
-                      border-[3px] border-[#3D2419]
-                      shadow-[2px_2px_0px_0px_#3D2419] select-none"
+    <button
+      onClick={() => setFavorited(!favorited)}
+      className="w-12 h-12 flex items-center justify-center bg-white border-2 border-[#3D2419] rounded-full shadow-[2px_2px_0px_0px_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
+    >
+      <svg className="w-5 h-5 transition-all" viewBox="0 0 24 24"
+        fill={favorited ? "#ef4444" : "none"}
+        stroke={favorited ? "#ef4444" : "#3D2419"}
+        strokeWidth="2"
       >
-        <button>收藏</button>
-      </div>
-    </div>
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+      </svg>
+    </button>
   );
 }

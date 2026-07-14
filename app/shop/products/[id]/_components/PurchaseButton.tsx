@@ -1,16 +1,38 @@
 import React from "react";
+import { useRouter } from "next/navigation";
+import { addToCart } from "@/lib/shop/cart";
 
-export default function PurchaseButton() {
+type PurchaseButtonProps = {
+  product: { id: number; name: string; price: number; main_img?: string };
+  qty: number;
+};
+
+export default function PurchaseButton({ product, qty }: PurchaseButtonProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    const total = qty * product.price;
+    const confirmed = window.confirm(
+      `確認購買以下商品？\n\n商品：${product.name}\n數量：${qty}\n單價：$${product.price}\n總計：$${total}\n\n確定要前往結帳嗎？`
+    );
+    if (confirmed) {
+      addToCart(product, qty);
+      router.push("/shop/checkout");
+    }
+  };
+
   return (
-    <div className="w-full">
-      <div
-        className="flex items-center gap-1.5 px-3 py-1 h-15 justify-center w-full
-                      bg-[#FCF9F6] text-[#3D2419] font-bold text-sm
-                      border-[3px] border-[#3D2419]
-                      shadow-[2px_2px_0px_0px_#3D2419] select-none"
-      >
-        <button>立即購買</button>
-      </div>
+    <div
+      onClick={handleClick}
+      className="flex items-center justify-center w-full h-14 px-4
+                  bg-[#FF6B6B] text-white font-black text-xl tracking-wider
+                  border-[3px] border-[#3D2419]
+                  shadow-[4px_4px_0px_0px_#3D2419]
+                  hover:bg-[#ff8585]
+                  active:translate-x-[3px] active:translate-y-[3px] active:shadow-none
+                  transition-all duration-100 cursor-pointer select-none text-center"
+    >
+      立即購買
     </div>
   );
 }

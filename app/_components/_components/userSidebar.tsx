@@ -7,13 +7,26 @@ import { MdOutlineLogout } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
 
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { useUser } from "@/app/context/user";
 import Link from "next/link";
 
 export default function UserSidebar() {
   const [isOpening, setIsOpening] = useState<boolean>(false); // 控制側邊欄開關
   const { user,logout } = useUser();
+  // 💡 步驟 1：建立一個標記，記錄「是否已經在瀏覽器掛載」
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+
+  // 💡 步驟 2：useEffect 只會在瀏覽器（客戶端）執行
+  useEffect(() => {
+  // 透過 setTimeout 讓它變成非同步執行，
+  // 告訴 React：「你先忙完這次渲染，下一刻再幫我更新這個狀態」
+  const timer = setTimeout(() => {
+    setIsMounted(true);
+  }, 0);
+
+  return () => clearTimeout(timer); // 良好的習慣：清除定時器
+}, []);
 
   return (
     <>
@@ -33,8 +46,19 @@ export default function UserSidebar() {
         <div className="flex items-center bg-gray-100 ">
           <div className="w-25 h-25 ml-6 mr-2 my-6 border"></div>
           <div>
-            <p>你好 {user?.nick_name}</p>
-            <p>{user?.account}</p>
+            {/* 💡 步驟 3：在畫面上使用 isMounted 來確保前後端同步 */}
+            {isMounted ? (
+              <>
+                <p>你好 {user?.nick_name || "訪客"}</p>
+                <p>{user?.account || ""}</p>
+              </>
+            ) : (
+              <>
+                {/* 伺服器端渲染時，先顯示骨架或載入中狀態，跟伺服器保持一致 */}
+                <p>載入中...</p>
+                <p>&nbsp;</p>
+              </>
+            )}
           </div>
         </div>
         <div>

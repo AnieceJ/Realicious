@@ -1,6 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 
-export default function Searchbar() {
+type SearchbarProps = {
+  onSearch: (keyword: string) => void;
+};
+
+export default function Searchbar({ onSearch }: SearchbarProps) {
+  const [input, setInput] = useState("");
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") onSearch(input.trim());
+  };
+
   return (
     <div
       className="flex items-center justify-between w-full h-13 px-4 py-2.5 
@@ -21,6 +31,9 @@ export default function Searchbar() {
       <input
         type="text"
         placeholder="搜尋商品"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
         className="w-full h-full outline-none text-gray-500 placeholder-gray-500 text-sm"
       />
     </div>

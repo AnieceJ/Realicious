@@ -4,11 +4,15 @@ import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
 
 import { config } from "@fortawesome/fontawesome-svg-core";
-import { ShoppingBasket } from "lucide-react";
 
 import HeaderLoginBtn from "./_components/headerLoginBtn";
+import CartBadge from "../shop/_components/CartBadge";
 
-export default function Header (){
+interface HeaderProps{
+	token:boolean
+}
+
+export default function Header ({token}:HeaderProps){
 return (
   <header className="w-full h-15 bg-red-700 text-slate-100">
             <div className="max-w-7xl mx-auto h-full grid grid-cols-3 items-center">
@@ -42,8 +46,8 @@ return (
               </nav>
 
               <div className="flex items-center justify-end">
-                <ShoppingBasket className="h-6.25 w-7 mr-3" />
-                <HeaderLoginBtn></HeaderLoginBtn>
+                <CartBadge />
+                <HeaderLoginBtn token={token}></HeaderLoginBtn>
               </div>
             </div>
           </header>

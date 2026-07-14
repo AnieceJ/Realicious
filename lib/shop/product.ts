@@ -8,7 +8,7 @@ export type Product = {
   stock_qty: number;
   category_name: string;
   description?: string;
-  image?: string;
+  main_img?: string;
 };
 
 export async function getProducts(params?: {
@@ -22,5 +22,10 @@ export async function getProducts(params?: {
   if (params?.keyword) query.set("keyword", params.keyword);
 
   const res = await fetch(`${API_BASE}/products?${query}`);
+  return res.json();
+}
+
+export async function getProductById(id: string) {
+  const res = await fetch(`${API_BASE}/products/${id}`);
   return res.json();
 }
