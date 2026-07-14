@@ -40,6 +40,13 @@ export async function deleteTx(id: string): Promise<void> {
   await json(await fetch(`${BASE}/transactions/${id}`, { method: "DELETE" }));
 }
 
+export async function updateTx(id: string, tx: Omit<Tx, "id">): Promise<Tx> {
+  const d = await json<{ tx: Tx }>(
+    await fetch(`${BASE}/transactions/${id}`, PUT(tx)),
+  );
+  return d.tx;
+}
+
 export async function fetchBudget() {
   return json<{ budget: number; junkMode: boolean }>(await fetch(`${BASE}/budget`));
 }

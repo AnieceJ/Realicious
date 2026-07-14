@@ -12,6 +12,7 @@ import {
   fetchBudget,
   fetchPet,
   createTx,
+  updateTx,
   deleteTx,
   saveBudget,
   savePet,
@@ -131,6 +132,7 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [justFed, setJustFed] = useState(false);
 
   const [showAdd, setShowAdd] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [showBudget, setShowBudget] = useState(false);
   const [junkMode, setJunkMode] = useState(false);
   const [junkDismissed, setJunkDismissed] = useState(false);
@@ -214,28 +216,39 @@ const addTx = async () => {
     const amt = Number(fAmt);
     if (!amt || amt <= 0) return;
 
+    const payload = {
+      date: selKey,
+      category: fCat,
+      name: fNote.trim() || fCat,
+      amount: amt,
+      type: fType,
+    };
+
     try {
-      const created = await createTx({
-        date: selKey,
-        category: fCat,
-        name: fNote.trim() || fCat,
-        amount: amt,
-        type: fType,
-      });
-      setTxs((p) => [created, ...p]);
+      if (editingId) {
+        const updated = await updateTx(editingId, payload);
+        setTxs((p) => p.map((t) => (t.id === editingId ? updated : t)));
+      } else {
+        const created = await createTx(payload);
+        setTxs((p) => [created, ...p]);
+      }
     } catch (e) {
-      console.error("[lia] 新增失敗", e);
-      alert("新增失敗");
+      console.error("[lia] 儲存失敗", e);
+      alert("儲存失敗");
       return;
     }
 
     setFAmt("");
     setFNote("");
     setShowAdd(false);
+    setEditingId(null);
     setJunkDismissed(false);
-    setBurst((n) => n + 1);
-    setJustFed(true);
-    setTimeout(() => setJustFed(false), 1300);
+
+    if (!editingId) {
+      setBurst((n) => n + 1);
+      setJustFed(true);
+      setTimeout(() => setJustFed(false), 1300);
+    }
   };
 
   const delTx = async (id: string) => {
@@ -248,6 +261,16 @@ const addTx = async () => {
       setTxs(backup); // 失敗就放回去
       alert("刪除失敗");
     }
+  };
+
+  const openEdit = (tx: Tx) => {
+    setEditingId(tx.id);
+    setFType(tx.type);
+    setFCat(tx.category);
+    setFAmt(String(tx.amount));
+    setFNote(tx.name);
+    setSelected(keyToDate(tx.date));
+    setShowAdd(true);
   };
 
   return (
@@ -378,7 +401,12 @@ const addTx = async () => {
         <div className="flex items-center justify-between mb-4">
           <h2 className={`${pixel} text-[15px]`}>記帳明細</h2>
           <button
-            onClick={() => setShowAdd(true)}
+              onClick={() => {
+              setEditingId(null);
+              setFAmt("");
+              setFNote("");
+              setShowAdd(true);
+            }}
             aria-label="新增一筆記錄"
             className={`${BTN} w-10 h-10 bg-[#FFD45C] grid place-items-center text-[22px] font-black leading-none`}
           >
@@ -470,8 +498,19 @@ const addTx = async () => {
                 >
                   {tx.type === "income" ? "+" : "-"}${tx.amount.toLocaleString()}
                 </span>
+                
                 <button
-                  onClick={() => delTx(tx.id)}
+                  onClick={() => openEdit(tx)}
+                  aria-label="編輯"
+                  className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-black text-[14px]"
+                >
+                  ✎
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAdd(false);
+                    setEditingId(null);
+                  }}
                   aria-label="刪除"
                   className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-[#BB0015] text-[16px]"
                 >
@@ -494,7 +533,9 @@ const addTx = async () => {
             className="bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-6 w-full max-w-[360px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-[16px] font-black mb-4">新增一筆記錄</h3>
+            <h3 className="text-[16px] font-black mb-4">
+              {editingId ? "編輯這筆記錄" : "新增一筆記錄"}
+            </h3>
 
             <div className="flex gap-2 mb-4">
               {(["expense", "income"] as const).map((t) => (
@@ -549,7 +590,10 @@ const addTx = async () => {
 
             <div className="flex gap-2.5">
               <button
-                onClick={() => setShowAdd(false)}
+                onClick={() => {
+                setShowAdd(false);
+                setEditingId(null);
+              }}
                 className={`${BTN} flex-1 bg-white py-2.5 text-[14px] font-bold`}
               >
                 取消
@@ -558,7 +602,7 @@ const addTx = async () => {
                 onClick={addTx}
                 className={`${BTN} flex-1 bg-[#BB0015] text-white py-2.5 text-[14px] font-black`}
               >
-                記帳 &amp; 餵食
+                {editingId ? "儲存" : "記帳 & 餵食"}
               </button>
             </div>
           </div>
