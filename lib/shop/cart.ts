@@ -19,6 +19,7 @@ function getCart(): CartItem[] {
 
 function saveCart(items: CartItem[]) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("cart-updated"));
 }
 
 export function addToCart(product: { id: number; name: string; price: number; main_img?: string }, qty: number) {

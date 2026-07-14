@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
 import { addToCart } from "@/lib/shop/cart";
+import { useToast } from "./Toast";
 
 export default function ProductCard({ product }: { product: Product }) {
   const [favorited, setFavorited] = useState(false);
   const [showCart, setShowCart] = useState(false);
+  const { toastComponent, showToast } = useToast();
 
   return (
+    <>
+      {toastComponent}
     <div className="relative block w-full h-80 overflow-hidden border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] group cursor-pointer"
       onMouseEnter={() => setShowCart(true)}
       onMouseLeave={() => setShowCart(false)}
@@ -35,7 +39,7 @@ export default function ProductCard({ product }: { product: Product }) {
       {showCart && (
         <div className="absolute bottom-20 left-3 right-3 flex items-center justify-between transition-opacity duration-200">
           <button
-            onClick={(e) => { e.stopPropagation(); addToCart(product, 1); alert(`${product.name} 已加入購物車`); }}
+            onClick={(e) => { e.stopPropagation(); addToCart(product, 1); showToast(`${product.name} 已加入購物車`); }}
             className="px-4 py-2 bg-[#3D2419] text-white font-bold text-sm border-2 border-white rounded-md shadow-md hover:bg-[#5a3a2a] transition-colors cursor-pointer"
           >
             加入購物車
@@ -55,5 +59,6 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
 import { addToCart } from "@/lib/shop/cart";
+import { useToast } from "./Toast";
 
 interface FeaturedProductSectionProps {
   products: Product[];
@@ -39,8 +40,12 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
     setCurrentIndex((prev) => (prev === featuredList.length - 1 ? 0 : prev + 1));
   };
 
+  const { toastComponent, showToast } = useToast();
+
   return (
-    // 最外層
+    <>
+      {toastComponent}
+      {/* 最外層 */}
     <div className="relative group w-full h-80 bg-[#FFF9E6] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] overflow-hidden select-none"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
@@ -111,7 +116,7 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
             ${currentProduct.price}
           </div>
           <button 
-            onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); alert(`已將 ${currentProduct.name} 加入購物車`); }}
+            onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
             className="px-4 py-2 bg-purple-400 hover:bg-purple-500 active:translate-x-[1px] active:translate-y-[1px] text-[#3D2419] font-bold border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] rounded-sm cursor-pointer"
           >
             加入購物車
@@ -130,5 +135,6 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
       </div>
 
     </div>
+    </>
   );
 }

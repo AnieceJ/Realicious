@@ -1,4 +1,5 @@
 import React from "react";
+import { useToast } from "../../../_components/Toast";
 
 type PurchaseButtonProps = {
   productName?: string;
@@ -7,18 +8,21 @@ type PurchaseButtonProps = {
 };
 
 export default function PurchaseButton({ productName = "商品", qty = 1, price = 0 }: PurchaseButtonProps) {
-  // 核心邏輯完全不動，維持你原本寫好的漂亮計算
+  const { toastComponent, showToast } = useToast();
+
   const handleClick = () => {
     const total = qty * price;
     const confirmed = window.confirm(
       `確認購買以下商品？\n\n商品：${productName}\n數量：${qty}\n單價：$${price}\n總計：$${total}\n\n確定要前往結帳嗎？`
     );
     if (confirmed) {
-      alert(`已導向結帳頁面（總計 $${total}）`);
+      showToast(`已導向結帳頁面（總計 $${total}）`);
     }
   };
 
   return (
+    <>
+      {toastComponent}
     <div
       onClick={handleClick}
       className="flex items-center justify-center w-full h-14 px-4
@@ -31,5 +35,6 @@ export default function PurchaseButton({ productName = "商品", qty = 1, price 
     >
       立即購買
     </div>
+    </>
   );
 }
