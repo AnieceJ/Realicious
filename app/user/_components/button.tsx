@@ -1,0 +1,2 @@
+export const button_shadow =
+  "flex justify-center items-center cursor-pointer border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FCF9F6]";
