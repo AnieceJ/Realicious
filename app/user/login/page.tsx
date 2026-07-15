@@ -13,7 +13,7 @@ import loginAd from "@/public/user/login.png";
 import google from "@/public/user/google-logo.svg"
 import {button_shadow} from '../_components/button'
 
-import { loginSchema } from "@/validations/validate";
+import { loginSchema ,LoginInput} from "@/validations/validate";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Login() {
@@ -27,7 +27,7 @@ export default function Login() {
   const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
 
   // RHF有錯誤訊息時觸發晃動
-  const onError = (errors: any) => {
+  const onError = (errors: LoginInput) => {
     if (errors.account) {
       setShakeAccount(true);
       setTimeout(() => setShakeAccount(false), 400); // 0.4秒動畫跑完後，關掉開關
@@ -49,7 +49,7 @@ export default function Login() {
   });
 
   // 表單送出
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: LoginInput) => {
     console.log(123)
     if (submit) return; // 防止快速重複點擊
     setLoginError(false); // 登入中特效
@@ -158,7 +158,7 @@ export default function Login() {
 
           <h2 className="text-[20px] mb-4">--OR--</h2>
           <div className="flex justify-center items-center">
-            <Link href={'http://localhost:3001/user/auth/google'} className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}>
+            <Link href={'http://localhost:3001/user/api/auth/google'} className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}>
             <Image
             className=" object-contain object-bottom w-10 mr-4"
             src={google}

@@ -21,7 +21,6 @@ export default function VerifyButton({ onClick , child }: VerifyButtonProps) {
     if (seconds > 0) return;
     const isExternalVaild = await onClick()
     if(isExternalVaild){
-      console.log(`發送驗證`);
     setSeconds(10);
     }
   };
@@ -33,7 +32,6 @@ export default function VerifyButton({ onClick , child }: VerifyButtonProps) {
       onClick={(e) => {
         e.preventDefault();
         handleSend();
-        // onClick();
       }}
       type="button"
     >
