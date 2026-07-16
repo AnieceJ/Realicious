@@ -74,12 +74,27 @@ export async function saveBudget(patch: { budget?: number; junkMode?: boolean })
   );
 }
 
+export type PetData = {
+  petName: string;
+  equippedHead: "bow" | "cap" | "crown" | null; // 頭飾，擇一
+  equippedNeck: "scarf" | null; // 圍巾，獨立
+};
+
 export async function fetchPet() {
-  return json<{ petName: string }>(
-    await fetch(`${BASE}/pet`, { headers: authHeaders() }),
-  );
+  return json<PetData>(await fetch(`${BASE}/pet`, { headers: authHeaders() }));
 }
 
-export async function savePet(petName: string) {
-  return json<{ petName: string }>(await fetch(`${BASE}/pet`, PUT({ petName })));
+// 只送要改的欄位，沒送的後端不動。
+// savePet({ petName }) 改名字
+// savePet({ equippedHead: "cap" }) 換頭飾
+// savePet({ equippedHead: null }) 脫下頭飾
+// savePet({ equippedNeck: "scarf" }) 戴圍巾
+export async function savePet(
+  patch: Partial<{
+    petName: string;
+    equippedHead: "bow" | "cap" | "crown" | null;
+    equippedNeck: "scarf" | null;
+  }>,
+) {
+  return json<PetData>(await fetch(`${BASE}/pet`, PUT(patch)));
 }

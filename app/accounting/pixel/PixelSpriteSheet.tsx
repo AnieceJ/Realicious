@@ -123,11 +123,15 @@ function SheetLayer({
 export default function PetSprite({
   mood,
   streak = 0,
+  equippedHead = null,
+  equippedNeck = null,
   size = 128,
   className = "",
 }: {
   mood: PetMood;
   streak?: number;
+  equippedHead?: "bow" | "cap" | "crown" | null;
+  equippedNeck?: "scarf" | null;
   size?: number;
   className?: string;
 }) {
@@ -136,10 +140,13 @@ export default function PetSprite({
   // 放大倍率一定要取整數。3.7 倍會讓像素邊緣糊掉、出現半透明的鬼影。
   const scale = Math.max(1, Math.round(size / CELL));
 
-  // 配件：頭上只戴最高階的（王冠 > 帽 > 蝴蝶結），圍巾獨立疊。
+  // 配件戴「使用者選的」，不是「最高階的」。
+  // 但要雙重把關：即使 equipped 有值，也要真的解鎖了才戴
+  //   （避免 streak 掉了、卻還戴著沒資格的配件）。
+  const UNLOCK = { bow: 3, cap: 14, crown: 30, scarf: 7 } as const;
   const headwear =
-    streak >= 30 ? "crown" : streak >= 14 ? "cap" : streak >= 3 ? "bow" : null;
-  const scarf = streak >= 7;
+    equippedHead && streak >= UNLOCK[equippedHead] ? equippedHead : null;
+  const scarf = equippedNeck === "scarf" && streak >= UNLOCK.scarf;
 
   // 這三個狀態不戴配件：
   //   dead      幽靈不穿衣服

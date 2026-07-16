@@ -45,6 +45,8 @@ type Props = {
   groundHeight?: number;
   /** 小雞站在哪（視窗寬度的百分比）。之後畫了走路循環，改這個值她就會走。 */
   x?: number;
+  equippedHead?: "bow" | "cap" | "crown" | null;
+  equippedNeck?: "scarf" | null;
 };
 
 const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
@@ -58,31 +60,36 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
     spriteSize = 128,
     groundHeight = 44,
     x = 12,
+    equippedHead = null,
+    equippedNeck = null,
   },
   ref,
 ) {
   // ---- 拖曳狀態 ----
   // grabbed = 現在正被拎著嗎。這是「狀態切換」，用 state 沒問題（不是每幀）。
   const [grabbed, setGrabbed] = useState(false);
-  // 小雞那顆 div 的參考，拖曳中直接改它的 transform，不走 React。
+  // ghostBlip = 幽靈被點了、正在播一次驚訝。播完自動回 dead。
+  const [ghostBlip, setGhostBlip] = useState(false);
   const chickRef = useRef<HTMLDivElement | null>(null);
-  // 記住按下去的位置和小雞原本的位置，算位移用。
   const dragOrigin = useRef({ px: 0, py: 0 });
+  const blipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // 吃土不給拎；其他都可以。
-  const canGrab = mood !== "junk";
+  const dead = mood === "dead"; // 用「真實」mood 判斷是不是幽靈
 
-  // 被拎起來時，顯示的狀態要換：
-  //   幽靈 → surprised（OWO）
-  //   其他 → held
+  // ★ 幽靈抓不住（虛體），吃土也不給拎。只有健康時能拖。
+  const canGrab = mood !== "junk" && !dead;
+
+  // 顯示的狀態：
+  //   被拎（健康）→ held
+  //   幽靈被點     → surprised 播一次
+  //   其他         → 原本的 mood
   const shownMood: PetMood = grabbed
-    ? mood === "dead"
+    ? "held"
+    : ghostBlip
       ? "surprised"
-      : "held"
-    : mood;
+      : mood;
 
   const junk = shownMood === "junk";
-  const dead = mood === "dead"; // 用「真實」mood 判斷是不是幽靈（地面顏色等）
 
   const scale = Math.max(1, Math.round(spriteSize / CELL));
   const sprite = CELL * scale;
@@ -94,12 +101,21 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
 
   const totalH = spriteBottom + sprite;
 
-  // ---- 拖曳的三個處理函式 ----
+  // ---- 互動處理 ----
 
   function onPointerDown(e: ReactPointerEvent) {
+    // 幽靈：抓不住，但點一下驚訝一次（虛體被戳到會嚇一跳）
+    if (dead) {
+      if (ghostBlip) return; // 正在驚訝中，不重複觸發
+      setGhostBlip(true);
+      if (blipTimer.current) clearTimeout(blipTimer.current);
+      // surprised 一輪 = DURATION.surprised(0.7s) × 一次。播完回 dead。
+      blipTimer.current = setTimeout(() => setGhostBlip(false), 700);
+      return;
+    }
+
     if (!canGrab) return;
     e.preventDefault();
-    // 讓這根手指/滑鼠之後的移動事件都送到這個元素，即使滑出去也不斷。
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     dragOrigin.current = { px: e.clientX, py: e.clientY };
     setGrabbed(true);
@@ -116,20 +132,21 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
   function onPointerUp() {
     if (!grabbed) return;
     setGrabbed(false);
-    // 放開 → 掉回原位。加一個 transition 讓她「掉」下去，而不是瞬移。
     if (chickRef.current) {
       chickRef.current.style.transition = "transform 0.35s cubic-bezier(.5,0,.9,.6)";
       chickRef.current.style.transform = "translateX(-50%)";
-      // 動畫跑完把 transition 拿掉，免得之後拖曳有延遲感。
       window.setTimeout(() => {
         if (chickRef.current) chickRef.current.style.transition = "";
       }, 360);
     }
   }
 
-  // 保險：元件卸載時如果還抓著，清掉。
+  // 保險：元件卸載時清掉狀態和計時器。
   useEffect(() => {
-    return () => setGrabbed(false);
+    return () => {
+      setGrabbed(false);
+      if (blipTimer.current) clearTimeout(blipTimer.current);
+    };
   }, []);
 
   return (
@@ -176,7 +193,8 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
           bottom: spriteBottom,
           left: `${x}%`,
           transform: "translateX(-50%)",
-          cursor: !canGrab ? "default" : grabbed ? "grabbing" : "grab",
+          // 幽靈：一般游標（抓不住，只能戳）。健康：可抓的手。
+          cursor: dead ? "pointer" : !canGrab ? "default" : grabbed ? "grabbing" : "grab",
         }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -196,10 +214,16 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
           />
         )}
 
-        {/* 只有「真的死掉且沒被拎」時加 ghost-float。
-            被拎起來時(shownMood=surprised)不飄，讓拖曳的位移主導。 */}
-        <div className={dead && !grabbed ? "ghost-float" : undefined}>
-          <PetSprite mood={shownMood} streak={streak} size={sprite} />
+        {/* 幽靈一律加 ghost-float（飄浮），包含被戳出驚訝時 —— 虛體感要一直在。
+            健康被拎(held)時不飄，讓拖曳的位移主導。 */}
+        <div className={dead ? "ghost-float" : undefined}>
+          <PetSprite
+            mood={shownMood}
+            streak={streak}
+            equippedHead={equippedHead}
+            equippedNeck={equippedNeck}
+            size={sprite}
+          />
         </div>
 
         {/* 狀態氣泡：被拎起來時不顯示（她正忙著被玩） */}
