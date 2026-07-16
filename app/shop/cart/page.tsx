@@ -28,7 +28,7 @@ export default function CartPage() {
           ]} />
         </div>
         <div className="flex flex-row gap-8">
-          <div className="w-[60%]">
+          <div className={items.length === 0 ? "w-full" : "w-[60%]"}>
             {items.length === 0 ? (
               <EmptyCart />
             ) : (
@@ -56,9 +56,11 @@ export default function CartPage() {
             )}
           </div>
 
-          <div className="w-[40%]">
-            <OrderSummary items={items} />
-          </div>
+          {items.length > 0 && (
+            <div className="w-[40%]">
+              <OrderSummary items={items} />
+            </div>
+          )}
         </div>
       </div>
     </div>
