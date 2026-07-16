@@ -19,7 +19,7 @@ const notoSansTC = Noto_Sans_TC({
 export default function Page() {
   return (
     <div
-      className={`${notoSansTC.className} min-h-screen bg-white text-black p-4 md:p-8 font-bold selection:bg-[#BB0015] selection:text-white`}
+      className={`${notoSansTC.className} min-h-screen text-black p-4 md:p-8 font-bold selection:bg-[#BB0015] selection:text-white`}
     >
       <AccountingApp pixel={pressStart.className} />
     </div>

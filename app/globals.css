@@ -42,6 +42,7 @@
 	--color-article-gray: #e8e8e8;
 	--color-button-yellow: #ffd45c;
 	--color-button-white: #fcf9f6;
+	--color-page-red: #bb0015;
 	--radius-sm: calc(var(--radius) * 0.6);
 	--radius-md: calc(var(--radius) * 0.8);
 	--radius-lg: var(--radius);
@@ -133,12 +134,36 @@
 }
 
 .article-editor {
-	min-height: 800px;
+	min-width: 0;
+}
+
+.article-editor .ck.ck-editor,
+.article-editor .ck-editor__main {
+	min-width: 0;
+	width: 100%;
+}
+
+.article-editor .ck.ck-toolbar {
+	border: 0;
+	border-bottom: 1px solid var(--ck-color-base-border);
+	border-radius: 0;
+	overflow-x: auto;
 }
 
 .article-editor .ck-editor__editable {
-	min-height: 800px !important;
-	overflow: visible !important;
+	min-height: 36rem !important;
+	max-width: 100%;
+	overflow-x: hidden !important;
+	overflow-y: auto !important;
+}
+
+.article-editor .ck-content img {
+	max-width: 100%;
+}
+
+.article-editor .ck-content figure.table {
+	max-width: 100%;
+	overflow-x: auto;
 }
 
 .article-editor .ck-content ul {
@@ -149,6 +174,24 @@
 .article-editor .ck-content ol {
 	list-style-type: decimal !important;
 	padding-left: 2.5em !important;
+}
+
+.article-content {
+	line-height: 1.8;
+}
+
+.article-content p {
+	margin-block: 1rem;
+}
+
+.article-content img {
+	height: auto;
+	max-width: 100%;
+}
+
+.article-content figure.table {
+	max-width: 100%;
+	overflow-x: auto;
 }
 
 .ck-content h1 {

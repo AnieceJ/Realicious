@@ -187,9 +187,9 @@ export default function ArticleManagePage() {
 						{userArticles.length === 0 ? (
 							<p className="text-black text-center py-6">目前沒有任何文章。</p>
 						) : (
-							userArticles.map((art, idx) => (
+							userArticles.map((art) => (
 								<div
-									key={idx}
+									key={art.id}
 									className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3"
 								>
 									<div className="flex justify-between item-start">
@@ -200,11 +200,10 @@ export default function ArticleManagePage() {
 											{art.date}
 										</p>
 									</div>
-									<div>
-										<p className=" text-m wrap-break-word line-clamp-4">
-											{art.content}
-										</p>
-									</div>
+									<div
+										className="article-content max-h-72 overflow-hidden wrap-break-word text-base"
+										dangerouslySetInnerHTML={{ __html: art.content }}
+									/>
 									<div className="flex justify-between items-end mt-1.5">
 										<div className="flex items-center">
 											<Eye size={16} />
@@ -230,7 +229,7 @@ export default function ArticleManagePage() {
 				<nav aria-label="Pagination" className="inline-flex shadow-xs">
 					<a
 						href="#"
-						className="relative inline-flex items-center px-2 py-2 bg-red-700 text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
+						className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
 					>
 						<span className="sr-only">Previous</span>
 						<ChevronLeftIcon aria-hidden="true" className="size-5" />
@@ -277,7 +276,7 @@ export default function ArticleManagePage() {
 					</a>
 					<a
 						href="#"
-						className="relative inline-flex items-center px-2 py-2 bg-red-700 text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
+						className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
 					>
 						<span className="sr-only">Next</span>
 						<ChevronRightIcon aria-hidden="true" className="size-5" />

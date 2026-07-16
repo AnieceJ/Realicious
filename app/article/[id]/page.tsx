@@ -143,19 +143,10 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 							</ul>
 							<hr className="border-black border" />
 						</div>
-						<div className="full aspect-video border text-center relative border-black m-6 shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] ">
-							<Image
-								src="/article/braised-pork.jpg"
-								alt={page.title}
-								fill
-								priority
-								sizes="(max-width: 800px) 100vw, 80vw"
-								className="object-cover"
-							/>
-						</div>
-						<div className="first-letter:text-5xl first-letter:font-bold first-letter:text-red-500 first-letter:mr-2">
-							<p>{page.content}</p>
-						</div>
+						<div
+							className="article-content first-letter:mr-2 first-letter:text-5xl first-letter:font-bold first-letter:text-red-500"
+							dangerouslySetInnerHTML={{ __html: page.content }}
+						/>
 						<div className="p-4 mt-6 flex items-center justify-between h-15 bg-article-gray border-black border shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] relative">
 							<span>覺得這篇文章有幫助嗎？\收藏或分享/</span>
 							<div className=" flex gap-2">
