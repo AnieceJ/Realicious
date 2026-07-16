@@ -10,7 +10,7 @@ type ConfirmModalProps = {
 function ConfirmModal({ message, onConfirm, onCancel }: ConfirmModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white border-[3px] border-[#3D2419] shadow-[6px_6px_0px_0px_#3D2419] rounded-xl px-8 py-6 max-w-sm w-full mx-4">
+      <div className="bg-white border-[3px] border-[#3D2419] shadow-[6px_6px_0px_0px_#3D2419] px-8 py-6 max-w-sm w-full mx-4">
         <p className="text-[#3D2419] font-bold text-lg mb-6 whitespace-pre-line">{message}</p>
         <div className="flex justify-end gap-4">
           <button
