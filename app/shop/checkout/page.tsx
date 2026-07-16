@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Breadcrumbs from "../_components/Breadcrumbs";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutPaymentMethod from "./_components/CheckoutPaymentMethod";
@@ -13,7 +14,14 @@ export default function CheckoutPage() {
     <div className="relative min-h-screen">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-4xl mb-6">結帳/CHECKOUT</h2>
+        <div className="mb-6 pt-4">
+          <Breadcrumbs items={[
+            { label: "首頁", href: "/" },
+            { label: "商品列表", href: "/shop" },
+            { label: "購物車", href: "/shop/cart" },
+            { label: "結帳" }
+          ]} />
+        </div>
         <div className="flex flex-row gap-8">
           <div className="w-[60%]">
             <div className="mb-6">
@@ -26,7 +34,7 @@ export default function CheckoutPage() {
               <CheckoutPaymentMethod />
             </div>
           </div>
-          <div className="w-[30%]">
+          <div className="w-[30%] self-start sticky top-8">
             <CheckoutSummary items={items} />
           </div>
         </div>

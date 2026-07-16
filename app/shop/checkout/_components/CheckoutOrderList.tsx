@@ -1,12 +1,19 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import type { CartItem } from "@/lib/shop/cart";
 
+const MAX_VISIBLE = 3;
+
 export default function CheckoutOrderList({ items }: { items: CartItem[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const list = items || [];
+  const showItems = expanded ? list : list.slice(0, MAX_VISIBLE);
+  const hiddenCount = list.length - MAX_VISIBLE;
+
   return (
     <div className="w-full">
       <div className="flex flex-col w-full px-4 py-2.5 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
-        {(items || []).map((item, i) => (
+        {showItems.map((item) => (
           <div key={item.id} className="flex flex-row items-center justify-between border-[#3D2419] border-b-2 border-dashed last:border-b-0 mt-3 pb-1 pt-1">
             <div className="flex flex-row items-center">
               <div className="bg-pink-300 w-20 h-20 flex items-center justify-center text-sm shrink-0">
@@ -26,6 +33,14 @@ export default function CheckoutOrderList({ items }: { items: CartItem[] }) {
             <span className="text-xl">${item.price * item.qty}</span>
           </div>
         ))}
+        {hiddenCount > 0 && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="mt-2 text-sm text-[#3D2419]/70 hover:text-[#3D2419] underline cursor-pointer text-center py-2 transition-all"
+          >
+            {expanded ? "收合" : `還有 ${hiddenCount} 筆商品`}
+          </button>
+        )}
       </div>
     </div>
   );
