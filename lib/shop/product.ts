@@ -6,6 +6,7 @@ export type Product = {
   price: number;
   discount: number;
   stock_qty: number;
+  category_id: number;
   category_name: string;
   description?: string;
   main_img?: string;

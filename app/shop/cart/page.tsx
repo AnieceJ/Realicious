@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import OrderItem from "./_components/OrderItem";
 import OrderSummary from "./_components/OrderSummary";
@@ -8,10 +8,12 @@ import { clearCart, getCartItems, type CartItem } from "@/lib/shop/cart";
 import { useConfirm } from "../_components/ConfirmModal";
 
 export default function CartPage() {
-  const [items, setItems] = useState<CartItem[]>(() => getCartItems());
+  const [items, setItems] = useState<CartItem[]>([]);
   const { confirmComponent, showConfirm } = useConfirm();
 
   const refresh = () => setItems([...getCartItems()]);
+
+  useEffect(() => { refresh(); }, []);
 
   return (
     <div className="relative min-h-screen">

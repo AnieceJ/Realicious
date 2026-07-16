@@ -56,4 +56,5 @@ export function getCartItems(): CartItem[] {
 
 export function clearCart() {
   localStorage.removeItem(STORAGE_KEY);
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("cart-updated"));
 }
