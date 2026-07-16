@@ -1,23 +1,45 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore, useState } from "react";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutSummary from "./_components/CheckoutSummary";
-import { getCartItems, type CartItem } from "@/lib/shop/cart";
+import { clearCart, getCartItems, type CartItem } from "@/lib/shop/cart";
+
+const EMPTY: CartItem[] = [];
+let cached = EMPTY;
+
+function subscribe(cb: () => void) {
+  window.addEventListener("cart-updated", cb);
+  return () => window.removeEventListener("cart-updated", cb);
+}
+
+function getSnapshot() {
+  const latest = getCartItems();
+  if (latest.length === 0 && cached.length === 0) return cached;
+  if (latest.length !== cached.length) { cached = latest; return cached; }
+  for (let i = 0; i < latest.length; i++) {
+    if (latest[i].id !== cached[i].id || latest[i].qty !== cached[i].qty) {
+      cached = latest;
+      return cached;
+    }
+  }
+  return cached;
+}
+
+function getServerSnapshot() {
+  return EMPTY;
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const [items, setItems] = useState<CartItem[]>([]);
+  const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
-
-  useEffect(() => {
-    setItems(getCartItems());
-  }, []);
 
   const handlePayment = (method: string) => {
     setShowPayment(false);
+    clearCart();
     alert(`選擇付款方式：${method}，前往訂單完成頁`);
     router.push("/shop/checkoutFinished");
   };
