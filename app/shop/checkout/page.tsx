@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
@@ -8,7 +8,11 @@ import CheckoutSummary from "./_components/CheckoutSummary";
 import { getCartItems, type CartItem } from "@/lib/shop/cart";
 
 export default function CheckoutPage() {
-  const [items, setItems] = useState<CartItem[]>(() => getCartItems());
+  const [items, setItems] = useState<CartItem[]>([]);
+
+  useEffect(() => {
+    setItems(getCartItems());
+  }, []);
 
   return (
     <div className="relative min-h-screen">
