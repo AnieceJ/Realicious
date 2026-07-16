@@ -581,7 +581,7 @@ const addTx = async () => {
       {/* ============ 新增記帳 Modal ============ */}
       {showAdd && (
         <div
-          className="fixed inset-0 z-50 bg-black/55 grid place-items-center p-4"
+          className="fixed inset-0 z-[70] bg-black/55 grid place-items-center p-4"
           onClick={() => setShowAdd(false)}
         >
           <div
@@ -667,7 +667,7 @@ const addTx = async () => {
       {/* ============ 預算設定 Modal ============ */}
       {showBudget && (
         <div
-          className="fixed inset-0 z-50 bg-black/55 grid place-items-center p-4"
+          className="fixed inset-0 z-[70] bg-black/55 grid place-items-center p-4"
           onClick={() => setShowBudget(false)}
         >
           <div
@@ -713,7 +713,7 @@ const addTx = async () => {
 
       {/* ============ 吃土模式提示 ============ */}
       {over && !junkMode && !junkDismissed && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-4 w-[280px]">
+        <div className="toast-drop fixed top-6 left-1/2 -translate-x-1/2 z-[65] bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-4 w-[320px] max-w-[calc(100vw-2rem)]">
           <div className="text-[14px] font-black mb-1.5">今日已超出預算</div>
           <p className="text-[12px] font-bold text-black/60 mb-3.5 leading-relaxed">
             超出 ${(spent - budget).toLocaleString()}。要開啟「吃土模式」，讓 {petName} 陪你一起共體時艱嗎？

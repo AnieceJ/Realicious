@@ -377,3 +377,24 @@
     background-position-x: var(--sprite-end);
   }
 }
+
+/* ---------- 頂部橫幅通知：從畫面上方滑下來 ----------
+   steps() 讓它一格一格掉，維持像素感（不是平滑補間）。 */
+.toast-drop {
+  animation: toast-drop 0.32s steps(6, end) both;
+}
+@keyframes toast-drop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -120%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast-drop {
+    animation: none;
+  }
+}
