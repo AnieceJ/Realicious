@@ -11,13 +11,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
-import { registerSchema ,RegisterInput} from "@/validations/validate";
+import { registerSchema, RegisterInput } from "@/validations/validate";
 
 export default function Register() {
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
 
   const [isVerify, setIsVerify] = useState<boolean>(); // 發送驗證碼
+  const [registered, setRegistered] = useState<boolean>(); // 已註冊
   const [isVerifyMessage, setIsVerifyMessage] = useState<string>(); // 發送成功訊息
   const [submit, setSubmit] = useState(false); // form 送出
 
@@ -36,56 +37,68 @@ export default function Register() {
   // 處理email是否重複，是就發送驗證碼
 
   const handleSendCode = async (): Promise<boolean> => {
-  setIsVerify(false);
-  const isvaild = await trigger("account"); // 驗證 email 欄位格式正確
-  if (isvaild) {
-    const email = getValues("account");
+    setIsVerify(false);
+    setRegistered(false)
+    const isvaild = await trigger("account"); // 驗證 email 欄位格式正確
+    const scene = "register";
+    if (isvaild) {
+      const email = getValues("account");
+      try {
+        const res = await fetch(`${API_URL}/verification/send-code`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({email:email,scene:scene}),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          setIsVerify(true);
+          setIsVerifyMessage(data.message || "發送成功");
+          return true;
+        } else {
+          console.log(data.message)
+          setRegistered(true);
+          setIsVerifyMessage(data.message || "此帳號已註冊過");
+          return false;
+        }
+      } catch (error) {
+        console.error("發送驗證碼連線失敗:", error);
+        setIsVerify(true);
+        setIsVerifyMessage("無法連接至伺服器");
+        return false;
+      }
+    }
+    return false;
+  };
+
+  // 表單送出
+  const onSubmit = async (data: RegisterInput) => {
+    if (submit) return; // 防止快速重複點擊
+    setSubmit(true);
     try {
-      const res = await fetch(`${API_URL}/verification/send-code`, {
+      const res = await fetch(`${API_URL}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify(data),
       });
-      const data = await res.json();
-      
-      if (res.ok && data.success) {
-        setIsVerify(true); 
-        setIsVerifyMessage(data.message);
-        return true;
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        alert(`註冊成功`);
+        router.replace("/user/personal");
       } else {
-        setIsVerifyMessage(data.message || "發送失敗");
-        return false;
+        alert(result.message || "註冊失敗");
+        setSubmit(false);
       }
     } catch (error) {
       console.error("發送驗證碼連線失敗:", error);
-      setIsVerify(true); 
-      setIsVerifyMessage("無法連接至伺服器");
-      return false;
+      alert("連線伺服器失敗，請稍後再試");
+      setSubmit(false);
     }
-  }
-  return false;
-};
-
-  // 表單送出
-  const onSubmit = (data: RegisterInput) => {
-    setSubmit(true);
-
-    setTimeout(() => {
-      if (data.verification === `123`) {
-        if (data.check === data.password) {
-          console.log(data);
-          alert(`註冊成功`);
-          router.replace("/user/personal");
-        } else {
-          setSubmit(false);
-        }
-      } else {
-        setSubmit(false);
-        return alert(`驗證碼錯誤`);
-      }
-    }, 500);
   };
 
   return (
@@ -118,8 +131,8 @@ export default function Register() {
                     {String(errors.account.message)}
                   </p>
                 )}
+                {registered ? <p>{isVerifyMessage}</p> : ""}
                 {isVerify ? <p>{isVerifyMessage}</p> : ""}
-                {/* {isVerify ? '':<p>{isVerifyMessage}123</p> } */}
               </div>
             </div>
             <div className="flex flex-col items-start mb-4">

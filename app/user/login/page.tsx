@@ -50,7 +50,7 @@ export default function Login() {
 
   // 表單送出
   const onSubmit = (data: LoginInput) => {
-    console.log(123)
+    
     if (submit) return; // 防止快速重複點擊
     setLoginError(false); // 登入中特效
     setSubmit(true);
