@@ -22,7 +22,7 @@ export default function CategoryFilter({ activeKeywords, onTagToggle }: Category
         return (
         <div key={tag.label}
           className={`inline-flex items-center gap-1.5 px-3 py-1
-                      text-sm border-[3px] border-[#3D2419] rounded-xl
+                      text-sm border-[3px] border-[#3D2419]
                       shadow-[2px_2px_0px_0px_#3D2419] select-none
                       transition-colors cursor-pointer
                       ${isActive ? "bg-[#3D2419] text-white" : "bg-[#FFD3B6] text-[#3D2419] hover:bg-[#ffbe94]"}`}

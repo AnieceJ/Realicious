@@ -26,7 +26,7 @@ export default function CheckoutSummary({ items }: { items: CartItem[] }) {
           <h3 className="text-2xl">${subtotal.toLocaleString()}</h3>
         </div>
         <div className="flex flex-row items-center gap-3 mt-6">
-          <div className="w-6 h-6 border-[3px] border-[#3D2419] bg-white rounded-sm shrink-0 flex items-center justify-center shadow-[1px_1px_0px_0px_#3D2419]"></div>
+          <div className="w-6 h-6 border-[3px] border-[#3D2419] bg-white shrink-0 flex items-center justify-center shadow-[1px_1px_0px_0px_#3D2419]"></div>
           <span className="text-sm text-[#3D2419]/80 leading-tight">我已經閱讀並同意電子票券使用及退款規範</span>
         </div>
         <div className="flex items-center justify-center w-full px-4 py-2.5 mt-8 bg-[#89502E] text-[#FFFFFF] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">

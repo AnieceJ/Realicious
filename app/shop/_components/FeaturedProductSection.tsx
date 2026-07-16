@@ -53,7 +53,7 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
 
       {/* 【左側切換箭頭】 */}
       <div className="absolute left-0 top-0 bottom-0 w-16 z-30 flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
-        <span className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl rounded-sm
+        <span className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl
                         border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
                         hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
           ◀
@@ -62,7 +62,7 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
 
       {/* 【右側切換箭頭】 */}
       <div className="absolute right-0 top-0 bottom-0 w-16 z-20 flex items-center justify-center cursor-pointer" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
-        <span className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl rounded-sm
+        <span className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl
                         border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
                         hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
           ▶
@@ -88,7 +88,7 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
               />
               {/* Hover 遮罩 */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300 flex items-center justify-center">
-                <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 px-4 py-2 rounded-md">
+                <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/50 px-4 py-2">
                   查看商品詳情 →
                 </span>
               </div>
@@ -100,11 +100,11 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
       {/* 浮動半透明說明欄 — 不導航 */}
       <div className="absolute bottom-4 left-20 right-20 z-10
                       flex flex-col sm:flex-row items-center justify-between gap-4
-                      bg-white/75 backdrop-blur-sm p-4 text-left rounded-md
+                      bg-white/75 backdrop-blur-sm p-4 text-left
                       border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className="bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-sm border border-[#3D2419]">今日主打</span>
+            <span className="bg-amber-500 text-white text-xs px-1.5 py-0.5 border border-[#3D2419]">今日主打</span>
             <h3 className="text-xl font-black text-[#3D2419]">{currentProduct.name}</h3>
           </div>
           <p className="text-sm font-medium text-amber-950 line-clamp-2">
@@ -112,12 +112,12 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
           </p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0 w-full sm:w-auto">
-          <div className="text-xl font-black text-amber-700 bg-amber-100/80 px-3 py-1 border-2 border-[#3D2419] rounded-sm">
+          <div className="text-xl font-black text-amber-700 bg-amber-100/80 px-3 py-1 border-2 border-[#3D2419]">
             ${currentProduct.price}
           </div>
           <button 
             onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
-            className="px-4 py-2 bg-purple-400 hover:bg-purple-500 active:translate-x-[1px] active:translate-y-[1px] text-[#3D2419] font-bold border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] rounded-sm cursor-pointer"
+            className="px-4 py-2 bg-purple-400 hover:bg-purple-500 active:translate-x-[1px] active:translate-y-[1px] text-[#3D2419] font-bold border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer"
           >
             加入購物車
           </button>
@@ -125,11 +125,11 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
       </div>
 
       {/* 底部輪播小點點 — 不導航 */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 bg-white/60 px-2 py-1 rounded-full border border-[#3D2419]">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10 bg-white/60 px-2 py-1 border border-[#3D2419]">
         {featuredList.map((_, index) => (
           <div 
             key={index} 
-            className={`w-2 h-2 rounded-full border border-[#3D2419] transition-all ${index === currentIndex ? 'bg-[#3D2419] w-4' : 'bg-white'}`}
+            className={`w-2 h-2 border border-[#3D2419] transition-all ${index === currentIndex ? 'bg-[#3D2419] w-4' : 'bg-white'}`}
           />
         ))}
       </div>

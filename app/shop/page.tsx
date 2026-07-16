@@ -19,7 +19,7 @@ export default function ShopPage() {
   const searchParams = useSearchParams();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [categoryIds, setCategoryIds] = useState<string[]>([])
+  const [categoryId, setCategoryId] = useState("")
   const [keyword, setKeyword] = useState(searchParams.get("keyword") || "")
   const [tagKeywords, setTagKeywords] = useState<string[]>([])
   const [sortId, setSortId] = useState("")
@@ -35,14 +35,14 @@ export default function ShopPage() {
     let list = [...filteredProducts].filter(
       (p) => p.price >= minPrice && p.price <= maxPrice
     );
-    if (categoryIds.length > 0) list = list.filter((p) => categoryIds.includes(String(p.category_id)));
+    if (categoryId) list = list.filter((p) => String(p.category_id) === categoryId);
     if (tagKeywords.length > 0) list = list.filter((p) => tagKeywords.some((kw) => p.name.includes(kw)));
     if (filters.onSale) list = list.filter((p) => p.discount < 1);
     if (filters.inStock) list = list.filter((p) => p.stock_qty > 0);
     if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
     if (sortId === "price_high") list.sort((a, b) => b.price - a.price);
     return list;
-  }, [filteredProducts, sortId, minPrice, maxPrice, filters, categoryIds, tagKeywords]);
+  }, [filteredProducts, sortId, minPrice, maxPrice, filters, categoryId, tagKeywords]);
 
   // 初次載入全部商品（推薦區用）
   useEffect(() => {
@@ -61,7 +61,7 @@ export default function ShopPage() {
         if (res.pagination && 1 >= res.pagination.totalPages) setHasMore(false);
       }
     });
-  }, [categoryIds, keyword]);
+  }, [keyword]);
 
   // 載入更多（下一頁）
   const loadMore = useCallback(() => {
@@ -117,10 +117,8 @@ export default function ShopPage() {
         {/* 主內容 2 欄 */}
         <div className="flex gap-15">
           <div className="w-64 flex-shrink-0">
-            <SidebarFilter activeCategoryIds={categoryIds} onCategoryChange={(id) => {
-              setCategoryIds((prev) =>
-                prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
-              );
+            <SidebarFilter activeCategoryId={categoryId} onCategoryChange={(id) => {
+              setCategoryId((prev) => prev === id ? "" : id);
             }} onPriceChange={(min, max) => { setMinPrice(min); setMaxPrice(max) }} onFilterChange={(f) => setFilters(f)}/>
           </div>
 
@@ -133,46 +131,40 @@ export default function ShopPage() {
             </div>
 
             {/* 已選取的篩選條件標籤 */}
-            {(keyword || categoryIds.length > 0 || tagKeywords.length > 0 || minPrice > 0 || maxPrice < 5000 || filters.onSale || filters.inStock) && (
+            {(keyword || tagKeywords.length > 0 || minPrice > 0 || maxPrice < 5000 || filters.onSale || filters.inStock) && (
               <div className="flex flex-wrap items-center gap-2">
                 {keyword && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419] rounded-full">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
                     {keyword}
                     <button onClick={() => setKeyword("")} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
                   </span>
                 )}
-                {categoryIds.map((id) => (
-                  <span key={id} className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419] rounded-full">
-                    {categoryNames[id] || `分類 ${id}`}
-                    <button onClick={() => setCategoryIds((prev) => prev.filter((c) => c !== id))} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
-                  </span>
-                ))}
                 {tagKeywords.map((kw) => (
-                  <span key={kw} className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419] rounded-full">
+                  <span key={kw} className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
                     {tagLabels[kw] || kw}
                     <button onClick={() => setTagKeywords((prev) => prev.filter((k) => k !== kw))} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
                   </span>
                 ))}
                 {(minPrice > 0 || maxPrice < 5000) && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419] rounded-full">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
                     ${minPrice}–${maxPrice}
                     <button onClick={() => { setMinPrice(0); setMaxPrice(5000); }} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
                   </span>
                 )}
                 {filters.onSale && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419] rounded-full">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
                     特價中
                     <button onClick={() => setFilters((f) => ({ ...f, onSale: false }))} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
                   </span>
                 )}
                 {filters.inStock && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419] rounded-full">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
                     只顯示有貨
                     <button onClick={() => setFilters((f) => ({ ...f, inStock: false }))} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
                   </span>
                 )}
                 <button
-                  onClick={() => { setKeyword(""); setCategoryIds([]); setTagKeywords([]); setMinPrice(0); setMaxPrice(5000); setFilters({ onSale: false, inStock: false }); }}
+                  onClick={() => { setKeyword(""); setCategoryId(""); setTagKeywords([]); setMinPrice(0); setMaxPrice(5000); setFilters({ onSale: false, inStock: false }); }}
                   className="text-sm text-gray-500 hover:text-red-500 underline cursor-pointer"
                 >
                   清除全部

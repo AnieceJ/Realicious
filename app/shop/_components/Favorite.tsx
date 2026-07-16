@@ -6,7 +6,7 @@ export default function Favorite() {
   return (
     <button
       onClick={() => setFavorited(!favorited)}
-      className="w-12 h-12 flex items-center justify-center bg-white border-2 border-[#3D2419] rounded-full shadow-[2px_2px_0px_0px_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
+      className="w-12 h-12 flex items-center justify-center bg-white border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
     >
       <svg className="w-5 h-5 transition-all" viewBox="0 0 24 24"
         fill={favorited ? "#ef4444" : "none"}

@@ -12,7 +12,7 @@ export default function EmptyCart() {
       <p className="text-2xl mb-2">購物車裡沒有商品囉!</p>
       <p className="text-sm text-gray-500 mb-6">快去商城挑選喜歡的商品吧</p>
       <Link href="/shop"
-        className="px-6 py-3 bg-[#3D2419] text-white text-base font-bold rounded-xl
+        className="px-6 py-3 bg-[#3D2419] text-white text-base font-bold
                    shadow-[3px_3px_0px_0px_rgba(61,36,25,0.4)]
                    hover:bg-[#5a3a2a] active:translate-x-[1px] active:translate-y-[1px] transition-all"
       >

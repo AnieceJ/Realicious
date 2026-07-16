@@ -38,7 +38,7 @@ export default function Searchbar({ onSearch }: SearchbarProps) {
       />
       <button
         onClick={() => onSearch(input.trim())}
-        className="ml-2 px-3 py-1 bg-[#3D2419] text-white text-sm font-bold rounded-md
+        className="ml-2 px-3 py-1 bg-[#3D2419] text-white text-sm font-bold
                    hover:bg-[#5a3a2a] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer whitespace-nowrap"
       >
         搜尋

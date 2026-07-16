@@ -8,7 +8,7 @@ export default function Toast({ message, onClose }: { message: string; onClose: 
   }, [onClose]);
 
   return (
-    <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#3D2419] text-white px-6 py-3 shadow-lg text-base font-bold animate-pulse whitespace-nowrap">
+    <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-[#3D2419] text-white px-6 py-3 text-base font-bold animate-pulse whitespace-nowrap border-[3px] border-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]">
       {message}
     </div>
   );

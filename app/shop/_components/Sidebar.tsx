@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 
 type SidebarFilterProps = {
-  activeCategoryIds: string[];
+  activeCategoryId: string;
   onCategoryChange: (categoryId: string) => void;
   onPriceChange: (min: number, max: number) => void;
   onFilterChange: (filters: Record<string, boolean>) => void;
 };
 
-export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onPriceChange, onFilterChange }: SidebarFilterProps) {
+export default function SidebarFilter({ activeCategoryId, onCategoryChange, onPriceChange, onFilterChange }: SidebarFilterProps) {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
   const [minPriceStr, setMinPriceStr] = useState("0");
@@ -40,20 +40,37 @@ export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onP
       <hr className="border-t-2 border-[#3D2419]/20 mb-5" />
 
       <div className="flex flex-col gap-3 mb-8">
+        {/* 全部商品 */}
+        <button
+          onClick={() => onCategoryChange("")}
+          className={`flex items-center gap-4 w-full px-4 py-3 text-lg border-[3px] transition-all duration-100 cursor-pointer ${
+            activeCategoryId === ""
+            ? "bg-[#FFD3B6] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419]"
+            : "bg-transparent border-transparent hover:bg-[#3D2419]/5"
+          }`}
+        >
+          <span className={activeCategoryId === "" ? "text-[#3D2419]" : "text-[#3D2419]/80"}>
+            <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
+              <path d="M3 4h18v16H3V4zm2 2v12h14V6H5zm2 2h10v2H7V8zm0 4h10v2H7v-2z" />
+            </svg>
+          </span>
+          <span className="tracking-wide">全部商品</span>
+        </button>
+
         {categories.map((cat) => {
           return (
               <button
                   key={cat.name}
                   onClick={() => onCategoryChange(cat.id)}
-                  className={`flex items-center gap-4 w-full px-4 py-3 text-lg border-[3px] rounded-xl transition-all duration-100 cursor-pointer
+                  className={`flex items-center gap-4 w-full px-4 py-3 text-lg border-[3px] transition-all duration-100 cursor-pointer
                     ${
-                      activeCategoryIds.includes(cat.id)
+                      activeCategoryId === cat.id
                     ? "bg-[#FFD3B6] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419]"
                     : "bg-transparent border-transparent hover:bg-[#3D2419]/5"
                 }`}
             >
               <span
-                className={activeCategoryIds.includes(cat.id) ? "text-[#3D2419]" : "text-[#3D2419]/80"}
+                className={activeCategoryId === cat.id ? "text-[#3D2419]" : "text-[#3D2419]/80"}
               >
                 {cat.icon}
               </span>
@@ -76,11 +93,11 @@ export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onP
       {/* 雙拉桿 slider */}
       <div className="relative h-6 mb-4 mx-1">
         {/* 軌道背景 */}
-        <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-[#3D2419]/20 rounded-full" />
+        <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-[#3D2419]/20" />
 
         {/* 選取範圍（兩拉桿之間） */}
         <div
-          className="absolute top-1/2 -translate-y-1/2 h-2 bg-[#3D2419] rounded-full"
+          className="absolute top-1/2 -translate-y-1/2 h-2 bg-[#3D2419]"
           style={{
             left: `${(minPrice / PRICE_MAX) * 100}%`,
             width: `${((maxPrice - minPrice) / PRICE_MAX) * 100}%`,
@@ -163,7 +180,7 @@ export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onP
             setMinPrice(clamped);
             onPriceChange(clamped, maxPrice);
           }}
-          className="w-full h-10 text-center bg-white border-[3px] border-[#3D2419] rounded-xl focus:outline-none placeholder-[#3D2419]/40"
+          className="w-full h-10 text-center bg-white border-[3px] border-[#3D2419] focus:outline-none placeholder-[#3D2419]/40"
         />
         <span className="text-lg text-[#3D2419] font-bold">—</span>
         <input
@@ -183,7 +200,7 @@ export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onP
             setMaxPrice(clamped);
             onPriceChange(minPrice, clamped);
           }}
-          className="w-full h-10 text-center bg-white border-[3px] border-[#3D2419] rounded-xl focus:outline-none placeholder-[#3D2419]/40"
+          className="w-full h-10 text-center bg-white border-[3px] border-[#3D2419] focus:outline-none placeholder-[#3D2419]/40"
         />
       </div>
 
@@ -198,11 +215,11 @@ export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onP
             className="sr-only" // 隱藏原生網頁樣式
           />
           <div
-            className={`w-6 h-6 border-[3px] border-[#3D2419] rounded-md transition-all flex items-center justify-center shadow-[2px_2px_0px_0px_#3D2419]
+            className={`w-6 h-6 border-[3px] border-[#3D2419] transition-all flex items-center justify-center shadow-[2px_2px_0px_0px_#3D2419]
             ${filters.onSale ? "bg-[#A8E6CF]" : "bg-white"}`}
           >
             {filters.onSale && (
-              <div className="w-2 h-2 bg-[#3D2419] rounded-sm" />
+              <div className="w-2 h-2 bg-[#3D2419]" />
             )}
           </div>
           <span className="group-hover:text-[#3D2419]/80">特價中</span>
@@ -217,11 +234,11 @@ export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onP
             className="sr-only"
           />
           <div
-            className={`w-6 h-6 border-[3px] border-[#3D2419] rounded-md transition-all flex items-center justify-center shadow-[2px_2px_0px_0px_#3D2419]
+            className={`w-6 h-6 border-[3px] border-[#3D2419] transition-all flex items-center justify-center shadow-[2px_2px_0px_0px_#3D2419]
             ${filters.inStock ? "bg-[#A8E6CF]" : "bg-white"}`}
           >
             {filters.inStock && (
-              <div className="w-2 h-2 bg-[#3D2419] rounded-sm" />
+              <div className="w-2 h-2 bg-[#3D2419]" />
             )}
           </div>
           <span className="group-hover:text-[#3D2419]/80">只顯示有貨</span>

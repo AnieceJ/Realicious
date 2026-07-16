@@ -19,7 +19,7 @@ export default function OrderItem() {
               ORDER ID: <span className="text-[#8C5230]">#PB-2024001</span>
             </div>
             <div className="text-xs text-[#3D2419]/50 font-medium">2026-07-09</div>
-            <div className="flex items-center justify-center px-3 py-1 mt-2 bg-[#466f44] text-[#FFFFFF] font-black text-sm border-[3px] border-[#3D2419] rounded-sm shadow-[2px_2px_0px_0px_#3D2419]">
+            <div className="flex items-center justify-center px-3 py-1 mt-2 bg-[#466f44] text-[#FFFFFF] font-black text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]">
               <span>處理中</span>
             </div>
           </div>
@@ -37,7 +37,7 @@ export default function OrderItem() {
             </div>
 
             {/* 🔽 手風琴開關按鈕 (純樣式，自帶 Hover 沉下動效) */}
-            <button className="px-4 py-2.5 bg-white border-[3px] border-[#3D2419] rounded-xl shadow-[3px_3px_0px_0px_#3D2419] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-sm font-black flex items-center gap-2">
+            <button className="px-4 py-2.5 bg-white border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-sm font-black flex items-center gap-2">
               <span>檢視明細</span>
               {/* 像素向下箭頭 */}
               <span className="text-xs">▼</span>
@@ -55,7 +55,7 @@ export default function OrderItem() {
           </div>
 
           {/* 商品項目 1 */}
-          <div className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] rounded-md px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
+          <div className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
             <div className="flex items-center gap-2.5">
               <span className="text-[#8C5230] text-sm">🎒</span>
               <span className="text-base text-[#3D2419]">川媽臭臭鍋餐券 (單人套餐)</span>
@@ -66,7 +66,7 @@ export default function OrderItem() {
           </div>
 
           {/* 商品項目 2 */}
-          <div className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] rounded-md px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
+          <div className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
             <div className="flex items-center gap-2.5">
               <span className="text-[#8C5230] text-sm">🎒</span>
               <span className="text-base text-[#3D2419]">波霸奶茶組合 (去冰/半糖)</span>
@@ -77,7 +77,7 @@ export default function OrderItem() {
           </div>
 
           {/* 商品項目 3 */}
-          <div className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] rounded-md px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
+          <div className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
             <div className="flex items-center gap-2.5">
               <span className="text-[#8C5230] text-sm">🎒</span>
               <span className="text-base text-[#3D2419]">大雞排冒險餐包</span>

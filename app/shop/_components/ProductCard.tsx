@@ -26,7 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </Link>
 
       {/* 飄浮字卡 */}
-      <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left rounded-sm pointer-events-none">
+      <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left pointer-events-none">
         <p className="text-[#3D2419] font-black text-base truncate tracking-wide">
           {product.name}
         </p>
@@ -40,13 +40,13 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="absolute bottom-20 left-3 right-3 flex items-center justify-between transition-opacity duration-200">
           <button
             onClick={(e) => { e.stopPropagation(); addToCart(product, 1); showToast(`${product.name} 已加入購物車`); }}
-            className="px-4 py-2 bg-[#3D2419] text-white font-bold text-sm border-2 border-white rounded-md shadow-md hover:bg-[#5a3a2a] transition-colors cursor-pointer"
+            className="px-4 py-2 bg-[#3D2419] text-white font-bold text-sm border-2 border-white shadow-md hover:bg-[#5a3a2a] transition-colors cursor-pointer"
           >
             加入購物車
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); setFavorited(!favorited); }}
-            className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#3D2419] rounded-full shadow-md hover:bg-red-50 transition-colors cursor-pointer"
+            className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#3D2419] shadow-md hover:bg-red-50 transition-colors cursor-pointer"
           >
             <svg className="w-5 h-5 transition-all" viewBox="0 0 24 24"
               fill={favorited ? "#ef4444" : "none"}

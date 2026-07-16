@@ -65,7 +65,7 @@ export default function SortDropdown({ onSort }: ProductSortProps) {
       {isOpen && (
         <div
           className="absolute right-0 mt-3 w-48 bg-white 
-                    border-[3px] border-[#3D2419] rounded-xl 
+                    border-[3px] border-[#3D2419] 
                     shadow-[6px_6px_0px_0px_#3D2419] z-50 
                     overflow-hidden animate-fadeIn"
         >
@@ -80,7 +80,7 @@ export default function SortDropdown({ onSort }: ProductSortProps) {
               >
                 <span>{option.label}</span>
                 {option.badge && (
-                  <span className="text-xs bg-[#A8E6CF] px-1.5 py-0.5 rounded border border-[#3D2419]">
+                  <span className="text-xs bg-[#A8E6CF] px-1.5 py-0.5border border-[#3D2419]">
                     {option.badge}
                   </span>
                 )}
