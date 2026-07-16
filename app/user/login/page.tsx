@@ -27,7 +27,7 @@ export default function Login() {
   const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
 
   // RHF有錯誤訊息時觸發晃動
-  const onError = (errors: LoginInput) => {
+  const onError = (errors: any) => {
     if (errors.account) {
       setShakeAccount(true);
       setTimeout(() => setShakeAccount(false), 400); // 0.4秒動畫跑完後，關掉開關

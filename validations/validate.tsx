@@ -13,7 +13,6 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
-
 // 定義註冊的驗證規則
 export const registerSchema = z
   .object({
@@ -35,6 +34,22 @@ export const registerSchema = z
       }),
     check: z.string().min(1, { message: "此欄位必填" }),
   })
-  .refine((data) => data.password === data.check, { message: "密碼驗證不相同",path:['check'], });
+  .refine((data) => data.password === data.check, {
+    message: "密碼驗證不相同",
+    path: ["check"],
+  });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
+
+// 定義登入的驗證規則
+export const personalSchema = z.object({
+  first_name: z.string().min(1, { message: "此欄位必填" }),
+  last_name: z.string().min(1, { message: "此欄位必填" }),
+  nick_name: z.string().min(1, { message: "此欄位必填" }),
+  city: z.string().min(1, { message: "此欄位必填" }),
+  district: z.string().min(1, { message: "此欄位必填" }),
+  address: z.string().min(1, { message: "此欄位必填" }),
+  phone: z.number().min(1, { message: "此欄位必填" }),
+  birthday: z.string().min(1, { message: "此欄位必填" }),
+});
+export type PersonalInput = z.infer<typeof personalSchema>;
