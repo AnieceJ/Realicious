@@ -38,8 +38,10 @@ export default function AmbientBackground({
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   // 用 ref 讀 props，動畫迴圈就不用因為 props 變動而重啟
-  const props = useRef({ mood, intensity, danger });
+const props = useRef({ mood, intensity, danger });
+useEffect(() => {
   props.current = { mood, intensity, danger };
+}, [mood, intensity, danger]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -194,8 +196,42 @@ export default function AmbientBackground({
     };
   }, []);
 
+  /* 頁面本身就是天空。
+     小雞從底部的地面站起來，身體伸進這片天空裡 ——
+     所以這裡的顏色必須跟著她的心情走。
+
+     normal / junk 刻意壓得很淡（卡片還要看得清楚）；
+     dead 可以放膽做重，那是死亡畫面，本來就該讓人不安。 */
+  const sky =
+    mood === "dead"
+      ? { top: "#3A3450", mid: "#5C5470", low: "#8B8298" }
+      : mood === "junk"
+        ? { top: "#D8D2C4", mid: "#E8E4DA", low: "#F4F2EC" }
+        : { top: "#FFF4D6", mid: "#FFFAF0", low: "#FFFFFF" };
+
   return (
     <>
+      {/* 天空：抖色帶。像素遊戲沒有漸層，只有棋盤格混色。 */}
+      <div
+        className="fixed inset-0 -z-20 pointer-events-none sky-shift"
+        style={{ background: sky.low }}
+        aria-hidden
+      />
+      <div
+        className="dither fixed inset-x-0 top-0 h-[38vh] -z-20 pointer-events-none sky-shift"
+        style={
+          { "--dither-a": sky.top, "--dither-b": sky.mid } as React.CSSProperties
+        }
+        aria-hidden
+      />
+      <div
+        className="dither dither-sparse fixed inset-x-0 top-[38vh] h-[22vh] -z-20 pointer-events-none sky-shift"
+        style={
+          { "--dither-a": sky.mid, "--dither-b": sky.low } as React.CSSProperties
+        }
+        aria-hidden
+      />
+
       <canvas
         ref={canvasRef}
         className="fixed inset-0 -z-10 pointer-events-none"

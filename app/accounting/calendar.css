@@ -4,46 +4,70 @@
 
 .rdp-root {
   margin: 0;
-  --rdp-day-width: 38px;
-  --rdp-day-height: 38px;
+  width: 100%;              /* 讓整個日曆吃滿容器，不再靠左縮成一團 */
+  --rdp-day-height: 40px;
   font-weight: 700;
   color: #000;
 }
 
-/* 標題列：左右箭頭貼兩側、月份置中，中間留白 */
-.rdp-nav {
-  position: static;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 0;
+/* 每一格（td）等寬撐開；按鈕填滿格子 */
+.rdp-day {
+  padding: 2px;
+  text-align: center;
 }
+.rdp-week .rdp-day,
+.rdp-weekdays .rdp-weekday {
+  width: calc(100% / 7);   /* 7 欄平均 */
+}
+
+/* 標題列：← 　月份　 → 三者同一行。
+   react-day-picker 的結構是 .rdp-month_caption 和 .rdp-nav 兩個「分開的」
+   元素。舊版讓 caption 絕對定位浮在 nav 上面，結果 nav 自己撐了一行、
+   月份浮在另一層 —— 看起來就變兩行。
+
+   改法：把 .rdp-month 設成 grid，讓 caption 和 nav「疊在同一個格子裡」
+   （grid-area 都指到 1/1），nav 用 space-between 把箭頭推到兩側，
+   caption 置中。三者共用同一行高，視覺上就在一起了。 */
+.rdp-month {
+  position: relative;
+  width: 100%;
+  display: grid;
+}
+.rdp-months {
+  width: 100%;
+}
+
+/* caption（月份）和 nav（箭頭）疊在同一個 grid 格子 */
+.rdp-month_caption,
+.rdp-nav {
+  grid-area: 1 / 1;
+  height: 36px;
+}
+
 .rdp-month_caption {
-  position: absolute;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  pointer-events: none;
+  pointer-events: none;    /* 點擊穿透，讓底下的箭頭可以按 */
   font-weight: 900;
   font-size: 15px;
   margin: 0;
-  height: 32px;
 }
-.rdp-months,
-.rdp-month {
+.rdp-nav {
+  display: flex;
+  justify-content: space-between;   /* 箭頭推到左右兩端 */
+  align-items: center;
   width: 100%;
+  padding: 0;
+  margin: 0;
 }
+
+/* 月曆格子：table-layout: fixed 讓 7 欄平均分配，撐滿卡片寬度 */
 .rdp-month_grid {
   width: 100%;
-  margin-top: 14px;
-}
-/* 讓 caption 的絕對定位有參考點 */
-.rdp-month > .rdp-month_caption,
-.rdp-month {
-  position: relative;
+  margin-top: 16px;
+  table-layout: fixed;    /* ★ 每一欄等寬、一起撐滿 */
+  border-collapse: collapse;
 }
 .rdp-button_previous,
 .rdp-button_next {
@@ -73,14 +97,21 @@
   color: #bb0015;
   font-size: 11px;
   font-weight: 700;
+  text-align: center;
+  padding-bottom: 4px;
 }
 
-/* 每一格 */
+/* 每一格：按鈕撐滿整格，高度固定、寬度隨欄位 */
 .rdp-day_button {
+  width: 100%;
+  height: var(--rdp-day-height);
   border-radius: 0;
   border: 2px solid transparent;
   font-weight: 700;
   color: #000;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .rdp-day_button:hover {
   border-color: #000;

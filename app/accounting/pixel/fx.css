@@ -356,7 +356,22 @@
   .crt-lines {
     display: none;
   }
+  .sky-shift {
+    transition: none !important;
+  }
 }
+
+/* ---------- 天空換色：小雞死掉的時候，天不該「啪」一下就黑 ---------- */
+.sky-shift {
+  transition: background-color 0.8s ease;
+}
+.sky-shift.dither {
+  transition:
+    background-color 0.8s ease,
+    background-image 0.8s ease;
+}
+
+/* ---------- sprite sheet 播放 ---------- */
 @keyframes sprite-run {
   to {
     background-position-x: var(--sprite-end);
