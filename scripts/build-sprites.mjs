@@ -61,7 +61,7 @@ import path from "node:path";
 
 const CELL = 64; // 一格幾像素。要跟 PixelSpriteSheet.tsx 的 CELL 一致
 const FRAMES = 4; // 每個狀態幾格
-const STATES = ["idle", "happy", "hungry", "junk", "dead"]; // 順序 = 表格的列，別動
+const STATES = ["idle", "happy", "hungry", "junk", "dead", "held", "surprised"]; // 順序 = 表格的列，別動
 const PARTS = ["chick", "bow", "scarf", "cap", "crown"];
 
 const SRC = "sprites";
@@ -226,6 +226,19 @@ async function buildPart(part) {
   const notes = [];
   const stats = [];
 
+  // ★ --fix 要在「讀 idle 當備胎」之前先跑一輪，把所有原始檔清乾淨。
+  //   不然單張配件（只有 idle_0）永遠不會被 fix —— 那正是圍巾的 bug。
+  if (FIX) {
+    for (const state of STATES) {
+      const fs = await loadFrames(dir, state);
+      // 每個狀態各自用自己第 0 格的色盤當基準
+      const pal = fs.length ? await paletteOf(fs[0]) : null;
+      for (let i = 0; i < fs.length; i++) {
+        await autofix(fs[i], i === 0 ? null : pal);
+      }
+    }
+  }
+
   // 先把 idle 讀出來當備胎
   const idleFrames = await loadFrames(dir, "idle");
   if (idleFrames.length === 0 && part === "chick") {
@@ -233,11 +246,22 @@ async function buildPart(part) {
     return;
   }
 
+  // 配件（bow/scarf/cap/crown）在這些狀態「不出現」。
+  //   dead      —— 幽靈不戴東西
+  //   held      —— 被拎起來，帽子王冠會掉（而且 held 是橫躺，位置全不同）
+  //   surprised —— 幽靈驚訝，同樣不戴
+  // chick 本體不受這個限制（它每個狀態都要有圖）。
+  const ACCESSORY_SKIP = new Set(["dead", "held", "surprised"]);
+
   for (let row = 0; row < STATES.length; row++) {
     const state = STATES[row];
     let frames = await loadFrames(dir, state);
 
-    if (frames.length === 0) {
+    // 配件遇到「不該出現」的狀態 → 整列留空，不要用 idle 去頂
+    if (part !== "chick" && ACCESSORY_SKIP.has(state)) {
+      frames = [];
+      notes.push(`${state} → 配件不出現（留空）`);
+    } else if (frames.length === 0) {
       if (idleFrames.length > 0) {
         frames = idleFrames;
         notes.push(`${state} → 先用 idle 頂著`);
@@ -248,13 +272,6 @@ async function buildPart(part) {
 
     if (frames.length === 3) {
       notes.push(`${state} → 只有 3 格，會補成 0,1,2,0（第 0 格會連放兩次）`);
-    }
-
-    // --fix：先用第 0 格的色盤把後面幾格清乾淨
-    if (FIX && frames.length > 1) {
-      const pal = await paletteOf(frames[0]);
-      await autofix(frames[0], null);
-      for (let i = 1; i < frames.length; i++) await autofix(frames[i], pal);
     }
 
     // 檢查原始檔（只檢查真的存在的那幾張）
@@ -268,12 +285,39 @@ async function buildPart(part) {
       }
     }
 
+    // 配件只給 1 張 → 自動生成呼吸的第 2 格（往上 1px），跟身體呼吸同步。
+    // 這樣你每個配件只要畫 1 張，不用畫 idle_0 + idle_1 兩張。
+    // （chick 本體不套這規則 —— 它的動作是你精心畫的，不是機械位移。）
+    const autoBreathe = part !== "chick" && frames.length === 1;
+
     for (let col = 0; col < FRAMES; col++) {
-      // 循環補滿：2 格 → 0,1,0,1（一吸一吐），不是 0,1,1,1（吸一下憋住）
-      const src = frames.length ? frames[col % frames.length] : null;
-      const buf = src
-        ? await sharp(src).resize(CELL, CELL, { kernel: "nearest", fit: "contain" }).png().toBuffer()
-        : await blank();
+      let src = frames.length ? frames[col % frames.length] : null;
+      let buf;
+
+      if (!src) {
+        buf = await blank();
+      } else if (autoBreathe) {
+        // 奇數格往上 1px（呼吸的吸氣）：砍掉最上面 1 列，底部補 1 列透明。
+        // 這樣總高度維持 CELL，內容整體上移 1px。
+        const resized = await sharp(src)
+          .resize(CELL, CELL, { kernel: "nearest", fit: "contain" })
+          .png()
+          .toBuffer();
+        if (col % 2 === 1) {
+          buf = await sharp(resized)
+            .extract({ left: 0, top: 1, width: CELL, height: CELL - 1 }) // 砍掉頂端 1 列
+            .extend({ top: 0, bottom: 1, left: 0, right: 0, background: { r: 0, g: 0, b: 0, alpha: 0 } }) // 底部補回
+            .png()
+            .toBuffer();
+        } else {
+          buf = resized;
+        }
+      } else {
+        buf = await sharp(src)
+          .resize(CELL, CELL, { kernel: "nearest", fit: "contain" })
+          .png()
+          .toBuffer();
+      }
 
       composites.push({ input: buf, left: col * CELL, top: row * CELL });
     }

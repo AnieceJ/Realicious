@@ -32,18 +32,30 @@ import { useReducedMotion } from "./useReducedMotion";
    直接複製貼上就好 —— 重點是「格數一致」，動畫才會鎖在一起。
    ============================================================ */
 
-export type PetMood = "idle" | "happy" | "hungry" | "junk" | "dead";
+export type PetMood =
+  | "idle"
+  | "happy"
+  | "hungry"
+  | "junk"
+  | "dead"
+  | "held" // 被滑鼠拎起來（只有健康時）
+  | "surprised"; // 幽靈被拎起來的驚訝 OWO
 
 const CELL = 64; // 一格幾個像素（你的畫布尺寸）
 const FRAMES = 4; // 每個狀態幾格動畫
+
+// ★ 這裡的順序必須跟 build-sprites.mjs 的 STATES 完全一致，
+//   不然拖曳觸發 held、畫面卻顯示別的狀態。
 const ROW: Record<PetMood, number> = {
   idle: 0,
   happy: 1,
   hungry: 2,
   junk: 3,
   dead: 4,
+  held: 5,
+  surprised: 6,
 };
-const ROWS = 5;
+const ROWS = 7;
 
 // 每個狀態的播放速度（一輪幾秒）。慢 = 沉重，快 = 興奮。
 // 注意：4 格跑完 = 一個 DURATION。
@@ -55,6 +67,8 @@ const DURATION: Record<PetMood, number> = {
   hungry: 1.6,
   junk: 3.2, // 吃土：動得又慢又小
   dead: 3.6,
+  held: 0.6, // 被拎著搖晃，快一點才有掙扎感
+  surprised: 0.7,
 };
 
 const BASE = "/pixel";
@@ -122,11 +136,17 @@ export default function PetSprite({
   // 放大倍率一定要取整數。3.7 倍會讓像素邊緣糊掉、出現半透明的鬼影。
   const scale = Math.max(1, Math.round(size / CELL));
 
-  // 配件：頭上只戴最高階的，圍巾獨立
+  // 配件：頭上只戴最高階的（王冠 > 帽 > 蝴蝶結），圍巾獨立疊。
   const headwear =
     streak >= 30 ? "crown" : streak >= 14 ? "cap" : streak >= 3 ? "bow" : null;
   const scarf = streak >= 7;
-  const wearable = mood !== "dead"; // 幽靈不穿衣服
+
+  // 這三個狀態不戴配件：
+  //   dead      幽靈不穿衣服
+  //   held      被拎起來，帽子王冠會掉
+  //   surprised 幽靈驚訝
+  // （配件的 sheet 本來就把這三列留空了，這裡是雙保險，也讓意圖明確。）
+  const wearable = mood !== "dead" && mood !== "held" && mood !== "surprised";
 
   return (
     <div
@@ -141,11 +161,15 @@ export default function PetSprite({
       aria-label={
         mood === "dead"
           ? "小雞變成幽靈了"
-          : mood === "junk"
-            ? "小雞正在吃土"
-            : mood === "hungry"
-              ? "小雞餓了"
-              : "小雞"
+          : mood === "surprised"
+            ? "幽靈被拎起來嚇了一跳"
+            : mood === "held"
+              ? "小雞被拎起來了"
+              : mood === "junk"
+                ? "小雞正在吃土"
+                : mood === "hungry"
+                  ? "小雞餓了"
+                  : "小雞"
       }
     >
       <SheetLayer src={`${BASE}/chick.png`} mood={mood} scale={scale} reduce={reduce} z={0} />
