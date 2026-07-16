@@ -2,7 +2,7 @@
 import React from "react";
 import type { CartItem } from "@/lib/shop/cart";
 
-export default function CheckoutSummary({ items }: { items: CartItem[] }) {
+export default function CheckoutSummary({ items, onCheckout }: { items: CartItem[]; onCheckout: () => void }) {
   const subtotal = (items || []).reduce((sum, item) => sum + item.price * item.qty, 0);
 
   return (
@@ -29,8 +29,11 @@ export default function CheckoutSummary({ items }: { items: CartItem[] }) {
           <div className="w-6 h-6 border-[3px] border-[#3D2419] bg-white shrink-0 flex items-center justify-center shadow-[1px_1px_0px_0px_#3D2419]"></div>
           <span className="text-sm text-[#3D2419]/80 leading-tight">我已經閱讀並同意電子票券使用及退款規範</span>
         </div>
-        <div className="flex items-center justify-center w-full px-4 py-2.5 mt-8 bg-[#89502E] text-[#FFFFFF] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
-          <button className="text-3xl">確認結帳<br />CHECKOUT</button>
+        <div
+          onClick={onCheckout}
+          className="flex items-center justify-center w-full px-4 py-2.5 mt-8 bg-[#89502E] text-[#FFFFFF] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] cursor-pointer hover:bg-[#a06040] active:translate-x-[2px] active:translate-y-[2px] transition-all"
+        >
+          <span className="text-3xl">確認結帳<br />CHECKOUT</span>
         </div>
         <div className="flex justify-center">
           <span>*點擊後將開始進行支付</span>
