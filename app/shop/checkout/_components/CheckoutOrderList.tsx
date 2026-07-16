@@ -36,9 +36,15 @@ export default function CheckoutOrderList({ items }: { items: CartItem[] }) {
         {hiddenCount > 0 && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="mt-2 text-sm text-[#3D2419]/70 hover:text-[#3D2419] underline cursor-pointer text-center py-2 transition-all"
+            className="w-full mt-3 py-3 text-sm font-bold text-[#3D2419] bg-[#FFD3B6] border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-[#ffbe94] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center justify-center gap-2"
           >
-            {expanded ? "收合" : `還有 ${hiddenCount} 筆商品`}
+            <span>{expanded ? "收合" : `還有 ${hiddenCount} 筆商品`}</span>
+            <svg
+              className={`w-4 h-4 fill-[#3D2419] transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+              viewBox="0 0 24 24"
+            >
+              <path d="M24 6h-24l12 12z" />
+            </svg>
           </button>
         )}
       </div>
