@@ -10,8 +10,10 @@ import Image from "next/image";
 
 import Container from "../_components/container";
 import loginAd from "@/public/user/login.png";
+import google from "@/public/user/google-logo.svg"
+import {button_shadow} from '../_components/button'
 
-import { loginSchema } from "@/validations/validate";
+import { loginSchema ,LoginInput} from "@/validations/validate";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Login() {
@@ -19,7 +21,6 @@ export default function Login() {
   const { login } = useUser();
 
   const [loginError, setLoginError] = useState(false); // 登入錯誤處理
-  const [errorMessage, setErrorMesssage] =useState('')
 
   const [shakeAccount, setShakeAccount] = useState(false); // Email 欄位錯誤特效
   const [shakePassword, setShakePassword] = useState(false); // Password 欄位錯誤特效
@@ -48,7 +49,8 @@ export default function Login() {
   });
 
   // 表單送出
-  const onSubmit = (data: any) => {
+  const onSubmit = (data: LoginInput) => {
+    
     if (submit) return; // 防止快速重複點擊
     setLoginError(false); // 登入中特效
     setSubmit(true);
@@ -64,7 +66,6 @@ export default function Login() {
       } else {
         setLoginError(true); // 登入失敗，回復原狀
         setSubmit(false);
-        setErrorMesssage(onLogin.message)
       }
     }, 1000);
   };
@@ -85,11 +86,11 @@ export default function Login() {
         </div>
 
         <div className="w-110 h-180 bg-white flex flex-col items-center">
-          <h1 className="text-[24px] my-10">登入</h1>
+          <h1 className="text-[24px] my-5">登入</h1>
 
           <form
             onSubmit={handleSubmit(onSubmit, onError)}
-            className="flex flex-col items-center mb-5"
+            className="flex flex-col items-center mb-4"
           >
             <div className="flex flex-col items-start mb-5">
               <label className="text-5 mb-2" htmlFor="email">
@@ -102,13 +103,15 @@ export default function Login() {
                 id="email"
                 placeholder="請輸入電子郵件"
               />
+              <div className="w-auto h-4">
               {errors.account && (
-                <p className="text-red-500 text-sm mt-1 w-90 text-left">
+                <p className={`text-red-500 text-sm mt-1 w-90 text-left`}>
                   {String(errors.account.message)}
                 </p>
               )}
+              </div>
             </div>
-            <div className="flex flex-col items-start mb-5">
+            <div className="flex flex-col items-start mb-4">
               <label className="text-[20px] mb-2" htmlFor="password">
                 密碼
               </label>
@@ -117,27 +120,32 @@ export default function Login() {
                 className={`${errors.password ? "border-red-500" : ""} ${shakePassword ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
                 type="password"
                 id="password"
-                placeholder="密碼需要 6 個字元以上，且包含數字與英文"
+                placeholder="請輸入密碼"
               />
+              <div className="w-auto h-4">
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1 w-90 text-left">
                   {String(errors.password.message)}
                 </p>
               )}
+              </div>
             </div>
-            <div className="flex justify-between w-90 mb-5">
-              <p
-                className={`${loginError ? "animate-shake" : "invisible"} text-red-500`}
-              >
-                {errorMessage}
-              </p>
-              <Link
-                className=" text-[16px] text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
+            <div className="w-full h-10 flex justify-between">
+              <div className="">
+              {loginError && (
+                <span className={`text-red-500 text-sm `}>
+                  帳號或密碼錯誤
+                </span>
+              )}
+              </div>
+                <Link
+                className=" text-[16px] w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
                 href={`/user/forgetPassword`}
               >
                 忘記密碼
               </Link>
             </div>
+            
             <button
               onClick={() => {}}
               type="submit"
@@ -148,16 +156,27 @@ export default function Login() {
             </button>
           </form>
 
-          <h2 className="text-[26px]">--OR--</h2>
-          <div className="mt-5">
-            <Link href={'http://localhost:3001/user/auth/google'} className="w-40 h-12 mx-2 border">google</Link>
-          </div>
+          <h2 className="text-[20px] mb-4">--OR--</h2>
+          <div className="flex justify-center items-center">
+            <Link href={'http://localhost:3001/user/api/auth/google'} className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}>
+            <Image
+            className=" object-contain object-bottom w-10 mr-4"
+            src={google}
+            alt="廣告"
+            width={30}
+            height={30}
+            priority
+          />
+            <span>google 登入</span></Link>
+          
           <Link
-            className=" text-[20px] text-blue-600 mt-10 hover:bg-blue-100 active:bg-blue-800 active:text-white"
+            className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
             href={`/user/register`}
           >
-            還沒有帳號嗎？按此註冊
+            按此註冊
           </Link>
+          </div>
+            
         </div>
       </div>
     </Container>

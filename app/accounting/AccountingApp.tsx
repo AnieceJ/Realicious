@@ -2,10 +2,21 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import BudgetCalendar from "./BudgetCalendar";
-import PetStage from "./pixel/PetStage";
+import ChickGround, { groundClearance } from "./pixel/ChickGround";
 import AmbientBackground from "./pixel/AmbientBackground";
 import CoinBurst, { useCountUp } from "./pixel/CoinBurst";
-import type { PetMood } from "./pixel/PixelSprite";
+import type { PetMood } from "./pixel/PixelSpriteSheet";
+import {
+  type Tx,
+  fetchTxs,
+  fetchBudget,
+  fetchPet,
+  createTx,
+  updateTx,
+  deleteTx,
+  saveBudget,
+  savePet,
+} from "./api";
 
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
@@ -24,17 +35,17 @@ const HP_MAX = 100;
 const HP_GAIN = 20; // 有記帳 +20
 const HP_LOSS = 34; // 斷一天 -34（3 天歸零）
 const REVIVE_DAYS = 3; // 死後連續記帳 3 天復活
-const OUTFIT_MILESTONES = [3, 7, 14, 30]; // 連續簽到服裝獎勵
-const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"]; // 對應 PixelSprite 裡的配件圖層
+// 解鎖天數與名稱。衣櫃 modal 裡直接寫死了對應（bow=3, scarf=7...），
+// 這兩個保留給之後可能的「里程碑清單」用，目前沒有直接引用。
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const OUTFIT_MILESTONES = [3, 7, 14, 30];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"];
 
-type Tx = {
-  id: string;
-  date: string; // "2025-05-15"
-  category: string;
-  name: string;
-  amount: number;
-  type: "income" | "expense";
-};
+// 小雞的尺寸。SPRITE 必須是 64 的整數倍（128 = 2x, 192 = 3x）。
+// 非整數倍會讓瀏覽器把你的硬邊補成半透明鬼影。
+const SPRITE = 128;
+const GROUND_H = 44;
 
 const CATS: Record<string, { emoji: string; type: "income" | "expense" }> = {
   餐飲: { emoji: "🍔", type: "expense" },
@@ -46,10 +57,6 @@ const CATS: Record<string, { emoji: string; type: "income" | "expense" }> = {
   薪資: { emoji: "💰", type: "income" },
   其他收入: { emoji: "🧧", type: "income" },
 };
-
-const TX_KEY = "realicious-tx";
-const BUDGET_KEY = "realicious-budget";
-const NAME_KEY = "realicious-petname";
 const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
 
 const toKey = (d: Date) =>
@@ -69,48 +76,78 @@ const daysBetween = (a: Date, b: Date) =>
 /* ---------- 小雞狀態計算 ----------
    從「有記帳的日子」推算 HP、連續天數、生死、復活進度         */
 function calcPet(txs: Tx[]) {
-  const logged = [...new Set(txs.map((t) => t.date))].sort(); // 有記帳的日期（小到大）
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const todayKey = toKey(today);
+
+  // ★ 只看「今天（含）以前」有記帳的日子。
+  //   未來的帳（例如先登記 8/1 的訂閱）存著、顯示在日曆上、算進預算，
+  //   但「不影響小雞的健康」—— 你未來會花的錢，不該讓今天的小雞餓死。
+  const logged = [...new Set(txs.map((t) => t.date))]
+    .filter((k) => k <= todayKey) // ISO 字串字典序 = 時間序，可以直接比大小
+    .sort();
 
   if (logged.length === 0) {
     return { hp: HP_MAX, streak: 0, alive: true, reviveProgress: 0, loggedToday: false };
   }
 
-  let hp = HP_MAX;
+let hp = HP_MAX;
+  let dead = false;   // 現在是不是死的
+  let run = 0;        // 死後連續記帳幾天（復活進度）
   let prev: Date | null = null;
 
   for (const k of logged) {
     const d = keyToDate(k);
+
     if (prev) {
       const gap = daysBetween(prev, d) - 1; // 中間斷了幾天
-      hp -= gap * HP_LOSS;
+      if (gap > 0) {
+        hp = Math.max(0, hp - gap * HP_LOSS);
+        run = 0;                   // 斷了 → 復活進度歸零
+        if (hp === 0) dead = true;
+      }
     }
-    hp = Math.min(HP_MAX, Math.max(0, hp) + HP_GAIN);
+
+    if (dead) {
+      // 死掉的時候 HP 卡在 0，要連續記帳 REVIVE_DAYS 天才復活
+      run++;
+      if (run >= REVIVE_DAYS) {
+        dead = false;
+        hp = HP_GAIN * REVIVE_DAYS; // 復活，HP 回到 60
+        run = 0;
+      }
+    } else {
+      hp = Math.min(HP_MAX, hp + HP_GAIN);
+    }
+
+    prev = d;
   }
 
   // 從最後一次記帳到今天，中間斷掉的天數也要扣
   const last = keyToDate(logged[logged.length - 1]);
   const gapToToday = daysBetween(last, today);
-  if (gapToToday > 0) hp -= gapToToday * HP_LOSS;
-  hp = Math.max(0, Math.min(HP_MAX, hp));
+  if (gapToToday > 0) {
+    hp = Math.max(0, hp - gapToToday * HP_LOSS);
+    if (gapToToday >= 2) run = 0; // 昨天也沒記 → 復活進度歸零（今天還沒過完，不算）
+    if (hp === 0) dead = true;
+  }
 
   // 連續天數（從今天或昨天往回數）
   let streak = 0;
   const set = new Set(logged);
   const cur = new Date(today);
-  if (!set.has(toKey(cur))) cur.setDate(cur.getDate() - 1); // 今天沒記就從昨天算
+  if (!set.has(toKey(cur))) cur.setDate(cur.getDate() - 1);
   while (set.has(toKey(cur))) {
     streak++;
     cur.setDate(cur.getDate() - 1);
   }
 
-  const alive = hp > 0;
+  const alive = !dead;
   return {
     hp,
     streak,
     alive,
-    reviveProgress: alive ? 0 : Math.min(streak, REVIVE_DAYS),
+    reviveProgress: dead ? Math.min(run, REVIVE_DAYS) : 0,
     loggedToday: set.has(toKey(today)),
   };
 }
@@ -121,6 +158,10 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [petName, setPetName] = useState("米粒");
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("米粒");
+  // 衣櫃：目前戴的頭飾 / 圍巾，還有衣櫃彈窗開關
+  const [equippedHead, setEquippedHead] = useState<"bow" | "cap" | "crown" | null>(null);
+  const [equippedNeck, setEquippedNeck] = useState<"scarf" | null>(null);
+  const [showWardrobe, setShowWardrobe] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<Date>(new Date());
 
@@ -129,6 +170,7 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [justFed, setJustFed] = useState(false);
 
   const [showAdd, setShowAdd] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [showBudget, setShowBudget] = useState(false);
   const [junkMode, setJunkMode] = useState(false);
   const [junkDismissed, setJunkDismissed] = useState(false);
@@ -141,38 +183,68 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [budgetInput, setBudgetInput] = useState("500");
 
   useEffect(() => {
-    try {
-      const t = localStorage.getItem(TX_KEY);
-      if (t) setTxs(JSON.parse(t));
-      const b = localStorage.getItem(BUDGET_KEY);
-      if (b) {
-        setBudget(Number(b));
-        setBudgetInput(b);
+    (async () => {
+      try {
+        const [t, b, p] = await Promise.all([fetchTxs(), fetchBudget(), fetchPet()]);
+        setTxs(t);
+        setBudget(b.budget);
+        setBudgetInput(String(b.budget));
+        setJunkMode(b.junkMode);
+        setPetName(p.petName);
+        setNameInput(p.petName);
+        setEquippedHead(p.equippedHead);
+        setEquippedNeck(p.equippedNeck);
+      } catch (e) {
+        console.error("[lia] 載入失敗", e);
+      } finally {
+        setLoaded(true);
       }
-      const n = localStorage.getItem(NAME_KEY);
-      if (n) {
-        setPetName(n);
-        setNameInput(n);
-      }
-    } catch {}
-    setLoaded(true);
+    })();
   }, []);
 
-  useEffect(() => {
-    if (loaded) localStorage.setItem(TX_KEY, JSON.stringify(txs));
-  }, [txs, loaded]);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(BUDGET_KEY, String(budget));
-  }, [budget, loaded]);
-  useEffect(() => {
-    if (loaded) localStorage.setItem(NAME_KEY, petName);
-  }, [petName, loaded]);
 
-  const saveName = () => {
+  // 換頭飾（擇一，再點同一個 = 脫下）
+  const toggleHead = async (item: "bow" | "cap" | "crown") => {
+    const next = equippedHead === item ? null : item;
+    const prev = equippedHead;
+    setEquippedHead(next); // 先改畫面
+    try {
+      await savePet({ equippedHead: next });
+    } catch (e) {
+      console.error("[lia] 換頭飾失敗", e);
+      setEquippedHead(prev); // 失敗回復
+    }
+  };
+
+  // 換圍巾（獨立，可跟頭飾並存）
+  const toggleNeck = async () => {
+    const next = equippedNeck === "scarf" ? null : "scarf";
+    const prev = equippedNeck;
+    setEquippedNeck(next);
+    try {
+      await savePet({ equippedNeck: next });
+    } catch (e) {
+      console.error("[lia] 換圍巾失敗", e);
+      setEquippedNeck(prev);
+    }
+  };
+
+const saveName = async () => {
     const n = nameInput.trim().slice(0, 8);
-    if (n) setPetName(n);
-    else setNameInput(petName);
+    if (!n) {
+      setNameInput(petName);
+      setEditingName(false);
+      return;
+    }
+    setPetName(n);          // 先改畫面
     setEditingName(false);
+    try {
+      await savePet({ petName: n });
+    } catch (e) {
+      console.error("[lia] 改名失敗", e);
+      setPetName(petName);  // 失敗就回復
+      setNameInput(petName);
+    }
   };
 
   const pet = useMemo(() => calcPet(txs), [txs]);
@@ -206,32 +278,72 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
 
   const catsOfType = Object.keys(CATS).filter((k) => CATS[k].type === fType);
 
-  const addTx = () => {
+const addTx = async () => {
     const amt = Number(fAmt);
     if (!amt || amt <= 0) return;
-    setTxs((p) => [
-      {
-        id: uid(),
-        date: selKey,
-        category: fCat,
-        name: fNote.trim() || fCat,
-        amount: amt,
-        type: fType,
-      },
-      ...p,
-    ]);
+
+    const payload = {
+      date: selKey,
+      category: fCat,
+      name: fNote.trim() || fCat,
+      amount: amt,
+      type: fType,
+    };
+
+    try {
+      if (editingId) {
+        const updated = await updateTx(editingId, payload);
+        setTxs((p) => p.map((t) => (t.id === editingId ? updated : t)));
+      } else {
+        const created = await createTx(payload);
+        setTxs((p) => [created, ...p]);
+      }
+    } catch (e) {
+      console.error("[lia] 儲存失敗", e);
+      alert("儲存失敗");
+      return;
+    }
+
     setFAmt("");
     setFNote("");
     setShowAdd(false);
+    setEditingId(null);
     setJunkDismissed(false);
-    setBurst((n) => n + 1);
-    setJustFed(true);
-    setTimeout(() => setJustFed(false), 1300);
+
+    if (!editingId) {
+      setBurst((n) => n + 1);
+      setJustFed(true);
+      setTimeout(() => setJustFed(false), 1300);
+    }
   };
-  const delTx = (id: string) => setTxs((p) => p.filter((t) => t.id !== id));
+
+  const delTx = async (id: string) => {
+    const backup = txs;
+    setTxs((p) => p.filter((t) => t.id !== id)); // 先在畫面上拿掉，不要等
+    try {
+      await deleteTx(id);
+    } catch (e) {
+      console.error("[lia] 刪除失敗", e);
+      setTxs(backup); // 失敗就放回去
+      alert("刪除失敗");
+    }
+  };
+
+  const openEdit = (tx: Tx) => {
+    setEditingId(tx.id);
+    setFType(tx.type);
+    setFCat(tx.category);
+    setFAmt(String(tx.amount));
+    setFNote(tx.name);
+    setSelected(keyToDate(tx.date));
+    setShowAdd(true);
+  };
 
   return (
-    <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <div
+      className="max-w-[1100px] mx-auto flex flex-col gap-5"
+      style={{ paddingBottom: groundClearance(SPRITE, GROUND_H) }}
+    >
       {/* ============ 背景氛圍層（會跟著小雞的狀態變） ============ */}
       <AmbientBackground
         mood={!pet.alive ? "dead" : junkMode ? "junk" : "normal"}
@@ -240,10 +352,10 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
       />
       <CoinBurst fire={burst} originRef={stageRef} />
 
-      {/* ============ 左欄：小雞 + 日曆 ============ */}
-      <div className="lg:col-span-4 flex flex-col gap-6">
-        {/* 小雞 */}
-        <section className={`${CARD} p-5`} aria-label="小雞狀態">
+      {/* ============ 狀態卡（橫的、薄的）============
+           小雞本人不在這裡 —— 她住在畫面底部的地面上。
+           這張卡只放「數字」：HP、連續天數、今天記了沒。 */}
+      <section className={`${CARD} p-4 md:p-5`} aria-label="小雞狀態">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-[3px] bg-black" />
             {editingName ? (
@@ -276,20 +388,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             <div className="flex-1 h-[3px] bg-black" />
           </div>
 
-          {/* 遊戲畫面 —— 抖色天空 + 飄雲 + 地面，小雞是真的像素圖 */}
-          <PetStage
-            ref={stageRef}
-            mood={mood}
-            streak={pet.streak}
-            hp={pet.hp}
-            hpMax={HP_MAX}
-            reviveProgress={pet.reviveProgress}
-            reviveDays={REVIVE_DAYS}
-          />
-
-
-          {/* 狀態列 */}
-          <div className="flex flex-col gap-2.5 my-4">
+          {/* HP 與 STREAK 並排，不再上下堆疊 —— 省一半高度 */}
+          <div className="grid md:grid-cols-2 gap-3 mb-3">
             <Bar label="HP" val={`${pet.hp}/${HP_MAX}`} pct={pet.hp} color="bg-[#BB0015]" pixel={pixel} />
             <Bar
               label="STREAK"
@@ -300,42 +400,36 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             />
           </div>
 
-          {/* 今日打卡狀態 */}
-          <div
-            className={`border-[3px] border-black px-3 py-2 mb-3 text-[12px] font-bold text-center ${
-              pet.loggedToday ? "bg-[#FFD45C]" : "bg-white"
-            }`}
-          >
-            {!pet.alive
-              ? `${petName}變成幽靈了！連續記帳 ${REVIVE_DAYS} 天可復活`
-              : junkMode
-                ? `預算超支，${petName}正陪你一起吃土…`
-                : pet.loggedToday
-                  ? `✓ 今天已記帳，${petName}很滿足`
-                  : `今天還沒記帳，${petName}餓了…`}
-          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {/* 今日打卡狀態 */}
+            <div
+              className={`flex-1 min-w-[220px] border-[3px] border-black px-3 py-2 text-[12px] font-bold text-center ${
+                pet.loggedToday ? "bg-[#FFD45C]" : "bg-white"
+              }`}
+            >
+              {!pet.alive
+                ? `${petName}變成幽靈了！連續記帳 ${REVIVE_DAYS} 天可復活`
+                : junkMode
+                  ? `預算超支，${petName}正陪你一起吃土…`
+                  : pet.loggedToday
+                    ? `✓ 今天已記帳，${petName}很滿足`
+                    : `今天還沒記帳，${petName}餓了…`}
+            </div>
 
-          {/* 服裝里程碑 */}
-          <div className="flex gap-1.5 flex-wrap">
-            {OUTFIT_MILESTONES.map((m, i) => {
-              const got = pet.streak >= m;
-              return (
-                <span
-                  key={m}
-                  className={`text-[10px] font-bold px-2 py-1 border-2 border-black ${
-                    got ? "bg-[#FFD45C]" : "bg-[#E3E3E3] text-black/40"
-                  }`}
-                  title={got ? `已解鎖：${OUTFIT_NAMES[i]}` : `連續 ${m} 天解鎖`}
-                >
-                  {m}天 · {OUTFIT_NAMES[i]}
-                </span>
-              );
-            })}
+            {/* 衣櫃入口。里程碑改到衣櫃裡呈現（鎖頭 + 解鎖天數）。 */}
+            <button
+              onClick={() => setShowWardrobe(true)}
+              className={`${BTN} text-[12px] font-black px-3 py-1.5 bg-[#FFD45C]`}
+            >
+              👗 衣櫃
+            </button>
           </div>
-        </section>
+      </section>
 
+      {/* ============ 日曆 + 明細，左右並排，一眼看完 ============ */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
         {/* 日曆 */}
-        <section className={`${CARD} p-5`} aria-label="消費日曆">
+        <section className={`lg:col-span-5 ${CARD} p-5`} aria-label="消費日曆">
           <BudgetCalendar
             selected={selected}
             onSelect={(d) => d && setSelected(d)}
@@ -354,17 +448,23 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             </span>
           </div>
         </section>
-      </div>
 
-      {/* ============ 右欄：記帳明細 ============ */}
-      <aside
-        className={`lg:col-span-8 ${CARD} p-6 flex flex-col min-h-[calc(100dvh-4rem)]`}
-        aria-label="記帳明細"
-      >
+        {/* 明細。拿掉 min-h-[calc(100dvh-4rem)] ——
+            那一行把卡片強制撐成整個螢幕高，不管裡面有幾筆。
+            大部分時候只有一兩列，所以撐出來的全是空白。 */}
+        <aside
+          className={`lg:col-span-7 ${CARD} p-5 flex flex-col`}
+          aria-label="記帳明細"
+        >
         <div className="flex items-center justify-between mb-4">
           <h2 className={`${pixel} text-[15px]`}>記帳明細</h2>
           <button
-            onClick={() => setShowAdd(true)}
+              onClick={() => {
+              setEditingId(null);
+              setFAmt("");
+              setFNote("");
+              setShowAdd(true);
+            }}
             aria-label="新增一筆記錄"
             className={`${BTN} w-10 h-10 bg-[#FFD45C] grid place-items-center text-[22px] font-black leading-none`}
           >
@@ -406,6 +506,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               <button
                 onClick={() => {
                   setJunkMode(false);
+                  saveBudget({ junkMode: false }).catch((e) =>
+                    console.error("[lia] 吃土模式儲存失敗", e),
+                  );
                   setJunkDismissed(true);
                 }}
                 className="text-[11px] font-bold underline underline-offset-2 text-black/50"
@@ -425,8 +528,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
           </span>
         </div>
 
-        {/* 明細 */}
-        <div className="flex flex-col gap-2.5">
+        {/* 明細。內部捲動 —— 頁面本身不捲，所以小雞永遠不會蓋到你的內容。
+            記帳一天頂多幾筆，超過就在這個框裡捲。 */}
+        <div className="flex flex-col gap-2.5 max-h-[300px] overflow-y-auto pr-1">
           {dayTxs.length === 0 ? (
             <div className="border-[3px] border-dashed border-black/25 p-10 text-center text-[13px] font-bold text-black/40">
               這天還沒有記錄，按右上角 ＋ 記一筆
@@ -452,6 +556,14 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
                 >
                   {tx.type === "income" ? "+" : "-"}${tx.amount.toLocaleString()}
                 </span>
+                
+                <button
+                  onClick={() => openEdit(tx)}
+                  aria-label="編輯"
+                  className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-black text-[14px]"
+                >
+                  ✎
+                </button>
                 <button
                   onClick={() => delTx(tx.id)}
                   aria-label="刪除"
@@ -462,8 +574,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               </div>
             ))
           )}
-        </div>
-      </aside>
+          </div>
+        </aside>
+      </div>
 
       {/* ============ 新增記帳 Modal ============ */}
       {showAdd && (
@@ -475,7 +588,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
             className="bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-6 w-full max-w-[360px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-[16px] font-black mb-4">新增一筆記錄</h3>
+            <h3 className="text-[16px] font-black mb-4">
+              {editingId ? "編輯這筆記錄" : "新增一筆記錄"}
+            </h3>
 
             <div className="flex gap-2 mb-4">
               {(["expense", "income"] as const).map((t) => (
@@ -530,7 +645,10 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
 
             <div className="flex gap-2.5">
               <button
-                onClick={() => setShowAdd(false)}
+                onClick={() => {
+                setShowAdd(false);
+                setEditingId(null);
+              }}
                 className={`${BTN} flex-1 bg-white py-2.5 text-[14px] font-bold`}
               >
                 取消
@@ -539,7 +657,7 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
                 onClick={addTx}
                 className={`${BTN} flex-1 bg-[#BB0015] text-white py-2.5 text-[14px] font-black`}
               >
-                記帳 &amp; 餵食
+                {editingId ? "儲存" : "記帳 & 餵食"}
               </button>
             </div>
           </div>
@@ -574,8 +692,13 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               </button>
               <button
                 onClick={() => {
-                  const n = Number(budgetInput);
-                  if (n > 0) setBudget(n);
+              const n = Number(budgetInput);
+                if (n > 0) {
+                  setBudget(n);
+                  saveBudget({ budget: n }).catch((e) =>
+                    console.error("[lia] 預算儲存失敗", e),
+                  );
+                }
                   setShowBudget(false);
                   setJunkDismissed(false);
                 }}
@@ -603,11 +726,127 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
               先不用
             </button>
             <button
-              onClick={() => setJunkMode(true)}
+              onClick={() => {
+                setJunkMode(true);
+                saveBudget({ junkMode: true }).catch((e) =>
+                  console.error("[lia] 吃土模式儲存失敗", e),
+                );
+              }}
               className="flex-1 border-2 border-black bg-[#BB0015] text-white py-2 text-[12px] font-black"
             >
               開啟
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* ============ 小雞住在這裡 ============
+           滿版地面，釘在視窗底部。沒有邊框、沒有自己的天空 ——
+           頁面就是天空，她從地上站起來，身體伸進你的內容區。
+           x 是她站的位置（視窗寬度的 %）。之後畫了走路循環，
+           把 x 接上動畫，她就會走。 */}
+      <ChickGround
+        equippedHead={equippedHead}
+        equippedNeck={equippedNeck}
+        ref={stageRef}
+        mood={mood}
+        streak={pet.streak}
+        hp={pet.hp}
+        hpMax={HP_MAX}
+        reviveProgress={pet.reviveProgress}
+        reviveDays={REVIVE_DAYS}
+        spriteSize={SPRITE}
+        groundHeight={GROUND_H}
+        x={12}
+      />
+
+      {/* ============ 衣櫃 Modal ============
+           解鎖靠 streak（前端算，不進資料庫）。
+           戴哪個是使用者的選擇 → 存進 user_pet.equipped（後端）。 */}
+      {showWardrobe && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/50 flex items-center justify-center p-4"
+          onClick={() => setShowWardrobe(false)}
+        >
+          <div
+            className="bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-6 w-full max-w-[360px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-[15px] font-black">👗 {petName}的衣櫃</span>
+              <button
+                onClick={() => setShowWardrobe(false)}
+                className="w-7 h-7 grid place-items-center border-2 border-black bg-white font-black"
+                aria-label="關閉"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-[11px] font-bold text-black/50 mb-3">
+              連續記帳解鎖新配件，點一下穿脫。
+            </p>
+
+            {/* 頭飾（擇一） */}
+            <div className="text-[11px] font-black mb-1.5">頭飾（只能戴一個）</div>
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {([
+                { id: "bow", name: "蝴蝶結", need: 3 },
+                { id: "cap", name: "鴨舌帽", need: 14 },
+                { id: "crown", name: "王冠", need: 30 },
+              ] as const).map((it) => {
+                const unlocked = pet.streak >= it.need;
+                const on = equippedHead === it.id;
+                return (
+                  <button
+                    key={it.id}
+                    disabled={!unlocked}
+                    onClick={() => toggleHead(it.id)}
+                    className={`border-[3px] border-black p-2 text-[11px] font-black transition-transform ${
+                      !unlocked
+                        ? "bg-[#E3E3E3] text-black/30 cursor-not-allowed"
+                        : on
+                          ? "bg-[#BB0015] text-white"
+                          : "bg-white hover:-translate-y-0.5"
+                    }`}
+                  >
+                    <div className="text-[20px] leading-none mb-1">
+                      {unlocked ? (on ? "✓" : "🎀") : "🔒"}
+                    </div>
+                    {it.name}
+                    {!unlocked && (
+                      <div className="text-[9px] font-bold mt-0.5">
+                        {it.need}天解鎖
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 圍巾（獨立） */}
+            <div className="text-[11px] font-black mb-1.5">圍巾（可跟頭飾並存）</div>
+            <button
+              disabled={pet.streak < 7}
+              onClick={toggleNeck}
+              className={`w-full border-[3px] border-black p-2.5 text-[12px] font-black transition-transform ${
+                pet.streak < 7
+                  ? "bg-[#E3E3E3] text-black/30 cursor-not-allowed"
+                  : equippedNeck === "scarf"
+                    ? "bg-[#BB0015] text-white"
+                    : "bg-white hover:-translate-y-0.5"
+              }`}
+            >
+              {pet.streak < 7
+                ? "🔒 圍巾 · 連續 7 天解鎖"
+                : equippedNeck === "scarf"
+                  ? "✓ 已戴圍巾（再點脫下）"
+                  : "🧣 戴上圍巾"}
+            </button>
+
+            <div className="text-[10px] font-bold text-black/40 mt-4 text-center">
+              目前連續 {pet.streak} 天
+            </div>
           </div>
         </div>
       )}

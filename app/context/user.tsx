@@ -33,7 +33,7 @@ const FAKE_USER_INIT: User = {
 const UserContext = createContext<UserContextType | null>(null);
 UserContext.displayName = "UserContext";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();

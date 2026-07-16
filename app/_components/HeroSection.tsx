@@ -3,13 +3,13 @@ import Image from "next/image";
 
 export default function Hero() {
 	return (
-		<section className="w-full bg-red-700">
+		<section className="w-full bg-page-red">
 			<div className="max-w-[1920px] mx-auto">
 				<div className="grid lg:grid-cols-2 min-h-175">
 					{/* 左邊 */}
 					<div className="flex items-center justify-center px-16">
 						<div className="space-y-8">
-							<span className="text-[#BB0015] font-bold tracking-widest">
+							<span className="text-page-red font-bold tracking-widest">
 								REALICIOUS
 							</span>
 
@@ -25,7 +25,7 @@ export default function Hero() {
 							</p>
 							<Link
 								href="/article"
-								className="inline-flex bg-red-700 border-2 border-white text-white px-8 py-4 font-bold hover:bg-[#991012] transition shadow-[4px_4px_0px_0px_#FFFFFF]"
+								className="inline-flex bg-page-red border-2 border-white text-white px-8 py-4 font-bold hover:bg-[#991012] transition shadow-[4px_4px_0px_0px_#FFFFFF]"
 							>
 								開始探索 →
 							</Link>
