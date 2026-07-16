@@ -49,6 +49,23 @@ interface ArticlesResponse {
 	article: Article[];
 }
 
+const stripHtml = (html: string) => {
+	if (typeof document === "undefined") {
+		// server-side fallback: remove tags and decode basic entities
+		return html
+			.replace(/<[^>]+>/g, "")
+			.replace(/&nbsp;/g, " ")
+			.replace(/&amp;/g, "&")
+			.replace(/&lt;/g, "<")
+			.replace(/&gt;/g, ">")
+			.replace(/&quot;/g, '"')
+			.replace(/&#39;/g, "'");
+	}
+	const div = document.createElement("div");
+	div.innerHTML = html;
+	return div.textContent || div.innerText || "";
+};
+
 export default function ArticlePage() {
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [articles, setArticles] = React.useState<Article[]>([]);
@@ -183,7 +200,7 @@ export default function ArticlePage() {
 									{/* 內文 */}
 									<div>
 										<p className=" text-m wrap-break-word line-clamp-4">
-											{art.content}
+											{stripHtml(art.content)}
 										</p>
 									</div>
 									<div className="flex justify-between items-center mt-1.5">
