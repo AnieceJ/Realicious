@@ -18,7 +18,7 @@ export default function AccountingSection() {
 
 				<Link
 					href="/accounting"
-					className="bg-red-700 text-white font-bold px-8 py-4 hover:scale-105 transition"
+					className="bg-page-red text-white font-bold px-8 py-4 hover:scale-105 transition"
 				>
 					開始記帳
 				</Link>

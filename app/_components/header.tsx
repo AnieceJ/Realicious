@@ -14,7 +14,7 @@ interface HeaderProps {
 
 export default function Header({ token }: HeaderProps) {
 	return (
-		<header className="w-full h-15 bg-[#BB0015] text-white">
+		<header className="w-full h-15 bg-page-red text-white">
 			<div className="max-w-7xl mx-auto h-full px-5 flex items-center justify-between">
 				<Link
 					href="/"
@@ -22,15 +22,23 @@ export default function Header({ token }: HeaderProps) {
 				>
 					Realicious
 				</Link>
-
 				<nav className="hidden md:flex items-center gap-x-2">
-					<Link href="/article" className="px-4 py-3 font-medium hover:underline underline-offset-4">
+					<Link
+						href="/article"
+						className="px-4 py-3 font-medium hover:underline underline-offset-4"
+					>
 						文章
 					</Link>
-					<Link href="/shop" className="px-4 py-3 font-medium hover:underline underline-offset-4">
+					<Link
+						href="/shop"
+						className="px-4 py-3 font-medium hover:underline underline-offset-4"
+					>
 						商城
 					</Link>
-					<Link href="/accounting" className="px-4 py-3 font-medium hover:underline underline-offset-4">
+					<Link
+						href="/accounting"
+						className="px-4 py-3 font-medium hover:underline underline-offset-4"
+					>
 						記帳小雞
 					</Link>
 				</nav>

@@ -10,7 +10,11 @@ import Footer from "./_components/footer";
 
 config.autoAddCss = false;
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
 	const token = (await cookies()).get("token");
 
 	return (

@@ -37,7 +37,11 @@ import {
 } from "ckeditor5";
 import "ckeditor5/ckeditor5.css";
 
-export default function CustomEditor() {
+export default function CustomEditor({
+	onChange,
+}: {
+	onChange: (html: string) => void;
+}) {
 	return (
 		<CKEditor
 			editor={ClassicEditor}
@@ -45,7 +49,7 @@ export default function CustomEditor() {
 				language: "zh-tw",
 				licenseKey: "GPL",
 				simpleUpload: {
-					uploadUrl: `http://xxx`,
+					uploadUrl: `/api/article/uploads/article-images`,
 				},
 				heading: {
 					options: [
@@ -143,8 +147,9 @@ export default function CustomEditor() {
 					ImageUpload,
 					ImageResize,
 				],
-				initialData: "<p>Hello from CKEditor 5 in Next.js!</p>",
+				initialData: "",
 			}}
+			onChange={(_, editor) => onChange(editor.getData())}
 		/>
 	);
 }
