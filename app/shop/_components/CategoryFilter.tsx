@@ -1,11 +1,11 @@
 import React from "react";
 
 type CategoryFilterProps = {
-  activeKeyword: string;
-  onTagClick: (keyword: string) => void;
+  activeKeywords: string[];
+  onTagToggle: (keyword: string) => void;
 };
 
-export default function CategoryFilter({ activeKeyword, onTagClick }: CategoryFilterProps) {
+export default function CategoryFilter({ activeKeywords, onTagToggle }: CategoryFilterProps) {
   const tags = [
     { label: "火鍋", keyword: "鍋" },
     { label: "速食", keyword: "麥丹勞" },
@@ -18,7 +18,7 @@ export default function CategoryFilter({ activeKeyword, onTagClick }: CategoryFi
   return (
     <div className="flex items-center gap-6 w-full h-17 px-4 py-2.5 bg-white text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
       {tags.map((tag) => {
-        const isActive = activeKeyword === tag.keyword;
+        const isActive = activeKeywords.includes(tag.keyword);
         return (
         <div key={tag.label}
           className={`inline-flex items-center gap-1.5 px-3 py-1
@@ -26,7 +26,7 @@ export default function CategoryFilter({ activeKeyword, onTagClick }: CategoryFi
                       shadow-[2px_2px_0px_0px_#3D2419] select-none
                       transition-colors cursor-pointer
                       ${isActive ? "bg-[#3D2419] text-white" : "bg-[#FFD3B6] text-[#3D2419] hover:bg-[#ffbe94]"}`}
-          onClick={() => onTagClick(isActive ? "" : tag.keyword)}
+          onClick={() => onTagToggle(tag.keyword)}
         >
           {tag.label}
         </div>

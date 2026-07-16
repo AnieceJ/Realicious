@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 
 type SidebarFilterProps = {
-  activeCategory: string;
+  activeCategoryIds: string[];
   onCategoryChange: (categoryId: string) => void;
   onPriceChange: (min: number, max: number) => void;
   onFilterChange: (filters: Record<string, boolean>) => void;
 };
 
-export default function SidebarFilter({ activeCategory, onCategoryChange, onPriceChange, onFilterChange }: SidebarFilterProps) {
+export default function SidebarFilter({ activeCategoryIds, onCategoryChange, onPriceChange, onFilterChange }: SidebarFilterProps) {
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(5000);
   const [minPriceStr, setMinPriceStr] = useState("0");
@@ -47,13 +47,13 @@ export default function SidebarFilter({ activeCategory, onCategoryChange, onPric
                   onClick={() => onCategoryChange(cat.id)}
                   className={`flex items-center gap-4 w-full px-4 py-3 text-lg border-[3px] rounded-xl transition-all duration-100 cursor-pointer
                     ${
-                      activeCategory === cat.id
+                      activeCategoryIds.includes(cat.id)
                     ? "bg-[#FFD3B6] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419]"
                     : "bg-transparent border-transparent hover:bg-[#3D2419]/5"
                 }`}
             >
               <span
-                className={activeCategory === cat.id ? "text-[#3D2419]" : "text-[#3D2419]/80"}
+                className={activeCategoryIds.includes(cat.id) ? "text-[#3D2419]" : "text-[#3D2419]/80"}
               >
                 {cat.icon}
               </span>

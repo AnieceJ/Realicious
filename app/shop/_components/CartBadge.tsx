@@ -5,11 +5,10 @@ import { ShoppingBasket } from "lucide-react";
 import { getCartItems } from "@/lib/shop/cart";
 
 export default function CartBadge() {
-  const [count, setCount] = useState(() =>
-    getCartItems().reduce((sum, item) => sum + item.qty, 0)
-  );
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
+    setCount(getCartItems().reduce((sum, item) => sum + item.qty, 0));
     const refresh = () => setCount(getCartItems().reduce((sum, item) => sum + item.qty, 0));
     window.addEventListener("cart-updated", refresh);
     return () => window.removeEventListener("cart-updated", refresh);

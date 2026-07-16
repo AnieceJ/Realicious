@@ -8,7 +8,7 @@ export default function Searchbar({ onSearch }: SearchbarProps) {
   const [input, setInput] = useState("");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") onSearch(input.trim());
+    if (e.key === "Enter" && !e.nativeEvent.isComposing) onSearch(input.trim());
   };
 
   return (
@@ -34,8 +34,15 @@ export default function Searchbar({ onSearch }: SearchbarProps) {
         value={input}
         onChange={(e) => setInput(e.target.value)}
         onKeyDown={handleKeyDown}
-        className="w-full h-full outline-none text-gray-500 placeholder-gray-500 text-sm"
+        className="w-full h-full outline-none text-gray-500 placeholder-gray-500 text-sm ml-2"
       />
+      <button
+        onClick={() => onSearch(input.trim())}
+        className="ml-2 px-3 py-1 bg-[#3D2419] text-white text-sm font-bold rounded-md
+                   hover:bg-[#5a3a2a] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer whitespace-nowrap"
+      >
+        搜尋
+      </button>
     </div>
   );
 }

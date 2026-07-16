@@ -1,10 +1,22 @@
 import React from "react";
 import QuantityPicker from "../../_components/QuantityPicker";
 import { removeFromCart, updateQty, type CartItem } from "@/lib/shop/cart";
+import { useConfirm } from "../../_components/ConfirmModal";
 
 export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate: () => void }) {
+  const { confirmComponent, showConfirm } = useConfirm();
+
+  const handleRemove = async () => {
+    const confirmed = await showConfirm(`確定移除 ${item.name} 嗎？`);
+    if (confirmed) {
+      removeFromCart(item.id);
+      onUpdate();
+    }
+  };
+
   return (
     <div className="mb-6">
+      {confirmComponent}
       <div
         className="flex w-full px-4 py-2.5 
                   bg-[#FCF9F6] text-[#3D2419] font-bold text-base
@@ -33,22 +45,12 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
             <QuantityPicker
               value={item.qty}
               onChange={(qty) => { updateQty(item.id, qty); onUpdate(); }}
-              onReachMin={() => {
-                if (window.confirm(`確定移除 ${item.name} 嗎？`)) {
-                  removeFromCart(item.id);
-                  onUpdate();
-                }
-              }}
+              onReachMin={handleRemove}
             />
           </div>
           <div className="ml-15 mt-3">
             <button
-              onClick={() => {
-                if (window.confirm(`確定移除 ${item.name} 嗎？`)) {
-                  removeFromCart(item.id);
-                  onUpdate();
-                }
-              }}
+              onClick={handleRemove}
               className="flex flex-row w-fit items-center justify-between cursor-pointer
                         active:translate-x-[1px] active:translate-y-[1px] transition-all duration-75"
             >

@@ -1,19 +1,24 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import OrderItem from "./_components/OrderItem";
 import OrderSummary from "./_components/OrderSummary";
 import EmptyCart from "./_components/EmptyCart";
 import { clearCart, getCartItems, type CartItem } from "@/lib/shop/cart";
+import { useConfirm } from "../_components/ConfirmModal";
 
 export default function CartPage() {
-  const [items, setItems] = useState<CartItem[]>(() => getCartItems());
+  const [items, setItems] = useState<CartItem[]>([]);
+  const { confirmComponent, showConfirm } = useConfirm();
 
   const refresh = () => setItems([...getCartItems()]);
+
+  useEffect(() => { refresh(); }, []);
 
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
+      {confirmComponent}
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 pt-4">
           <Breadcrumbs items={[
@@ -33,11 +38,9 @@ export default function CartPage() {
                 ))}
                 <div className="flex justify-end mt-4">
                   <button
-                    onClick={() => {
-                      if (window.confirm("確定清空購物車嗎？")) {
-                        clearCart();
-                        refresh();
-                      }
+                    onClick={async () => {
+                      const confirmed = await showConfirm("確定清空購物車嗎？");
+                      if (confirmed) { clearCart(); refresh(); }
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-white text-[#3D2419] font-bold text-sm
                               border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]
