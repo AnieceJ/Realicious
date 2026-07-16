@@ -35,8 +35,12 @@ const HP_MAX = 100;
 const HP_GAIN = 20; // 有記帳 +20
 const HP_LOSS = 34; // 斷一天 -34（3 天歸零）
 const REVIVE_DAYS = 3; // 死後連續記帳 3 天復活
-const OUTFIT_MILESTONES = [3, 7, 14, 30]; // 連續簽到服裝獎勵
-const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"]; // 對應 sprite 裡的配件圖層
+// 解鎖天數與名稱。衣櫃 modal 裡直接寫死了對應（bow=3, scarf=7...），
+// 這兩個保留給之後可能的「里程碑清單」用，目前沒有直接引用。
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const OUTFIT_MILESTONES = [3, 7, 14, 30];
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"];
 
 // 小雞的尺寸。SPRITE 必須是 64 的整數倍（128 = 2x, 192 = 3x）。
 // 非整數倍會讓瀏覽器把你的硬邊補成半透明鬼影。
@@ -72,9 +76,16 @@ const daysBetween = (a: Date, b: Date) =>
 /* ---------- 小雞狀態計算 ----------
    從「有記帳的日子」推算 HP、連續天數、生死、復活進度         */
 function calcPet(txs: Tx[]) {
-  const logged = [...new Set(txs.map((t) => t.date))].sort(); // 有記帳的日期（小到大）
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const todayKey = toKey(today);
+
+  // ★ 只看「今天（含）以前」有記帳的日子。
+  //   未來的帳（例如先登記 8/1 的訂閱）存著、顯示在日曆上、算進預算，
+  //   但「不影響小雞的健康」—— 你未來會花的錢，不該讓今天的小雞餓死。
+  const logged = [...new Set(txs.map((t) => t.date))]
+    .filter((k) => k <= todayKey) // ISO 字串字典序 = 時間序，可以直接比大小
+    .sort();
 
   if (logged.length === 0) {
     return { hp: HP_MAX, streak: 0, alive: true, reviveProgress: 0, loggedToday: false };
@@ -147,6 +158,10 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [petName, setPetName] = useState("米粒");
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("米粒");
+  // 衣櫃：目前戴的頭飾 / 圍巾，還有衣櫃彈窗開關
+  const [equippedHead, setEquippedHead] = useState<"bow" | "cap" | "crown" | null>(null);
+  const [equippedNeck, setEquippedNeck] = useState<"scarf" | null>(null);
+  const [showWardrobe, setShowWardrobe] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<Date>(new Date());
 
@@ -177,6 +192,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
         setJunkMode(b.junkMode);
         setPetName(p.petName);
         setNameInput(p.petName);
+        setEquippedHead(p.equippedHead);
+        setEquippedNeck(p.equippedNeck);
       } catch (e) {
         console.error("[lia] 載入失敗", e);
       } finally {
@@ -185,6 +202,32 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
     })();
   }, []);
 
+
+  // 換頭飾（擇一，再點同一個 = 脫下）
+  const toggleHead = async (item: "bow" | "cap" | "crown") => {
+    const next = equippedHead === item ? null : item;
+    const prev = equippedHead;
+    setEquippedHead(next); // 先改畫面
+    try {
+      await savePet({ equippedHead: next });
+    } catch (e) {
+      console.error("[lia] 換頭飾失敗", e);
+      setEquippedHead(prev); // 失敗回復
+    }
+  };
+
+  // 換圍巾（獨立，可跟頭飾並存）
+  const toggleNeck = async () => {
+    const next = equippedNeck === "scarf" ? null : "scarf";
+    const prev = equippedNeck;
+    setEquippedNeck(next);
+    try {
+      await savePet({ equippedNeck: next });
+    } catch (e) {
+      console.error("[lia] 換圍巾失敗", e);
+      setEquippedNeck(prev);
+    }
+  };
 
 const saveName = async () => {
     const n = nameInput.trim().slice(0, 8);
@@ -196,7 +239,7 @@ const saveName = async () => {
     setPetName(n);          // 先改畫面
     setEditingName(false);
     try {
-      await savePet(n);
+      await savePet({ petName: n });
     } catch (e) {
       console.error("[lia] 改名失敗", e);
       setPetName(petName);  // 失敗就回復
@@ -373,21 +416,13 @@ const addTx = async () => {
                     : `今天還沒記帳，${petName}餓了…`}
             </div>
 
-            {/* 服裝里程碑 */}
-            {OUTFIT_MILESTONES.map((m, i) => {
-              const got = pet.streak >= m;
-              return (
-                <span
-                  key={m}
-                  className={`text-[10px] font-bold px-2 py-1.5 border-2 border-black ${
-                    got ? "bg-[#FFD45C]" : "bg-[#E3E3E3] text-black/40"
-                  }`}
-                  title={got ? `已解鎖：${OUTFIT_NAMES[i]}` : `連續 ${m} 天解鎖`}
-                >
-                  {m}天 · {OUTFIT_NAMES[i]}
-                </span>
-              );
-            })}
+            {/* 衣櫃入口。里程碑改到衣櫃裡呈現（鎖頭 + 解鎖天數）。 */}
+            <button
+              onClick={() => setShowWardrobe(true)}
+              className={`${BTN} text-[12px] font-black px-3 py-1.5 bg-[#FFD45C]`}
+            >
+              👗 衣櫃
+            </button>
           </div>
       </section>
 
@@ -711,6 +746,8 @@ const addTx = async () => {
            x 是她站的位置（視窗寬度的 %）。之後畫了走路循環，
            把 x 接上動畫，她就會走。 */}
       <ChickGround
+        equippedHead={equippedHead}
+        equippedNeck={equippedNeck}
         ref={stageRef}
         mood={mood}
         streak={pet.streak}
@@ -722,6 +759,97 @@ const addTx = async () => {
         groundHeight={GROUND_H}
         x={12}
       />
+
+      {/* ============ 衣櫃 Modal ============
+           解鎖靠 streak（前端算，不進資料庫）。
+           戴哪個是使用者的選擇 → 存進 user_pet.equipped（後端）。 */}
+      {showWardrobe && (
+        <div
+          className="fixed inset-0 z-[70] bg-black/50 flex items-center justify-center p-4"
+          onClick={() => setShowWardrobe(false)}
+        >
+          <div
+            className="bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-6 w-full max-w-[360px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-[15px] font-black">👗 {petName}的衣櫃</span>
+              <button
+                onClick={() => setShowWardrobe(false)}
+                className="w-7 h-7 grid place-items-center border-2 border-black bg-white font-black"
+                aria-label="關閉"
+              >
+                ✕
+              </button>
+            </div>
+
+            <p className="text-[11px] font-bold text-black/50 mb-3">
+              連續記帳解鎖新配件，點一下穿脫。
+            </p>
+
+            {/* 頭飾（擇一） */}
+            <div className="text-[11px] font-black mb-1.5">頭飾（只能戴一個）</div>
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {([
+                { id: "bow", name: "蝴蝶結", need: 3 },
+                { id: "cap", name: "鴨舌帽", need: 14 },
+                { id: "crown", name: "王冠", need: 30 },
+              ] as const).map((it) => {
+                const unlocked = pet.streak >= it.need;
+                const on = equippedHead === it.id;
+                return (
+                  <button
+                    key={it.id}
+                    disabled={!unlocked}
+                    onClick={() => toggleHead(it.id)}
+                    className={`border-[3px] border-black p-2 text-[11px] font-black transition-transform ${
+                      !unlocked
+                        ? "bg-[#E3E3E3] text-black/30 cursor-not-allowed"
+                        : on
+                          ? "bg-[#BB0015] text-white"
+                          : "bg-white hover:-translate-y-0.5"
+                    }`}
+                  >
+                    <div className="text-[20px] leading-none mb-1">
+                      {unlocked ? (on ? "✓" : "🎀") : "🔒"}
+                    </div>
+                    {it.name}
+                    {!unlocked && (
+                      <div className="text-[9px] font-bold mt-0.5">
+                        {it.need}天解鎖
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 圍巾（獨立） */}
+            <div className="text-[11px] font-black mb-1.5">圍巾（可跟頭飾並存）</div>
+            <button
+              disabled={pet.streak < 7}
+              onClick={toggleNeck}
+              className={`w-full border-[3px] border-black p-2.5 text-[12px] font-black transition-transform ${
+                pet.streak < 7
+                  ? "bg-[#E3E3E3] text-black/30 cursor-not-allowed"
+                  : equippedNeck === "scarf"
+                    ? "bg-[#BB0015] text-white"
+                    : "bg-white hover:-translate-y-0.5"
+              }`}
+            >
+              {pet.streak < 7
+                ? "🔒 圍巾 · 連續 7 天解鎖"
+                : equippedNeck === "scarf"
+                  ? "✓ 已戴圍巾（再點脫下）"
+                  : "🧣 戴上圍巾"}
+            </button>
+
+            <div className="text-[10px] font-bold text-black/40 mt-4 text-center">
+              目前連續 {pet.streak} 天
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
