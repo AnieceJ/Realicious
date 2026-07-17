@@ -398,3 +398,24 @@
     animation: none;
   }
 }
+
+/* ---------- 燈箱彈出：從小放大 + 淡入 ----------
+   steps() 維持像素感。 */
+.lightbox-pop {
+  animation: lightbox-pop 0.22s steps(4, end) both;
+}
+@keyframes lightbox-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox-pop {
+    animation: none;
+  }
+}
