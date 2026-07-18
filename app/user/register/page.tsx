@@ -89,7 +89,7 @@ export default function Register() {
 
       if (res.ok && result.success) {
         alert(`註冊成功`);
-        router.replace("/user/personal");
+        router.replace("/user/login");
       } else {
         alert(result.message || "註冊失敗");
         setSubmit(false);
