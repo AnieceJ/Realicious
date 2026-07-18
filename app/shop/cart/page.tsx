@@ -43,7 +43,7 @@ export default function CartPage() {
   const hiddenCount = items.length - MAX_VISIBLE;
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen scroll-smooth">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       {confirmComponent}
       <div className="max-w-7xl mx-auto">

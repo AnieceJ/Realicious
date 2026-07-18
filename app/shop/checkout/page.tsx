@@ -45,7 +45,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen scroll-smooth">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 pt-4">
@@ -65,7 +65,7 @@ export default function CheckoutPage() {
               <CheckoutOrderList items={items} />
             </div>
           </div>
-          <div className="w-[30%] self-start sticky top-8">
+          <div className="w-[30%] self-start sticky top-8 transition-all duration-300">
             <CheckoutSummary items={items} onCheckout={() => setShowPayment(true)} />
           </div>
         </div>
