@@ -20,6 +20,7 @@ interface UserContextType {
     password: string,
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<User>>
 }
 
 const FAKE_USER_INIT: User = {
@@ -62,7 +63,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           // 清除網址列上的 ?token=xxx，保持網址美觀
           const newUrl = window.location.pathname;
           window.history.replaceState({}, document.title, newUrl);
-          router.refresh()
+          // router.refresh()
         }
       }
 
@@ -89,6 +90,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (res.ok && data.success) {
           setUser(data.user);
           Cookies.set("user", JSON.stringify(data.user), { expires: 1 });
+          router.refresh();
         } else {
           handleLocalLogout();
         }
@@ -149,7 +151,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     // 🆕 把 loading 一併傳下去，讓切換路由或頂層組件可以判斷是否正在驗證中
-    <UserContext.Provider value={{ user, loading, login, logout }}>
+    <UserContext.Provider value={{ user, loading, login, logout ,setUser }}>
       {children}
     </UserContext.Provider>
   );
