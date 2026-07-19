@@ -37,10 +37,11 @@ export default function CheckoutPage() {
   const router = useRouter();
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
+  const [address, setAddress] = useState("");
 
   const handlePayment = async (method: string) => {
     setShowPayment(false);
-    const order = await createOrder(items);
+    const order = await createOrder(items, address);
     if (order.success) {
       saveLastOrder(items);
       clearCart();
@@ -65,7 +66,7 @@ export default function CheckoutPage() {
         <div className="flex flex-row gap-8">
           <div className="w-[60%]">
             <div className="mb-6">
-              <CheckoutContactInfo />
+              <CheckoutContactInfo onAddressChange={setAddress} />
             </div>
             <div className="mb-6">
               <CheckoutOrderList items={items} />

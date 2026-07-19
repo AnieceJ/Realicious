@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 
 const mockUser = {
   email: "user@example.com",
   phone: "0912-345-678"
 }
 
-export default function CheckoutContactInfo() {
+export default function CheckoutContactInfo({ onAddressChange }: { onAddressChange?: (addr: string) => void }) {
+  const [name, setName] = useState("");
+
   return (
     <div className="w-full">
       <div className="flex flex-col w-full px-4 py-2.5 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
@@ -13,7 +15,7 @@ export default function CheckoutContactInfo() {
         <div className="flex flex-col gap-3">
           <label>
             <span className="text-sm">姓名</span>
-            <input type="text" placeholder="請輸入姓名" defaultValue="" className="w-full px-3 py-2 border-2 border-[#3D2419] bg-white text-sm font-normal placeholder-gray-400" />
+            <input type="text" placeholder="請輸入姓名" value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 border-2 border-[#3D2419] bg-white text-sm font-normal placeholder-gray-400" />
           </label>
           <label>
             <span className="text-sm">電子郵件</span>
@@ -25,7 +27,7 @@ export default function CheckoutContactInfo() {
           </label>
           <label className="flex flex-col gap-1">
             <span className="text-sm">地址</span>
-            <input type="text" placeholder="請輸入地址" defaultValue="" className="w-full px-3 py-2 border-2 border-[#3D2419] bg-white text-sm font-normal placeholder-gray-400" />
+            <input type="text" placeholder="請輸入地址" onChange={(e) => onAddressChange?.(e.target.value)} className="w-full px-3 py-2 border-2 border-[#3D2419] bg-white text-sm font-normal placeholder-gray-400" />
           </label>
         </div>
       </div>
