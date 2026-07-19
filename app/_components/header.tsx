@@ -14,7 +14,7 @@ interface HeaderProps {
 
 export default function Header({ token }: HeaderProps) {
 	return (
-		<header className="w-full h-15 bg-page-red text-white">
+		<header className="sticky top-0 z-40 h-15 bg-page-red backdrop-blur text-white">
 			<div className="max-w-7xl mx-auto h-full px-5 flex items-center justify-between">
 				<Link
 					href="/"
@@ -43,7 +43,7 @@ export default function Header({ token }: HeaderProps) {
 					</Link>
 				</nav>
 
-				<div className="flex items-center gap-x-3">
+				<div className="flex items-center ">
 					<CartBadge />
 					<HeaderLoginBtn token={token} />
 				</div>

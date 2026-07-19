@@ -208,3 +208,138 @@
 	font-size: 1.17em !important;
 	font-weight: bold !important;
 }
+
+/* Hero carousel orbit — centered at hero right-middle (right edge vertical center) */
+
+/* core orbit variables (defaults for desktop) */
+:root {
+	--orbit-radius: 500px; /* distance from orbit center to plate center */
+	--plate-size: 600px; /* plate width/height */
+	--orbit-diameter: calc((var(--orbit-radius) * 2) + var(--plate-size));
+}
+
+/* Position the orbit so its center aligns with the hero area's right middle. Right offset uses half the diameter to place the orbit center exactly at the hero's right edge middle. */
+.orbit {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: var(--orbit-diameter);
+	height: var(--orbit-diameter);
+	right: calc(var(--orbit-diameter) / -2);
+	pointer-events: none;
+	display: block;
+}
+
+/* inner container rotates around its center */
+.orbit-inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transform-origin: 50% 50%;
+	animation: orbit-step 9s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+/* plates: positioned at the center then offset along radius by rotate(... ) translate(radius) */
+.plate {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: var(--plate-size);
+	height: var(--plate-size);
+	border-radius: 9999px;
+	overflow: hidden;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18);
+	transform-origin: center center;
+}
+
+/* place three plates evenly on the circle; keep images upright by counter-rotating using a synchronized animation */
+.plate-1 {
+	transform: translate(-50%, -50%) rotate(180deg) translate(var(--orbit-radius))
+		rotate(-180deg);
+	z-index: 30;
+}
+
+.plate-2 {
+	transform: translate(-50%, -50%) rotate(300deg) translate(var(--orbit-radius))
+		rotate(-300deg);
+	z-index: 20;
+}
+.plate-3 {
+	transform: translate(-50%, -50%) rotate(60deg) translate(var(--orbit-radius))
+		rotate(-60deg);
+	z-index: 20;
+}
+
+/* synchronized counter-rotation to keep images upright */
+.plate-content {
+	/* position: relative;
+	width: 100%;
+	height: 100%;
+	transform-origin: center center;
+	animation: counter-orbit 12s linear infinite; */
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transform-origin: center center;
+	animation: counter-orbit-step 9s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+/* 外層順時針軌道旋轉 */
+@keyframes orbit-step {
+	/* 第一張停留 (0s ~ 2s) */
+	0%,
+	22.2% {
+		transform: rotate(0deg);
+	}
+	/* 滑動到第二張 (2s ~ 3s) */
+	33.3%,
+	55.5% {
+		transform: rotate(-120deg); /* 改為負向旋轉以配合結構，或維持正向 */
+	}
+	/* 滑動到第三張 (5s ~ 6s) */
+	66.6%,
+	88.8% {
+		transform: rotate(-240deg);
+	}
+	/* 滑動回第一張 (8s ~ 9s) */
+	100% {
+		transform: rotate(-360deg);
+	}
+}
+
+/* 內層逆時針反轉（維持圖片端正） */
+@keyframes counter-orbit-step {
+	0%,
+	22.2% {
+		transform: rotate(0deg);
+	}
+	33.3%,
+	55.5% {
+		transform: rotate(120deg);
+	}
+	66.6%,
+	88.8% {
+		transform: rotate(240deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+/* Responsive — smaller orbit and plates for <=1024px */
+@media (max-width: 1024px) {
+	:root {
+		--orbit-radius: 320px;
+		--plate-size: 320px;
+	}
+	/* orbit diameter will recompute from the variables */
+	.orbit {
+		width: var(--orbit-diameter);
+		height: var(--orbit-diameter);
+		right: calc(var(--orbit-diameter) / -2);
+	}
+	.plate {
+		width: var(--plate-size);
+		height: var(--plate-size);
+	}
+}
