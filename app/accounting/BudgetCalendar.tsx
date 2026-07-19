@@ -11,19 +11,25 @@ export default function BudgetCalendar({
   onSelect,
   spendDays = [],
   incomeDays = [],
+  month,
+  onMonthChange,
 }: {
   selected?: Date;
   onSelect?: (date: Date | undefined) => void;
   spendDays?: Date[];
   incomeDays?: Date[];
+  month?: Date;
+  onMonthChange?: (m: Date) => void;
 }) {
+  // 自己控制顯示哪個月，箭頭才能換月
   return (
     <DayPicker
       mode="single"
       locale={zhTW}
       selected={selected}
       onSelect={onSelect}
-      defaultMonth={selected}
+      month={month}
+      onMonthChange={onMonthChange}
       showOutsideDays
       modifiers={{ spend: spendDays, income: incomeDays }}
       modifiersClassNames={{ spend: "day-spend", income: "day-income" }}

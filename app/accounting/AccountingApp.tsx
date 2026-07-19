@@ -162,6 +162,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [equippedHead, setEquippedHead] = useState<"bow" | "cap" | "crown" | null>(null);
   const [equippedNeck, setEquippedNeck] = useState<"scarf" | null>(null);
   const [showWardrobe, setShowWardrobe] = useState(false);
+    // 月曆現在顯示哪個月。從 BudgetCalendar 提上來（lifting state up），
+  // 因為「本月結餘」也要用同一個月份。
+  const [calMonth, setCalMonth] = useState(new Date());
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<Date>(new Date());
 
@@ -263,6 +266,12 @@ const saveName = async () => {
   const dayTxs = txs.filter((t) => t.date === selKey);
   const spent = dayTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
   const earned = dayTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+    // 本月結餘：當月收入 − 當月支出
+  const monthKey = toKey(calMonth).slice(0, 7);
+  const monthTxs = txs.filter((t) => t.date.slice(0, 7) === monthKey);
+  const monthIncome = monthTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const monthExpense = monthTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const balance = monthIncome - monthExpense;
   const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
   const over = spent > budget;
   const spentAnim = useCountUp(spent); // 金額用「數」的，不要用「跳」的
@@ -435,6 +444,8 @@ const addTx = async () => {
             onSelect={(d) => d && setSelected(d)}
             spendDays={spendDays}
             incomeDays={incomeDays}
+            month={calMonth}
+            onMonthChange={setCalMonth}
           />
           <div className="flex gap-3 mt-3 pt-3 border-t-2 border-dashed border-black/20 text-[11px] font-bold text-black/60">
             <span className="flex items-center gap-1.5">
@@ -519,6 +530,24 @@ const addTx = async () => {
           )}
         </div>
 
+{/* 本月結餘 */}
+        <div className="border-[3px] border-black bg-white p-3.5 mb-4">
+          <div className="flex justify-between items-center">
+            <span className="text-[13px] font-bold">本月結餘</span>
+            <span
+              className={`${pixel} text-[15px] ${
+                balance >= 0 ? "text-black" : "text-[#BB0015]"
+              }`}
+            >
+              {balance >= 0 ? "" : "-"}${Math.abs(balance).toLocaleString()}
+            </span>
+          </div>
+          <div className="flex justify-between text-[11px] font-bold text-black/50 mt-1.5">
+            <span>收入 ${monthIncome.toLocaleString()}</span>
+            <span>支出 ${monthExpense.toLocaleString()}</span>
+          </div>
+        </div>
+        
         {/* 選到的日期 */}
         <div className="flex justify-between items-center mb-3 text-[13px] font-bold">
           <span>📅 {fmtDay(selected)}</span>

@@ -35,6 +35,7 @@
 }
 .rdp-months {
   width: 100%;
+  position: relative;
 }
 
 /* caption（月份）和 nav（箭頭）疊在同一個 grid 格子 */
@@ -55,11 +56,16 @@
 }
 .rdp-nav {
   display: flex;
-  justify-content: space-between;   /* 箭頭推到左右兩端 */
+  justify-content: space-between;
+  pointer-events: auto;
   align-items: center;
   width: 100%;
   padding: 0;
   margin: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
 }
 
 /* 月曆格子：table-layout: fixed 讓 7 欄平均分配，撐滿卡片寬度 */
