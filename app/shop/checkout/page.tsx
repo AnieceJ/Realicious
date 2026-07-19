@@ -5,7 +5,8 @@ import Breadcrumbs from "../_components/Breadcrumbs";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutSummary from "./_components/CheckoutSummary";
-import { clearCart, getCartItems, type CartItem } from "@/lib/shop/cart";
+import { clearCart, getCartItems, saveLastOrder, type CartItem } from "@/lib/shop/cart";
+import { createOrder } from "@/lib/shop/orders";
 
 const EMPTY: CartItem[] = [];
 let cached = EMPTY;
@@ -37,11 +38,16 @@ export default function CheckoutPage() {
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
 
-  const handlePayment = (method: string) => {
+  const handlePayment = async (method: string) => {
     setShowPayment(false);
-    clearCart();
-    alert(`選擇付款方式：${method}，前往訂單完成頁`);
-    router.push("/shop/checkoutFinished");
+    const order = await createOrder(items);
+    if (order.success) {
+      saveLastOrder(items);
+      clearCart();
+      router.push("/shop/checkoutFinished");
+    } else {
+      alert("訂單建立失敗，請稍後再試");
+    }
   };
 
   return (

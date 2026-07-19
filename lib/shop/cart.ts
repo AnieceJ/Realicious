@@ -54,7 +54,23 @@ export function getCartItems(): CartItem[] {
   return getCart();
 }
 
+const ORDER_KEY = "realicious-last-order";
+
 export function clearCart() {
   localStorage.removeItem(STORAGE_KEY);
   if (typeof window !== "undefined") window.dispatchEvent(new Event("cart-updated"));
+}
+
+export function saveLastOrder(items: CartItem[]) {
+  localStorage.setItem(ORDER_KEY, JSON.stringify({ items, date: Date.now() }));
+}
+
+export function getLastOrder(): CartItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = JSON.parse(localStorage.getItem(ORDER_KEY) || "null");
+    return data?.items || [];
+  } catch {
+    return [];
+  }
 }
