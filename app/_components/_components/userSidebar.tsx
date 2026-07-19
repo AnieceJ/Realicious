@@ -6,27 +6,36 @@ import { GiChicken } from "react-icons/gi";
 import { MdOutlineLogout } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
+import defaultAvatar from "@/public/user/Avatar.svg";
 
-import { useState ,useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/app/context/user";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function UserSidebar() {
+
+  
   const [isOpening, setIsOpening] = useState<boolean>(false); // 控制側邊欄開關
-  const { user,logout } = useUser();
+  const { user, logout } = useUser();
   // 💡 步驟 1：建立一個標記，記錄「是否已經在瀏覽器掛載」
   const [isMounted, setIsMounted] = useState<boolean>(false);
+  
+  const BACKEND_URL = "http://localhost:3001";
+  const DEFAULT_AVATAR = "@/public/user/Avatar.svg";
+  // 拼接大頭貼完整路徑
+  const headerAvatar = user.avatar ? `${BACKEND_URL}${user.avatar}` :defaultAvatar ;
 
   // 💡 步驟 2：useEffect 只會在瀏覽器（客戶端）執行
   useEffect(() => {
-  // 透過 setTimeout 讓它變成非同步執行，
-  // 告訴 React：「你先忙完這次渲染，下一刻再幫我更新這個狀態」
-  const timer = setTimeout(() => {
-    setIsMounted(true);
-  }, 0);
+    // 透過 setTimeout 讓它變成非同步執行，
+    // 告訴 React：「你先忙完這次渲染，下一刻再幫我更新這個狀態」
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 0);
 
-  return () => clearTimeout(timer); // 良好的習慣：清除定時器
-}, []);
+    return () => clearTimeout(timer); // 良好的習慣：清除定時器
+  }, []);
 
   return (
     <>
@@ -44,7 +53,15 @@ export default function UserSidebar() {
         className={`fixed z-50 top-15 right-0 w-90 bg-[#FCF9F6] h-full ${isOpening ? "transform transition-transform duration-300 ease-in-out" : "transform translate-x-full transition-transform duration-300 ease-in-out"} `}
       >
         <div className="flex items-center bg-gray-100 ">
-          <div className="w-25 h-25 ml-6 mr-2 my-6 border"></div>
+          <div className="w-25 h-25 ml-6 mr-2 my-6 rounded-full">
+            <Image
+              src={headerAvatar}
+              alt="avatar"
+              width={100}
+              height={100}
+              className="w-full h-full object-cover rounded-full"
+            />
+          </div>
           <div>
             {/* 💡 步驟 3：在畫面上使用 isMounted 來確保前後端同步 */}
             {isMounted ? (

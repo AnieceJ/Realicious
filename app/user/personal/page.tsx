@@ -46,13 +46,14 @@ export default function Login() {
   } = useForm({
     resolver: zodResolver(personalSchema),
     defaultValues: {
+      avatar:'',
       first_name: "",
       last_name: "",
       nick_name: "",
       city: "",
       district: "",
       address: "",
-      phone: "",
+      phone: undefined,
       birthday: "",
     },
   });

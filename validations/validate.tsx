@@ -43,6 +43,7 @@ export type RegisterInput = z.infer<typeof registerSchema>;
 
 // 定義登入的驗證規則
 export const personalSchema = z.object({
+  avatar: z.string().min(1, { message: "此欄位必填" }),
   first_name: z.string().min(1, { message: "此欄位必填" }),
   last_name: z.string().min(1, { message: "此欄位必填" }),
   nick_name: z.string().min(1, { message: "此欄位必填" }),
