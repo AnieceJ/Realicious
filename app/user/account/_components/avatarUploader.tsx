@@ -63,7 +63,7 @@ export default function AvatarUploader({ currentAvatar, onUploadSuccess }: Avata
       formData.append("avatar", croppedFile);
 
       try {
-        const res = await fetch(`${API_URL}/profile/avatar`, {
+        const res = await fetch(`${API_URL}/avatar`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`, // 注意：傳 FormData 時，千萬不要手動加 "Content-Type" header，瀏覽器會自動幫你加並附上 boundary
@@ -91,8 +91,8 @@ export default function AvatarUploader({ currentAvatar, onUploadSuccess }: Avata
 
   // 計算目前要顯示的圖片路徑 (如果有原本的就用原本的，否則用預設圖)
   // 如果你的後端網址跟前端不同，記得在 currentAvatar 前面加上後端主機域名，例如 `${process.env.NEXT_PUBLIC_BACKEND_URL}${currentAvatar}`
-  const displayAvatar = currentAvatar ? `http://localhost:3001/${currentAvatar}` : defaultAvatar;
-
+  const displayAvatar = currentAvatar ? `${currentAvatar}` : defaultAvatar;
+  console.log(currentAvatar)
   return (
     <div className="flex flex-col items-center space-y-4 p-4 border-b">
       <h3 className="text-sm font-medium text-gray-700">個人頭像</h3>

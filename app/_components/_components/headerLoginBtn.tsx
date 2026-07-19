@@ -8,20 +8,20 @@ import ChatroomSidebar from "./chatroomSidebar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
 import Link from "next/link"
+import {useUser} from '@/app/context/user'
 
 interface HeaderLoginBtnProps{
   token:boolean
   className?:string,
 }
 
-
 export default function HeaderLoginBtn({className ,token}:HeaderLoginBtnProps) {
 // 用有沒有token來判斷是否登入，接後端後是需求或安全性可能需要更改判斷條件
   // const token = (Cookies.get("token") ? true :false)
-
+const {user} =useUser()
   return (
     <div className={`text-black ${className}`}>
-      {token ? (
+      {user ? (
         <div className="flex gap-x-2 items-center justify-end">
           <UserSidebar/>
           <ChatroomSidebar />
