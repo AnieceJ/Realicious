@@ -162,6 +162,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [equippedHead, setEquippedHead] = useState<"bow" | "cap" | "crown" | null>(null);
   const [equippedNeck, setEquippedNeck] = useState<"scarf" | null>(null);
   const [showWardrobe, setShowWardrobe] = useState(false);
+    // 月曆現在顯示哪個月。從 BudgetCalendar 提上來（lifting state up），
+  // 因為「本月結餘」也要用同一個月份。
+  const [calMonth, setCalMonth] = useState(new Date());
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<Date>(new Date());
 
@@ -263,6 +266,12 @@ const saveName = async () => {
   const dayTxs = txs.filter((t) => t.date === selKey);
   const spent = dayTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
   const earned = dayTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+    // 本月結餘：當月收入 − 當月支出
+  const monthKey = toKey(calMonth).slice(0, 7);
+  const monthTxs = txs.filter((t) => t.date.slice(0, 7) === monthKey);
+  const monthIncome = monthTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const monthExpense = monthTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+  const balance = monthIncome - monthExpense;
   const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
   const over = spent > budget;
   const spentAnim = useCountUp(spent); // 金額用「數」的，不要用「跳」的
@@ -435,6 +444,8 @@ const addTx = async () => {
             onSelect={(d) => d && setSelected(d)}
             spendDays={spendDays}
             incomeDays={incomeDays}
+            month={calMonth}
+            onMonthChange={setCalMonth}
           />
           <div className="flex gap-3 mt-3 pt-3 border-t-2 border-dashed border-black/20 text-[11px] font-bold text-black/60">
             <span className="flex items-center gap-1.5">
@@ -519,6 +530,24 @@ const addTx = async () => {
           )}
         </div>
 
+{/* 本月結餘 */}
+        <div className="border-[3px] border-black bg-white p-3.5 mb-4">
+          <div className="flex justify-between items-center">
+            <span className="text-[13px] font-bold">本月結餘</span>
+            <span
+              className={`${pixel} text-[15px] ${
+                balance >= 0 ? "text-black" : "text-[#BB0015]"
+              }`}
+            >
+              {balance >= 0 ? "" : "-"}${Math.abs(balance).toLocaleString()}
+            </span>
+          </div>
+          <div className="flex justify-between text-[11px] font-bold text-black/50 mt-1.5">
+            <span>收入 ${monthIncome.toLocaleString()}</span>
+            <span>支出 ${monthExpense.toLocaleString()}</span>
+          </div>
+        </div>
+        
         {/* 選到的日期 */}
         <div className="flex justify-between items-center mb-3 text-[13px] font-bold">
           <span>📅 {fmtDay(selected)}</span>
@@ -581,7 +610,7 @@ const addTx = async () => {
       {/* ============ 新增記帳 Modal ============ */}
       {showAdd && (
         <div
-          className="fixed inset-0 z-50 bg-black/55 grid place-items-center p-4"
+          className="fixed inset-0 z-[70] bg-black/55 grid place-items-center p-4"
           onClick={() => setShowAdd(false)}
         >
           <div
@@ -624,9 +653,10 @@ const addTx = async () => {
 
             <label className="block text-[12px] font-bold mb-1.5">金額 ($)</label>
             <input
-              type="number"
+              type="text"
+              inputMode="numeric"
               value={fAmt}
-              onChange={(e) => setFAmt(e.target.value)}
+              onChange={(e) => setFAmt(e.target.value.replace(/[^0-9]/g, "").replace(/^0+/, ""))}
               onKeyDown={(e) => e.key === "Enter" && addTx()}
               placeholder="0"
               autoFocus
@@ -667,7 +697,7 @@ const addTx = async () => {
       {/* ============ 預算設定 Modal ============ */}
       {showBudget && (
         <div
-          className="fixed inset-0 z-50 bg-black/55 grid place-items-center p-4"
+          className="fixed inset-0 z-[70] bg-black/55 grid place-items-center p-4"
           onClick={() => setShowBudget(false)}
         >
           <div
@@ -711,31 +741,41 @@ const addTx = async () => {
         </div>
       )}
 
-      {/* ============ 吃土模式提示 ============ */}
+      {/* ============ 吃土模式提示（燈箱）============
+           全螢幕遮罩 + flex 置中。用 flex 而不是絕對定位喬 px ——
+           數學上絕對正中，永遠不會歪。跟記帳/預算/衣櫃 modal 一致。 */}
       {over && !junkMode && !junkDismissed && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-4 w-[280px]">
-          <div className="text-[14px] font-black mb-1.5">今日已超出預算</div>
-          <p className="text-[12px] font-bold text-black/60 mb-3.5 leading-relaxed">
-            超出 ${(spent - budget).toLocaleString()}。要開啟「吃土模式」，讓 {petName} 陪你一起共體時艱嗎？
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setJunkDismissed(true)}
-              className="flex-1 border-2 border-black bg-white py-2 text-[12px] font-bold"
-            >
-              先不用
-            </button>
-            <button
-              onClick={() => {
-                setJunkMode(true);
-                saveBudget({ junkMode: true }).catch((e) =>
-                  console.error("[lia] 吃土模式儲存失敗", e),
-                );
-              }}
-              className="flex-1 border-2 border-black bg-[#BB0015] text-white py-2 text-[12px] font-black"
-            >
-              開啟
-            </button>
+        <div
+          className="fixed inset-0 z-[70] bg-black/55 grid place-items-center p-4"
+          onClick={() => setJunkDismissed(true)}
+        >
+          <div
+            className="lightbox-pop bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-6 w-full max-w-[340px]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-[15px] font-black mb-2">今日已超出預算</div>
+            <p className="text-[12px] font-bold text-black/60 mb-4 leading-relaxed">
+              超出 ${(spent - budget).toLocaleString()}。要開啟「吃土模式」，讓 {petName} 陪你一起共體時艱嗎？
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setJunkDismissed(true)}
+                className="flex-1 border-[3px] border-black bg-white py-2.5 text-[13px] font-bold"
+              >
+                先不用
+              </button>
+              <button
+                onClick={() => {
+                  setJunkMode(true);
+                  saveBudget({ junkMode: true }).catch((e) =>
+                    console.error("[lia] 吃土模式儲存失敗", e),
+                  );
+                }}
+                className="flex-1 border-[3px] border-black bg-[#BB0015] text-white py-2.5 text-[13px] font-black"
+              >
+                開啟
+              </button>
+            </div>
           </div>
         </div>
       )}
