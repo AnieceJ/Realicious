@@ -3,73 +3,116 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import Container from "../_components/container";
-import Link from "next/link";
 import ReturnLogin from "../_components/returnLogin";
 import VerifyButton from "../_components/verifyButton";
+import {
+  forgetPasswordSchema,
+  forgetPasswordInput,
+} from "@/validations/validate";
 
 export default function ForgetPassword() {
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
   const router = useRouter();
-  const fakeVerification = "123"; // 模擬驗證碼
 
-  const [loginError, setLoginError] = useState(false); // 登入錯誤處理
-
-  const [shakeEmail, setShakeEmail] = useState(false); // Email 欄位錯誤特效
-  const [shakeVerification, setShakeVerification] = useState(false); // Password 欄位錯誤特效
-  const [isVerification ,setIsVerification] = useState(false)
+  const [isVerify, setIsVerify] = useState<boolean>(); // 發送驗證碼
+  const [isVerifyMessage, setIsVerifyMessage] = useState<string>(); // 發送成功訊息
   const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
 
-  // RHF有錯誤訊息時觸發晃動
-  const onError = (errors: any) => {
-    if (errors.email) {
-      setShakeEmail(true);
-      setTimeout(() => setShakeEmail(false), 400); // 0.4秒動畫跑完後，關掉開關
-    }
-    if (errors.verification) {
-      setShakeVerification(true);
-      setTimeout(() => setShakeVerification(false), 400); // 0.4秒後關掉
-    }
-  };
-
-  const handleSendCode = async (): Promise<boolean> => {
-    setIsVerification(false);
-    const isvaild = await trigger("email");
-    if (isvaild) {
-      alert(`模擬發送驗證碼：123`)
-      setIsVerification(true);
-      return true;
-    }
-    return false;
-  };
   // 使用 RHF
   const {
     register,
     handleSubmit,
     trigger,
+    getValues,
     formState: { errors },
   } = useForm({
-    defaultValues: { email: "", verification: "" },
+    resolver: zodResolver(forgetPasswordSchema),
+    defaultValues: { email: "", code: "" },
   });
+  
+  const scene = "forgot-password";
+  // 處理email是否重複，是就發送驗證碼
+
+  const handleSendCode = async (): Promise<boolean> => {
+    setIsVerify(false);
+
+    const isvaild = await trigger("email"); // 驗證 email 欄位格式正確
+    if (isvaild) {
+      const email = getValues("email");
+      try {
+        const res = await fetch(`${API_URL}/verification/send-code`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email, scene: scene }),
+        });
+        const data = await res.json();
+        console.log(data)
+        if (res.ok && data.success) {
+          setIsVerify(true);
+          setIsVerifyMessage(data.message || "驗證碼已成功寄出，請至信箱收取1");
+          console.log(1)
+          return true;
+        } else {
+          setIsVerifyMessage(data.message || "伺服器錯誤，無法發送驗證碼");
+          console.log(2)
+          return false;
+        }
+      } catch (error) {
+        console.error("發送驗證碼連線失敗:", error);
+        setIsVerify(true);
+        setIsVerifyMessage("伺服器錯誤，無法發送驗證碼");
+        console.log(3)
+        return false;
+      }
+    }
+    console.log(4)
+    return false;
+  };
 
   // 表單送出
-  const onSubmit = (data: any) => {
+const onSubmit = async (data: forgetPasswordInput) => {
+  if (submit) return; // 防止快速重複點擊
+  setSubmit(true);
+  
+  try {
+    const res = await fetch(`${API_URL}/verification/verify-code`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // data 裡面應該本來就有包含 email 和 code
+      body: JSON.stringify({ ...data, scene: scene }), 
+    });
+    
+    const result = await res.json();
 
-    if (submit) return; // 防止快速重複點擊
-    setLoginError(false); // 登入中特效
-    setSubmit(true);
-
-    // 模擬延遲送出
-    setTimeout(async () => {
-      if (fakeVerification === data.verification) {
-        alert("驗證成功")
-        router.replace("/user/resetPassword");
-      } else {
-        setLoginError(true); // 登入失敗，回復原狀
-        setSubmit(false);
-      }
-    }, 1000);
-  };
+    if (res.ok && result.success) {
+      alert(`驗證成功`);
+      
+      // 1. 從後端回傳的結果中，把我們剛剛做好的 resetToken 撈出來
+      const token = result.resetToken; 
+      const email = data.email; // 或者是從你前端 state 拿到的 email
+      
+      // 2. 跳轉時，把 token 和 email 用 Query String 帶到重設密碼頁面
+      // 網址會變成：/user/resetPassword?token=xxxx&email=xxx@example.com
+      router.replace(`/user/resetPassword?token=${token}&email=${encodeURIComponent(email)}`);
+      
+    } else {
+      alert(result.message || "驗證錯誤");
+      setSubmit(false);
+    }
+  } catch (error) {
+    console.error("發送驗證碼連線失敗:", error);
+    alert("連線伺服器失敗，請稍後再試");
+    setSubmit(false);
+  }
+};
 
   return (
     <Container>
@@ -78,39 +121,47 @@ export default function ForgetPassword() {
           <h1 className="text-[24px] my-10">忘記密碼</h1>
 
           <form
-            onSubmit={handleSubmit(onSubmit, onError)}
+            onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col items-center mb-5"
           >
-            <div className="flex flex-col items-start mb-1.25 w-90">
-              <label className="text-[20px] mb-2.5" htmlFor="email">
-                電子郵件
-              </label>
-              <div className="w-90 flex justify-between">
-                <input
-                  {...register("email", { required: "這是必填欄位" })}
-                  className={`${errors.email ? "border-red-500" : ""} ${shakeEmail ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
-                  type="text"
-                  placeholder="請輸入電子郵件"
-                />
-                <VerifyButton onClick={handleSendCode} child={`發送`} />
-              </div>
+            <div className="w-90 flex justify-between">
+              <input
+                {...register("email")}
+                className={`border w-72.5 h-12.5 text-[16px] px-2 ${isVerify ? "bg-yellow-100" : ""}`}
+                type="text"
+                id="email"
+                placeholder="請輸入電子郵件"
+                disabled={isVerify}
+              />
+              <VerifyButton onClick={handleSendCode} child={`驗證`} />
             </div>
-            <div className="w-full mb-2.5">
-              <p className={`text-green-600 ${isVerification ? '' :'invisible'}`}>已發送驗證碼到您的信箱</p>
+            <div className="w-auto h-4">
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1 w-90 text-left">
+                  {String(errors.email.message)}
+                </p>
+              )}
+              {isVerify ? <p>{isVerifyMessage}</p> : ""}
             </div>
-            <div className="flex flex-col items-start mb-1.25">
+
+            <div className="flex flex-col items-start mb-4">
               <label className="text-[20px] mb-2.5" htmlFor="verification">
                 驗證碼
               </label>
               <input
-                {...register("verification", { required: "這是必填欄位" })}
-                className={`${errors.verification ? "border-red-500" : ""} ${shakeVerification ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
+                {...register("code")}
+                className="border w-90 h-12.5 text-[16px] px-2"
                 type="text"
+                id="Verification"
                 placeholder="如未收到驗證碼 請60秒後再試"
               />
-            </div>
-            <div className="w-full mb-2.5">
-              <p className={`text-red-600 ${loginError ? '' :'invisible'}`}>驗證碼錯誤</p>
+              <div className="w-auto h-4">
+                {errors.code && (
+                  <p className="text-red-500 text-sm mt-1 w-90 text-left">
+                    {String(errors.code.message)}
+                  </p>
+                )}
+              </div>
             </div>
             <button
               type="submit"

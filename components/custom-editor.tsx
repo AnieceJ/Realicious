@@ -38,13 +38,16 @@ import {
 import "ckeditor5/ckeditor5.css";
 
 export default function CustomEditor({
+	value = "",
 	onChange,
 }: {
+	value?: string;
 	onChange: (html: string) => void;
 }) {
 	return (
 		<CKEditor
 			editor={ClassicEditor}
+			data={value}
 			config={{
 				language: "zh-tw",
 				licenseKey: "GPL",
@@ -147,7 +150,6 @@ export default function CustomEditor({
 					ImageUpload,
 					ImageResize,
 				],
-				initialData: "",
 			}}
 			onChange={(_, editor) => onChange(editor.getData())}
 		/>

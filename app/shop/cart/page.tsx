@@ -9,11 +9,16 @@ import { useConfirm } from "../_components/ConfirmModal";
 
 export default function CartPage() {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [expanded, setExpanded] = useState(false);
   const { confirmComponent, showConfirm } = useConfirm();
 
   const refresh = () => setItems([...getCartItems()]);
 
   useEffect(() => { refresh(); }, []);
+
+  const MAX_VISIBLE = 3;
+  const showItems = expanded ? items : items.slice(0, MAX_VISIBLE);
+  const hiddenCount = items.length - MAX_VISIBLE;
 
   return (
     <div className="relative min-h-screen">
@@ -33,10 +38,7 @@ export default function CartPage() {
               <EmptyCart />
             ) : (
               <>
-                {items.map((item) => (
-                  <OrderItem key={item.id} item={item} onUpdate={refresh} />
-                ))}
-                <div className="flex justify-end mt-4">
+                <div className="flex justify-end mb-4">
                   <button
                     onClick={async () => {
                       const confirmed = await showConfirm("確定清空購物車嗎？");
@@ -52,12 +54,29 @@ export default function CartPage() {
                     清空購物車
                   </button>
                 </div>
+                {showItems.map((item) => (
+                  <OrderItem key={item.id} item={item} onUpdate={refresh} />
+                ))}
+                {hiddenCount > 0 && (
+                  <button
+                    onClick={() => setExpanded(!expanded)}
+                    className="w-full mt-3 py-3 text-sm font-bold text-[#3D2419] bg-[#FFD3B6] border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-[#ffbe94] active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <span>{expanded ? "收合" : `還有 ${hiddenCount} 筆商品`}</span>
+                    <svg
+                      className={`w-4 h-4 fill-[#3D2419] transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M24 6h-24l12 12z" />
+                    </svg>
+                  </button>
+                )}
               </>
             )}
           </div>
 
           {items.length > 0 && (
-            <div className="w-[40%]">
+            <div className="w-[40%] self-start sticky top-8">
               <OrderSummary items={items} />
             </div>
           )}

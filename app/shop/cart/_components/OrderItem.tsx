@@ -15,7 +15,7 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
   };
 
   return (
-    <div className="mb-6">
+    <div className="mb-3">
       {confirmComponent}
       <div
         className="flex w-full px-4 py-2.5 

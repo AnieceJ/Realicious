@@ -6,12 +6,14 @@ import ReturnLogin from "../_components/returnLogin";
 import VerifyButton from "../_components/verifyButton";
 
 import Image from "next/image";
+import Cookies from "js-cookie";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 
 import { registerSchema, RegisterInput } from "@/validations/validate";
+import { useUser } from "@/app/context/user";
 
 export default function Register() {
   const API_URL =
@@ -21,6 +23,7 @@ export default function Register() {
   const [registered, setRegistered] = useState<boolean>(); // 已註冊
   const [isVerifyMessage, setIsVerifyMessage] = useState<string>(); // 發送成功訊息
   const [submit, setSubmit] = useState(false); // form 送出
+  const { setUser } = useUser();
 
   const router = useRouter();
   const {
@@ -38,7 +41,7 @@ export default function Register() {
 
   const handleSendCode = async (): Promise<boolean> => {
     setIsVerify(false);
-    setRegistered(false)
+    setRegistered(false);
     const isvaild = await trigger("account"); // 驗證 email 欄位格式正確
     const scene = "register";
     if (isvaild) {
@@ -49,7 +52,7 @@ export default function Register() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({email:email,scene:scene}),
+          body: JSON.stringify({ email: email, scene: scene }),
         });
         const data = await res.json();
 
@@ -58,7 +61,6 @@ export default function Register() {
           setIsVerifyMessage(data.message || "發送成功");
           return true;
         } else {
-          console.log(data.message)
           setRegistered(true);
           setIsVerifyMessage(data.message || "此帳號已註冊過");
           return false;
@@ -88,7 +90,11 @@ export default function Register() {
       const result = await res.json();
 
       if (res.ok && result.success) {
+        Cookies.set("token", result.token, { expires: 1 });
+        Cookies.set("user", JSON.stringify(result.user), { expires: 1 });
+        setUser(result.user);
         alert(`註冊成功`);
+        router.refresh();
         router.replace("/user/personal");
       } else {
         alert(result.message || "註冊失敗");

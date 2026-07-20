@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { ChevronLeft, Eye, SquarePen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -24,6 +25,16 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
 
 interface SubCategory {
 	id: string;
@@ -51,6 +62,7 @@ interface UserArticlesResponse {
 }
 
 export default function ArticleManagePage() {
+	const router = useRouter();
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [userArticles, setUserArticles] = React.useState<UserArticle[]>([]);
 	const [loading, setLoading] = React.useState(true);
@@ -68,6 +80,30 @@ export default function ArticleManagePage() {
 		setUserArticles(data.articles);
 	};
 
+	// 刪除文章
+	const handleDeleteArticle = async (articleId: string) => {
+		const isConfirm = window.confirm("確定要刪除嗎？");
+		if (!isConfirm) return;
+		try {
+			const response = await fetch(`/api/article/articles/${articleId}`, {
+				method: "DELETE",
+			});
+			if (!response.ok) {
+				throw new Error("後端刪除失敗");
+			}
+			const data = await response.json();
+			if (data.success) {
+				alert("文章已成功刪除！");
+				setUserArticles((prevArticles) =>
+					prevArticles.filter((art) => art.id !== articleId),
+				);
+			}
+		} catch (error) {
+			console.error("刪除請求出錯:", error);
+			alert("刪除失敗，請檢查網路或稍後再試。");
+		}
+	};
+
 	React.useEffect(() => {
 		const initAllData = async () => {
 			try {
@@ -78,12 +114,7 @@ export default function ArticleManagePage() {
 
 				const catData: CategoriesResponse = await catResponse.json();
 				setCategories(catData.category);
-
 				await fetchUserArticles();
-				// const artResponse = await fetch(`/api/article/user-articles?user_id=1`);
-				// if (!artResponse.ok) throw new Error("Fetch failed");
-				// const artData: UserArticlesResponse = await artResponse.json();
-				// setUserArticles(artData.articles);
 			} catch (error) {
 				console.error("Error fetching categories:", error);
 			} finally {
@@ -192,28 +223,57 @@ export default function ArticleManagePage() {
 									key={art.id}
 									className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3"
 								>
-									<div className="flex justify-between item-start">
-										<h3 className="font-bold text-lg text-slate-900">
+									{/* 1. 調整標題區塊為垂直居中齊平 */}
+									<div className="flex justify-between items-center gap-4">
+										<h3 className="font-bold text-lg text-slate-900 flex-1 truncate">
 											{art.title}
 										</h3>
-										<p className="whitespace-nowrap pt-1 text-xs text-gray-700">
-											{art.date}
-										</p>
+										{/* 將日期與按鈕包在一起，推到最右側 */}
+										<div className="flex items-center gap-4 shrink-0">
+											<p className="whitespace-nowrap text-xs text-gray-500">
+												{art.date}
+											</p>
+											<DropdownMenu>
+												<DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors focus:outline-none">
+													<FontAwesomeIcon icon={faEllipsis} />
+												</DropdownMenuTrigger>
+												{/* 3. 限制選單寬度 min-w-[5rem] 並讓文字居中 */}
+												<DropdownMenuContent
+													align="end"
+													className="min-w-20 text-center"
+												>
+													<DropdownMenuItem
+														className="justify-center cursor-pointer"
+														onClick={() =>
+															router.push(`/article/edit?id=${art.id}`)
+														}
+													>
+														編輯
+													</DropdownMenuItem>
+													<DropdownMenuItem
+														className="justify-center cursor-pointer text-red-600 focus:text-red-600"
+														onClick={() => handleDeleteArticle(art.id)}
+													>
+														刪除
+													</DropdownMenuItem>
+												</DropdownMenuContent>
+											</DropdownMenu>
+										</div>
 									</div>
 									<div
-										className="article-content max-h-72 overflow-hidden wrap-break-word text-base"
+										className="article-content overflow-hidden wrap-break-word text-base line-clamp-3 text-gray-600"
 										dangerouslySetInnerHTML={{ __html: art.content }}
 									/>
 									<div className="flex justify-between items-end mt-1.5">
-										<div className="flex items-center">
+										<div className="flex items-center text-gray-500">
 											<Eye size={16} />
-											<div className="ml-1 text-sm">瀏覽次數</div>
+											<div className="ml-1 text-sm">收藏次數</div>
 										</div>
 										<Link href={`/article/${art.id}`}>
 											<Button
 												variant="outline"
 												size="sm"
-												className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs"
+												className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs hover:bg-red-700 hover:text-white"
 											>
 												閱讀全文
 											</Button>
@@ -225,6 +285,7 @@ export default function ArticleManagePage() {
 					</div>
 				</div>
 			</div>
+			{/* 分頁...保持不變 */}
 			<div className="m-4 flex justify-center">
 				<nav aria-label="Pagination" className="inline-flex shadow-xs">
 					<a

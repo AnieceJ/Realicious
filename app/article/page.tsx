@@ -72,6 +72,9 @@ export default function ArticlePage() {
 	const [loading, setLoading] = React.useState(true);
 	const [selectedSubCategory, setSelectedSubCategory] =
 		React.useState<string>("");
+	const [savedCounts, setSavedCounts] = React.useState<{
+		[key: string]: number;
+	}>({});
 
 	const fetchArticles = async (subCatId?: number) => {
 		let url = "/api/article/articles";
@@ -101,6 +104,17 @@ export default function ArticlePage() {
 		};
 		initAllData();
 	}, []);
+
+	//savedCount
+	React.useEffect(() => {
+		articles.forEach((art) => {
+			fetch(`/api/article/saved-count?article_id=${art.id}`)
+				.then((r) => r.json())
+				.then((data) =>
+					setSavedCounts((prev) => ({ ...prev, [art.id]: data.saved.count })),
+				);
+		});
+	}, [articles]);
 
 	return (
 		<>
@@ -206,7 +220,9 @@ export default function ArticlePage() {
 									<div className="flex justify-between items-center mt-1.5">
 										<div className="flex items-center">
 											<Eye size={16} />
-											<div className="ml-1 text-sm">瀏覽次數</div>
+											<div className="ml-1 text-sm">
+												收藏次數({savedCounts[art.id] || 0})
+											</div>
 										</div>
 										<Link href={`/article/${art.id}`}>
 											<Button
