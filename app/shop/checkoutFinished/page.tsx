@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import FinishedPhoto from "./_components/FinishedPhoto";
@@ -9,28 +9,25 @@ import { clearCart, getCartItems, saveLastOrder, type CartItem } from "@/lib/sho
 
 export default function CheckoutFinishedPage() {
   const searchParams = useSearchParams();
-  const [items, setItems] = useState<CartItem[]>([]);
+  const itemsRef = useRef<CartItem[]>([]);
   const [orderId, setOrderId] = useState("");
   const [status, setStatus] = useState<"loading" | "success" | "fail">("loading");
 
   useEffect(() => {
-    // 從 pending-order 拿真正的 orderId
     const pendingId = localStorage.getItem("realicious-pending-order") || "";
     const rtnCode = searchParams.get("RtnCode");
     const isCancelled = searchParams.get("cancel") === "1";
     const isSuccess = rtnCode === "1" || (searchParams.get("from") === "linepay" && !isCancelled);
 
     if (isSuccess || pendingId) {
-      // 付款成功 → 清空購物車，存 last order
       const cart = getCartItems();
-      setItems(cart);
+      itemsRef.current = cart;
       setOrderId(pendingId);
       saveLastOrder(cart);
       clearCart();
       localStorage.removeItem("realicious-pending-order");
       setStatus("success");
     } else {
-      // 付款失敗／取消 → 保留購物車
       setStatus("fail");
     }
   }, [searchParams]);
@@ -69,7 +66,7 @@ export default function CheckoutFinishedPage() {
       </div>
       <div className="flex flex-col items-center justify-center">
         <div className="w-[60%]">
-          <FinishedOrderList items={items} orderId={`ORD-${orderId}`} />
+          <FinishedOrderList items={itemsRef.current} orderId={`ORD-${orderId}`} />
         </div>
       </div>
       <div className="flex flex-col items-center justify-center">
