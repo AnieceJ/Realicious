@@ -21,8 +21,8 @@ export default async function RootLayout({
 		<html lang="zh-TW">
 			<body className="w-full min-h-screen bg-white flex flex-col">
 				<UserProvider>
-					<Header token={!!token} />
-					<main className="grow w-full">{children}</main>
+					<Header className="" token={!!token} />
+					<main className=" grow w-full">{children}</main>
 					<Footer />
 				</UserProvider>
 			</body>
