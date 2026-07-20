@@ -100,7 +100,7 @@ export default function Register() {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        showAlert("loading", "註冊成功", "自動跳轉中...請稍候");
+        showAlert("success", "註冊成功", "自動跳轉中...請稍候");
         Cookies.set("token", result.token, { expires: 1 });
         Cookies.set("user", JSON.stringify(result.user), { expires: 1 });
         setUser(result.user);
