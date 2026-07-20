@@ -105,7 +105,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  // 🟢 登入 (保持你原本的優良邏輯，微調 Authorization 的部分)
+  // 🟢 登入
   const login = async (account: string, password: string) => {
     try {
       const res = await fetch(`${API_URL}/login`, {
@@ -125,7 +125,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         setUser(data.user);
 
-        router.refresh();
+        // router.refresh();
         return { success: true, message: "登入成功" };
       } else {
         return { success: false, message: data.message || "登入失敗" };
@@ -138,15 +138,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   // 🔴 登出
   const logout = () => {
-    const result = confirm("確定要登出嗎？");
-    if (result) {
+    // const result = confirm("確定要登出嗎？");
+    // if (result) {
       handleLocalLogout();
 
       fetch(`${API_URL}/logout`, { method: "POST" }).catch(console.error);
 
       router.push("/user/login");
       router.refresh();
-    }
+    // }
   };
 
   return (

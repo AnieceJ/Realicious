@@ -10,11 +10,12 @@ config.autoAddCss = false;
 
 interface HeaderProps {
 	token: boolean;
+	className:string
 }
 
-export default function Header({ token }: HeaderProps) {
+export default function Header({ token ,className='' }: HeaderProps) {
 	return (
-		<header className="sticky top-0 z-40 h-15 bg-page-red backdrop-blur text-white">
+		<header className={`${className} sticky top-0 z-30 h-15 bg-page-red backdrop-blur text-white`}>
 			<div className="max-w-7xl mx-auto h-full px-5 flex items-center justify-between">
 				<Link
 					href="/"
