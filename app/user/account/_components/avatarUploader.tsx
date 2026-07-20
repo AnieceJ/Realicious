@@ -113,7 +113,7 @@ if (currentAvatar && typeof currentAvatar === "string" && currentAvatar.trim() !
 }
 
   return (
-    <div className="flex flex-col items-center p-4 border-b">
+    <div className="flex flex-col items-center p-4">
       {/* 大頭貼與右下角圖示按鈕 */}
       <div className="relative w-32 h-32">
         {/* 大頭貼本體 */}

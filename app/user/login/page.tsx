@@ -7,14 +7,14 @@ import { useUser } from "@/app/context/user";
 
 import Link from "next/link";
 import Image from "next/image";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import Container from "../_components/container";
 import loginAd from "@/public/user/login.png";
-import google from "@/public/user/google-logo.svg"
-import {button_shadow} from '../_components/button'
-
-import { loginSchema ,LoginInput} from "@/validations/validate";
-import { zodResolver } from "@hookform/resolvers/zod";
+import google from "@/public/user/google-logo.svg";
+import { button_shadow } from "../_components/button";
+import { loginSchema, LoginInput } from "@/validations/validate";
+import { RiLoginBoxLine } from "react-icons/ri";
 
 export default function Login() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function Login() {
       setShakePassword(true);
       setTimeout(() => setShakePassword(false), 400); // 0.4秒後關掉
     }
-  }
+  };
 
   // 使用 RHF
   const {
@@ -50,7 +50,6 @@ export default function Login() {
 
   // 表單送出
   const onSubmit = (data: LoginInput) => {
-    
     if (submit) return; // 防止快速重複點擊
     setLoginError(false); // 登入中特效
     setSubmit(true);
@@ -104,11 +103,11 @@ export default function Login() {
                 placeholder="請輸入電子郵件"
               />
               <div className="w-auto h-4">
-              {errors.account && (
-                <p className={`text-red-500 text-sm mt-1 w-90 text-left`}>
-                  {String(errors.account.message)}
-                </p>
-              )}
+                {errors.account && (
+                  <p className={`text-red-500 text-sm mt-1 w-90 text-left`}>
+                    {String(errors.account.message)}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex flex-col items-start mb-4">
@@ -123,29 +122,29 @@ export default function Login() {
                 placeholder="請輸入密碼"
               />
               <div className="w-auto h-4">
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1 w-90 text-left">
-                  {String(errors.password.message)}
-                </p>
-              )}
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1 w-90 text-left">
+                    {String(errors.password.message)}
+                  </p>
+                )}
               </div>
             </div>
             <div className="w-full h-10 flex justify-between">
               <div className="">
-              {loginError && (
-                <span className={`text-red-500 text-sm `}>
-                  帳號或密碼錯誤
-                </span>
-              )}
+                {loginError && (
+                  <span className={`text-red-500 text-sm `}>
+                    帳號或密碼錯誤
+                  </span>
+                )}
               </div>
-                <Link
-                className=" text-[16px] w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
+              <Link
+                className=" text-[16px] text-center h-6 align-middle w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
                 href={`/user/forgetPassword`}
               >
                 忘記密碼
               </Link>
             </div>
-            
+
             <button
               onClick={() => {}}
               type="submit"
@@ -158,25 +157,30 @@ export default function Login() {
 
           <h2 className="text-[20px] mb-4">--OR--</h2>
           <div className="flex justify-center items-center">
-            <Link href={'http://localhost:3001/user/api/auth/google'} className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}>
-            <Image
-            className=" object-contain object-bottom w-10 mr-4"
-            src={google}
-            alt="廣告"
-            width={30}
-            height={30}
-            priority
-          />
-            <span>google 登入</span></Link>
-          
-          <Link
-            className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
-            href={`/user/register`}
-          >
-            按此註冊
-          </Link>
+            <Link
+              href={"http://localhost:3001/user/api/auth/google"}
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
+            >
+              <Image
+                className=" object-contain object-bottom w-10 mr-2"
+                src={google}
+                alt="廣告"
+                width={30}
+                height={30}
+                priority
+              />
+              <span>google 登入</span>
+            </Link>
+
+            <Link
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
+              href={`/user/register`}
+            >
+              <RiLoginBoxLine className="text-4xl mr-2" />
+              按此註冊
+            </Link>
+            <button>CustomAlert</button>
           </div>
-            
         </div>
       </div>
     </Container>

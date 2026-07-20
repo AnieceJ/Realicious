@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import Container from "../_components/container";
 import Left from "./_components/left";
 import AvatarUploader from "./_components/avatarUploader";
+import {button_revise,button_cancel, button_submit} from '../_components/button'
 
 // 1. 定義符合你後端 /profile/full 回傳的資料型態
 interface FullProfile {
@@ -129,7 +130,6 @@ export default function ProfileForm() {
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left></Left>
       <div className="w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
-        <h2 className="text-xl font-bold mb-4">個人詳細資料</h2>
         {/* 放入大頭貼組件 */}
         <AvatarUploader
           currentAvatar={formData.avatar}
@@ -158,7 +158,7 @@ export default function ProfileForm() {
               value={formData.last_name}
               onChange={handleInputChange}
               disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              className="mt-1 block w-full border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
             />
           </div>
 
@@ -268,13 +268,13 @@ export default function ProfileForm() {
           </div>
 
           {/* 下方的按鈕切換邏輯 */}
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-start space-x-2 pt-4">
             {!isEditing ? (
               // 模式 A：唯讀狀態，只顯示「修改」按鈕
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className={`${button_revise}`}
               >
                 修改資料
               </button>
@@ -284,13 +284,15 @@ export default function ProfileForm() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                className={`${button_cancel} `}
+
                 >
                   取消
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                className={`${button_submit}`}
+
                 >
                   送出變更
                 </button>
