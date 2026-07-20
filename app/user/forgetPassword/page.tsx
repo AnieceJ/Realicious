@@ -12,11 +12,13 @@ import {
   forgetPasswordSchema,
   forgetPasswordInput,
 } from "@/validations/validate";
+import { useAlert } from "../context/alert";
 
 export default function ForgetPassword() {
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
   const router = useRouter();
+  const { showAlert, closeAlert } = useAlert();
 
   const [isVerify, setIsVerify] = useState<boolean>(); // 發送驗證碼
   const [isVerifyMessage, setIsVerifyMessage] = useState<string>(); // 發送成功訊息
@@ -33,13 +35,12 @@ export default function ForgetPassword() {
     resolver: zodResolver(forgetPasswordSchema),
     defaultValues: { email: "", code: "" },
   });
-  
+
   const scene = "forgot-password";
-  // 處理email是否重複，是就發送驗證碼
 
   const handleSendCode = async (): Promise<boolean> => {
     setIsVerify(false);
-
+    showAlert("loading", "驗證中...", "請稍候");
     const isvaild = await trigger("email"); // 驗證 email 欄位格式正確
     if (isvaild) {
       const email = getValues("email");
@@ -52,67 +53,69 @@ export default function ForgetPassword() {
           body: JSON.stringify({ email: email, scene: scene }),
         });
         const data = await res.json();
-        console.log(data)
+
         if (res.ok && data.success) {
           setIsVerify(true);
-          setIsVerifyMessage(data.message || "驗證碼已成功寄出，請至信箱收取1");
-          console.log(1)
+          showAlert("success", "發送成功", "請到信箱確認驗證碼");
+          setIsVerifyMessage(data.message || "驗證碼已成功寄出，請至信箱收取");
           return true;
         } else {
+          showAlert("error", "發送失敗", "伺服器錯誤 請稍後再試");
           setIsVerifyMessage(data.message || "伺服器錯誤，無法發送驗證碼");
-          console.log(2)
           return false;
         }
       } catch (error) {
         console.error("發送驗證碼連線失敗:", error);
+        showAlert("error", "發送失敗", "伺服器錯誤 請稍後再試");
         setIsVerify(true);
         setIsVerifyMessage("伺服器錯誤，無法發送驗證碼");
-        console.log(3)
         return false;
       }
     }
-    console.log(4)
     return false;
   };
 
   // 表單送出
-const onSubmit = async (data: forgetPasswordInput) => {
-  if (submit) return; // 防止快速重複點擊
-  setSubmit(true);
-  
-  try {
-    const res = await fetch(`${API_URL}/verification/verify-code`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // data 裡面應該本來就有包含 email 和 code
-      body: JSON.stringify({ ...data, scene: scene }), 
-    });
-    
-    const result = await res.json();
+  const onSubmit = async (data: forgetPasswordInput) => {
+    if (submit) return; // 防止快速重複點擊
+    setSubmit(true);
+    showAlert("loading", "驗證中...", "請稍候");
 
-    if (res.ok && result.success) {
-      alert(`驗證成功`);
-      
-      // 1. 從後端回傳的結果中，把我們剛剛做好的 resetToken 撈出來
-      const token = result.resetToken; 
-      const email = data.email; // 或者是從你前端 state 拿到的 email
-      
-      // 2. 跳轉時，把 token 和 email 用 Query String 帶到重設密碼頁面
-      // 網址會變成：/user/resetPassword?token=xxxx&email=xxx@example.com
-      router.replace(`/user/resetPassword?token=${token}&email=${encodeURIComponent(email)}`);
-      
-    } else {
-      alert(result.message || "驗證錯誤");
+    try {
+      const res = await fetch(`${API_URL}/verification/verify-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        // data 裡面應該本來就有包含 email 和 code
+        body: JSON.stringify({ ...data, scene: scene }),
+      });
+
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+          showAlert("success", "驗證成功", "請稍候...自動跳轉中");
+        setTimeout(()=>{
+           // 1. 從後端回傳的結果中，把我們剛剛做好的 resetToken 撈出來
+        const token = result.resetToken;
+        const email = data.email; // 或者是從你前端 state 拿到的 email
+closeAlert()
+        // 2. 跳轉時，把 token 和 email 用 Query String 帶到重設密碼頁面
+        // 網址會變成：/user/resetPassword?token=xxxx&email=xxx@example.com
+        router.replace(
+          `/user/resetPassword?token=${token}&email=${encodeURIComponent(email)}`,
+        );
+        },2000)
+      } else {
+        showAlert("error", "驗證錯誤", "請確認驗證碼是否正確");
+        setSubmit(false);
+      }
+    } catch (error) {
+      console.error("發送驗證碼連線失敗:", error);
+      showAlert("error", "連線異常", "連線伺服器失敗，請稍後再試");
       setSubmit(false);
     }
-  } catch (error) {
-    console.error("發送驗證碼連線失敗:", error);
-    alert("連線伺服器失敗，請稍後再試");
-    setSubmit(false);
-  }
-};
+  };
 
   return (
     <Container>
@@ -124,8 +127,12 @@ const onSubmit = async (data: forgetPasswordInput) => {
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col items-center mb-5"
           >
-            <div className="w-90 flex justify-between">
-              <input
+            <div className="w-90 flex flex-col justify-between">
+               <label className="text-[20px] mb-2.5" htmlFor="verification">
+                電子郵件
+              </label>
+              <div className="flex justify-between">
+                <input
                 {...register("email")}
                 className={`border w-72.5 h-12.5 text-[16px] px-2 ${isVerify ? "bg-yellow-100" : ""}`}
                 type="text"
@@ -134,14 +141,16 @@ const onSubmit = async (data: forgetPasswordInput) => {
                 disabled={isVerify}
               />
               <VerifyButton onClick={handleSendCode} child={`驗證`} />
+              </div>
+              
             </div>
-            <div className="w-auto h-4">
+            <div className="w-auto h-4 mb-4">
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1 w-90 text-left">
                   {String(errors.email.message)}
                 </p>
               )}
-              {isVerify ? <p>{isVerifyMessage}</p> : ""}
+              {/* {isVerify ? <p>{isVerifyMessage}</p> : ""} */}
             </div>
 
             <div className="flex flex-col items-start mb-4">

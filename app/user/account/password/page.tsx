@@ -70,6 +70,7 @@ export default function Account() {
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left />
       <div className="w-[70%] h-[720px] p-4 overflow-y-auto">
+        <h1 className="text-6xl">此頁尚未完成</h1>
         <form onSubmit={handleSubmit}>
           
           {/* 電子郵件 */}

@@ -9,12 +9,16 @@ import { faUser } from "@fortawesome/free-regular-svg-icons";
 import defaultAvatar from "@/public/user/Avatar.svg";
 
 import { useState, useEffect } from "react";
-import { createPortal } from "react-dom"; // 💡 步驟 1：引入 createPortal
+import { createPortal } from "react-dom";
 import { useUser } from "@/app/context/user";
 import Link from "next/link";
 import Image from "next/image";
+import { useAlert } from "@/app/user/context/alert";
+
 
 export default function UserSidebar() {
+  const { showAlert, closeAlert } = useAlert();
+
   const [isOpening, setIsOpening] = useState<boolean>(false);
   const { user, logout } = useUser();
   const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -128,7 +132,7 @@ export default function UserSidebar() {
                   <button
                     onClick={() => {
                       setIsOpening(false);
-                      logout();
+                      showAlert("confirm","確定要登出嗎？",'',()=>{logout()})
                     }}
                     className="w-full h-12.5 text-red-600 border-gray-700 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
                   >

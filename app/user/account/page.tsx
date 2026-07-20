@@ -9,6 +9,9 @@ import Container from "../_components/container";
 import Left from "./_components/left";
 import AvatarUploader from "./_components/avatarUploader";
 import {button_revise,button_cancel, button_submit} from '../_components/button'
+import { useAlert } from "../context/alert";
+import { useRouter } from "next/navigation";
+
 
 // 1. 定義符合你後端 /profile/full 回傳的資料型態
 interface FullProfile {
@@ -41,6 +44,8 @@ const API_URL =
 
 export default function ProfileForm() {
   const { user, setUser } = useUser();
+  const { showAlert, closeAlert } = useAlert();
+  const router = useRouter()
   // 控制是否為編輯模式
   const [isEditing, setIsEditing] = useState(false);
   // 畫面上正在輸入的資料
@@ -69,7 +74,11 @@ export default function ProfileForm() {
           setOriginalData(result.data);
         }
       } catch (error) {
+        showAlert("error",'伺服器異常')
         console.error("抓取詳細資料失敗:", error);
+        setTimeout(()=>{
+          router.push('/')
+        },2000)
       } finally {
         setLoading(false);
       }
@@ -111,16 +120,19 @@ export default function ProfileForm() {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        alert("資料更新成功！");
+        showAlert("success", "資料更新成功！");
         // 更新成功後，把當前資料變成「新的原始資料」
         setOriginalData(formData);
         setIsEditing(false);
+        setTimeout(()=>{
+          closeAlert()
+        },2000)
       } else {
-        alert(result.message || "更新失敗");
+      showAlert("error", "更新失敗！",result.message);
       }
     } catch (error) {
       console.error("發送更新 API 失敗:", error);
-      alert("系統發生錯誤，請稍後再試");
+      showAlert("error", "系統發生錯誤，請稍後再試");
     }
   };
 

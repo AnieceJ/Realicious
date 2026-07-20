@@ -138,15 +138,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   // 🔴 登出
   const logout = () => {
-    const result = confirm("確定要登出嗎？");
-    if (result) {
+    // const result = confirm("確定要登出嗎？");
+    // if (result) {
       handleLocalLogout();
 
       fetch(`${API_URL}/logout`, { method: "POST" }).catch(console.error);
 
       router.push("/user/login");
       router.refresh();
-    }
+    // }
   };
 
   return (
