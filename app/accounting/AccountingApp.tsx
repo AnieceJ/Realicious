@@ -285,6 +285,17 @@ const saveName = async () => {
     [txs],
   );
 
+  const overDays = useMemo(() => {
+    const sum = new Map<string, number>();
+    for (const t of txs) {
+      if (t.type !== "expense") continue;
+      sum.set(t.date, (sum.get(t.date) ?? 0) + t.amount);
+    }
+    return [...sum.entries()]
+      .filter(([, total]) => total > budget)
+      .map(([key]) => keyToDate(key));
+  }, [txs, budget]);
+
   const catsOfType = Object.keys(CATS).filter((k) => CATS[k].type === fType);
 
 const addTx = async () => {
@@ -446,6 +457,7 @@ const addTx = async () => {
             incomeDays={incomeDays}
             month={calMonth}
             onMonthChange={setCalMonth}
+            overDays={overDays}
           />
           <div className="flex gap-3 mt-3 pt-3 border-t-2 border-dashed border-black/20 text-[11px] font-bold text-black/60">
             <span className="flex items-center gap-1.5">
@@ -457,12 +469,12 @@ const addTx = async () => {
             <span className="flex items-center gap-1.5">
               <i className="w-2.5 h-2.5 bg-[#FFD45C] border border-black" />已選取
             </span>
+            <span className="flex items-center gap-1.5">
+              <i className="w-2.5 h-2.5 bg-white border-2 border-[#BB0015]" />超支
+            </span>
           </div>
         </section>
 
-        {/* 明細。拿掉 min-h-[calc(100dvh-4rem)] ——
-            那一行把卡片強制撐成整個螢幕高，不管裡面有幾筆。
-            大部分時候只有一兩列，所以撐出來的全是空白。 */}
         <aside
           className={`lg:col-span-7 ${CARD} p-5 flex flex-col`}
           aria-label="記帳明細"
@@ -530,7 +542,7 @@ const addTx = async () => {
           )}
         </div>
 
-{/* 本月結餘 */}
+        {/* 本月結餘 */}
         <div className="border-[3px] border-black bg-white p-3.5 mb-4">
           <div className="flex justify-between items-center">
             <span className="text-[13px] font-bold">本月結餘</span>
@@ -557,8 +569,7 @@ const addTx = async () => {
           </span>
         </div>
 
-        {/* 明細。內部捲動 —— 頁面本身不捲，所以小雞永遠不會蓋到你的內容。
-            記帳一天頂多幾筆，超過就在這個框裡捲。 */}
+        {/* 明細。 */}
         <div className="flex flex-col gap-2.5 max-h-[300px] overflow-y-auto pr-1">
           {dayTxs.length === 0 ? (
             <div className="border-[3px] border-dashed border-black/25 p-10 text-center text-[13px] font-bold text-black/40">
