@@ -8,7 +8,7 @@ export default function AccountingSection() {
 					<div className="text-7xl">🐥</div>
 				</div>
 
-				<div className="text-center text-black">
+				<div className="text-center text-white">
 					<h2 className="text-5xl font-black">今天花了多少？</h2>
 
 					<p className="mt-4 text-xl opacity-90">
