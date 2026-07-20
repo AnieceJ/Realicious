@@ -7,6 +7,7 @@ import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutSummary from "./_components/CheckoutSummary";
 import { clearCart, getCartItems, saveLastOrder, type CartItem } from "@/lib/shop/cart";
 import { createOrder } from "@/lib/shop/orders";
+import { paymentMethods } from "@/lib/shop/payment";
 
 const EMPTY: CartItem[] = [];
 let cached = EMPTY;
@@ -39,15 +40,19 @@ export default function CheckoutPage() {
   const [showPayment, setShowPayment] = useState(false);
   const [address, setAddress] = useState("");
 
-  const handlePayment = async (method: string) => {
+  const handlePayment = async (methodId: "ecpay" | "linepay") => {
     setShowPayment(false);
     const order = await createOrder(items, address);
-    if (order.success) {
-      saveLastOrder(items);
-      clearCart();
+    if (!order.success) { alert("訂單建立失敗"); return; }
+
+    saveLastOrder(items);
+    clearCart();
+
+    try {
+      await paymentMethods[methodId].checkout(order.orderId);
+    } catch (e: any) {
+      alert(e.message || "付款導向失敗");
       router.push("/shop/checkoutFinished");
-    } else {
-      alert("訂單建立失敗，請稍後再試");
     }
   };
 
@@ -85,7 +90,7 @@ export default function CheckoutPage() {
             <h3 className="text-2xl font-bold text-[#3D2419] text-center mb-6">選擇支付方式</h3>
             <div className="flex flex-col gap-4">
               <button
-                onClick={() => handlePayment("線上刷卡")}
+                onClick={() => handlePayment("ecpay")}
                 className="flex items-center justify-center gap-3 w-full py-5 bg-slate-200 text-slate-600 font-bold text-xl border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-slate-300 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
               >
                 <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
@@ -94,7 +99,7 @@ export default function CheckoutPage() {
                 線上刷卡
               </button>
               <button
-                onClick={() => handlePayment("行動支付")}
+                onClick={() => handlePayment("linepay")}
                 className="flex items-center justify-center gap-3 w-full py-5 bg-slate-200 text-slate-600 font-bold text-xl border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-slate-300 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
               >
                 <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
