@@ -5,17 +5,22 @@ import { zhTW } from "react-day-picker/locale";
 import "react-day-picker/style.css";
 import "./calendar.css";
 
-// 受控版本：選到的日期、紅綠點資料都由外面(AccountingApp)傳進來
 export default function BudgetCalendar({
   selected,
   onSelect,
   spendDays = [],
   incomeDays = [],
+  overDays = [],  
+  month,
+  onMonthChange,
 }: {
   selected?: Date;
   onSelect?: (date: Date | undefined) => void;
   spendDays?: Date[];
   incomeDays?: Date[];
+  overDays?: Date[];
+  month?: Date;
+  onMonthChange?: (m: Date) => void;
 }) {
   return (
     <DayPicker
@@ -23,10 +28,11 @@ export default function BudgetCalendar({
       locale={zhTW}
       selected={selected}
       onSelect={onSelect}
-      defaultMonth={selected}
+      month={month}
+      onMonthChange={onMonthChange}
       showOutsideDays
-      modifiers={{ spend: spendDays, income: incomeDays }}
-      modifiersClassNames={{ spend: "day-spend", income: "day-income" }}
+      modifiers={{ spend: spendDays, income: incomeDays, over: overDays }}
+      modifiersClassNames={{ spend: "day-spend", income: "day-income", over: "day-over" }}
     />
   );
 }

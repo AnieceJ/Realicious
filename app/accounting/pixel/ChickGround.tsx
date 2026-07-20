@@ -72,6 +72,8 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
   const [ghostBlip, setGhostBlip] = useState(false);
   const chickRef = useRef<HTMLDivElement | null>(null);
   const dragOrigin = useRef({ px: 0, py: 0 });
+  // 開始拖曳那一刻，小雞在視窗裡的位置與大小。clamp 邊界要用。
+  const startRect = useRef({ left: 0, top: 0, width: 0, height: 0 });
   const blipTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const dead = mood === "dead"; // 用「真實」mood 判斷是不是幽靈
@@ -118,15 +120,26 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
     e.preventDefault();
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     dragOrigin.current = { px: e.clientX, py: e.clientY };
+    // 記下這一刻小雞的位置（尚未位移），clamp 用。
+    const r = chickRef.current?.getBoundingClientRect();
+    if (r) startRect.current = { left: r.left, top: r.top, width: r.width, height: r.height };
     setGrabbed(true);
   }
 
   function onPointerMove(e: ReactPointerEvent) {
     if (!grabbed || !chickRef.current) return;
-    // 直接改 transform，不 setState —— 這是流暢的關鍵。
+
     const dx = e.clientX - dragOrigin.current.px;
     const dy = e.clientY - dragOrigin.current.py;
-    chickRef.current.style.transform = `translateX(-50%) translate(${dx}px, ${dy}px)`;
+
+    // ★ 把小雞夾在視窗內。startRect 是開始拖曳那一刻小雞的位置，
+    //   加上位移後不能讓她的邊界超出視窗。
+    const { left, top, width, height } = startRect.current;
+    const m = 8; // 邊界留白
+    const clampedDx = Math.max(m - left, Math.min(window.innerWidth - m - width - left, dx));
+    const clampedDy = Math.max(m - top, Math.min(window.innerHeight - m - height - top, dy));
+
+    chickRef.current.style.transform = `translateX(-50%) translate(${clampedDx}px, ${clampedDy}px)`;
   }
 
   function onPointerUp() {
