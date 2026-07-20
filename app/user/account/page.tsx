@@ -92,7 +92,7 @@ export default function ProfileForm() {
     setIsEditing(false); // 關閉編輯模式
   };
 
-  // 5. 送出鍵：發送一個新的更新 API (假設叫 PUT /profile/full)
+  // 5. 送出鍵：發送一個新的更新 API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = Cookies.get("token");

@@ -38,14 +38,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/a
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [user, setUser] = useState<User>(FAKE_USER_INIT);
+  const [user, setUser] = useState<User | null>();
   const [loading, setLoading] = useState(true); // 🆕 預設為載入中
 
   // 封裝一個清除本地狀態的輔助函式
   const handleLocalLogout = () => {
     Cookies.remove("token");
     Cookies.remove("user");
-    setUser(FAKE_USER_INIT);
+    setUser(null);
   };
 
   // 🆕 當網頁初始化、刷新時，主動去後端驗證 Token

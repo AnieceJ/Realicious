@@ -12,7 +12,6 @@ export default function Left() {
   const pathname = usePathname();
 
   const getLink = (path: string) => {
-    console.log(pathname);
     return `${pathname === path ? "bg-[#FBDF58]" : ""}`;
   };
 

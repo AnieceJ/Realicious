@@ -34,5 +34,6 @@ export const config = {
     '/user/login',
     '/user/account',
     '/user/chatroom',
+    // '/user/personal'
   ],
 };

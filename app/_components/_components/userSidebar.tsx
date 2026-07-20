@@ -21,10 +21,8 @@ export default function UserSidebar() {
   // 💡 步驟 1：建立一個標記，記錄「是否已經在瀏覽器掛載」
   const [isMounted, setIsMounted] = useState<boolean>(false);
   
-  const BACKEND_URL = "http://localhost:3001";
-  const DEFAULT_AVATAR = "@/public/user/Avatar.svg";
   // 拼接大頭貼完整路徑
-  const headerAvatar = user.avatar ? `${BACKEND_URL}${user.avatar}` :defaultAvatar ;
+  const headerAvatar = user?.avatar ? `${user.avatar}` :defaultAvatar ;
 
   // 💡 步驟 2：useEffect 只會在瀏覽器（客戶端）執行
   useEffect(() => {
