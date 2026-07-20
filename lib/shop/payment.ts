@@ -18,8 +18,6 @@ export const paymentMethods = {
     async checkout(orderId: number) {
       const data = await pay("ecpay", orderId);
       if (!data.success) throw new Error(data.error || "ECPay 付款失敗");
-
-      // 綠界需用表單 POST 送出
       const form = document.createElement("form");
       form.method = data.method;
       form.action = data.action;
@@ -43,6 +41,16 @@ export const paymentMethods = {
       const data = await pay("linepay", orderId);
       if (!data.success) throw new Error(data.error || "LINE Pay 付款失敗");
       window.location.href = data.action;
+    },
+  },
+
+  mock: {
+    id: "mock",
+    label: "模擬付款（測試用）",
+    icon: "test-tube",
+    async checkout(orderId: number) {
+      const data = await pay("mock", orderId);
+      if (!data.success) throw new Error(data.error || "模擬付款失敗");
     },
   },
 };

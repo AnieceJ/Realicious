@@ -5,7 +5,7 @@ import Breadcrumbs from "../_components/Breadcrumbs";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutSummary from "./_components/CheckoutSummary";
-import { clearCart, getCartItems, saveLastOrder, type CartItem } from "@/lib/shop/cart";
+import { getCartItems, type CartItem } from "@/lib/shop/cart";
 import { createOrder } from "@/lib/shop/orders";
 import { paymentMethods } from "@/lib/shop/payment";
 
@@ -40,19 +40,21 @@ export default function CheckoutPage() {
   const [showPayment, setShowPayment] = useState(false);
   const [address, setAddress] = useState("");
 
-  const handlePayment = async (methodId: "ecpay" | "linepay") => {
+  const handlePayment = async (methodId: "ecpay" | "linepay" | "mock") => {
     setShowPayment(false);
     const order = await createOrder(items, address);
     if (!order.success) { alert("訂單建立失敗"); return; }
 
-    saveLastOrder(items);
-    clearCart();
+    localStorage.setItem("realicious-pending-order", String(order.orderId));
 
     try {
       await paymentMethods[methodId].checkout(order.orderId);
+      // mock 付款成功後留在頁面，手動導向完成頁
+      if (methodId === "mock") {
+        router.push("/shop/checkoutFinished?RtnCode=1");
+      }
     } catch (e: any) {
       alert(e.message || "付款導向失敗");
-      router.push("/shop/checkoutFinished");
     }
   };
 
@@ -105,7 +107,14 @@ export default function CheckoutPage() {
                 <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
                   <path d="M6 2h12v20H6V2zm2 2v14h8V4H8zm3 15h2v2h-2v-2z" />
                 </svg>
-                行動支付
+                 行動支付
+              </button>
+              <hr className="border-t-2 border-[#3D2419]/20 my-3" />
+              <button
+                onClick={() => handlePayment("mock")}
+                className="flex items-center justify-center gap-3 w-full py-3 bg-gray-100 text-gray-500 font-bold text-base border-[2px] border-gray-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.15)] hover:bg-gray-200 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
+              >
+                ⚡ 模擬付款（測試用，跳過金流）
               </button>
             </div>
             <button

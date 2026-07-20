@@ -26,8 +26,18 @@ export default function OrderItem({ order }: { order: Order }) {
               ORDER ID: <span className="text-[#8C5230]">#{order.id}</span>
             </div>
             <div className="text-xs text-[#3D2419]/50 font-medium">{date}</div>
-            <div className="flex items-center justify-center px-3 py-1 mt-2 bg-[#466f44] text-[#FFFFFF] font-black text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]">
-              <span>處理中</span>
+            <div className={`flex items-center justify-center px-3 py-1 mt-2 font-black text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] ${
+              order.status === 1 ? "bg-yellow-400 text-[#3D2419]" :
+              order.status === 2 ? "bg-blue-400 text-white" :
+              order.status === 3 ? "bg-[#466f44] text-white" :
+              "bg-gray-300 text-gray-600"
+            }`}>
+              <span>{
+                order.status === 1 ? "待付款" :
+                order.status === 2 ? "處理中" :
+                order.status === 3 ? "已完成" :
+                "已取消"
+              }</span>
             </div>
           </div>
 
