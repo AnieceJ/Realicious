@@ -14,10 +14,12 @@ import { useRouter } from "next/navigation";
 
 import { registerSchema, RegisterInput } from "@/validations/validate";
 import { useUser } from "@/app/context/user";
+import { useAlert } from "../context/alert";
 
 export default function Register() {
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+  const { showAlert, closeAlert } = useAlert();
 
   const [isVerify, setIsVerify] = useState<boolean>(); // 發送驗證碼
   const [registered, setRegistered] = useState<boolean>(); // 已註冊
@@ -44,6 +46,7 @@ export default function Register() {
     setRegistered(false);
     const isvaild = await trigger("account"); // 驗證 email 欄位格式正確
     const scene = "register";
+    showAlert("loading", "驗證中...", "請稍候...");
     if (isvaild) {
       const email = getValues("account");
       try {
@@ -57,15 +60,21 @@ export default function Register() {
         const data = await res.json();
 
         if (res.ok && data.success) {
-          setIsVerify(true);
-          setIsVerifyMessage(data.message || "發送成功");
-          return true;
+          showAlert("success", "驗證成功", "請到信箱確認驗證碼");
+          setTimeout(() => {
+            setIsVerify(true);
+            setIsVerifyMessage(data.message || "發送成功");
+            closeAlert();
+            return true;
+          }, 3000);
         } else {
+          showAlert("error", data.message);
           setRegistered(true);
           setIsVerifyMessage(data.message || "此帳號已註冊過");
           return false;
         }
       } catch (error) {
+        showAlert("error", "發送驗證碼失敗...", "無法連接至伺服器");
         console.error("發送驗證碼連線失敗:", error);
         setIsVerify(true);
         setIsVerifyMessage("無法連接至伺服器");
@@ -79,6 +88,7 @@ export default function Register() {
   const onSubmit = async (data: RegisterInput) => {
     if (submit) return; // 防止快速重複點擊
     setSubmit(true);
+    showAlert("loading", "驗證中...", "請稍候...");
     try {
       const res = await fetch(`${API_URL}/register`, {
         method: "POST",
@@ -90,19 +100,22 @@ export default function Register() {
       const result = await res.json();
 
       if (res.ok && result.success) {
+        showAlert("loading", "註冊成功", "自動跳轉中...請稍候");
         Cookies.set("token", result.token, { expires: 1 });
         Cookies.set("user", JSON.stringify(result.user), { expires: 1 });
         setUser(result.user);
-        alert(`註冊成功`);
-        router.refresh();
-        router.replace("/user/personal");
+        setTimeout(() => {
+        closeAlert();
+          router.refresh();
+          router.replace("/user/personal");
+        }, 2000);
       } else {
-        alert(result.message || "註冊失敗");
+      showAlert("error", "註冊失敗...", result.message);
         setSubmit(false);
       }
     } catch (error) {
-      console.error("發送驗證碼連線失敗:", error);
-      alert("連線伺服器失敗，請稍後再試");
+      showAlert("error", "註冊失敗...", "無法連接至伺服器");
+      console.error("註冊失敗:", error);
       setSubmit(false);
     }
   };
@@ -126,19 +139,19 @@ export default function Register() {
                   className={`border w-72.5 h-12.5 text-[16px] px-2 ${isVerify ? "bg-yellow-100" : ""}`}
                   type="text"
                   id="email"
-                  placeholder="請輸入電子郵件"
+                  placeholder="請輸入電子郵件 點擊驗證"
                   disabled={isVerify}
                 />
                 <VerifyButton onClick={handleSendCode} child={`驗證`} />
               </div>
               <div className="w-auto h-4">
-                {errors.account && (
+                {/* {errors.account && (
                   <p className="text-red-500 text-sm mt-1 w-90 text-left">
                     {String(errors.account.message)}
                   </p>
                 )}
                 {registered ? <p>{isVerifyMessage}</p> : ""}
-                {isVerify ? <p>{isVerifyMessage}</p> : ""}
+                {isVerify ? <p>{isVerifyMessage}</p> : ""} */}
               </div>
             </div>
             <div className="flex flex-col items-start mb-4">

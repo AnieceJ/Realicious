@@ -1,4 +1,6 @@
+"use client";
 import "./user.css";
+import { AlertProvider } from "./context/alert";
 
 export default function UserLayout({
   children,
@@ -6,8 +8,8 @@ export default function UserLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-    {children}
-    </>
+    <div>
+      <AlertProvider>{children}</AlertProvider>;
+    </div>
   );
 }

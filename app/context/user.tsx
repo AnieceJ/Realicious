@@ -105,7 +105,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  // 🟢 登入 (保持你原本的優良邏輯，微調 Authorization 的部分)
+  // 🟢 登入
   const login = async (account: string, password: string) => {
     try {
       const res = await fetch(`${API_URL}/login`, {
@@ -125,7 +125,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         setUser(data.user);
 
-        router.refresh();
+        // router.refresh();
         return { success: true, message: "登入成功" };
       } else {
         return { success: false, message: data.message || "登入失敗" };
