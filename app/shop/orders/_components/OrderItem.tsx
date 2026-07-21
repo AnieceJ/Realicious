@@ -34,7 +34,7 @@ export default function OrderItem({ order }: { order: Order }) {
             }`}>
               <span>{
                 order.status === 1 ? "待付款" :
-                order.status === 2 ? "處理中" :
+                order.status === 2 ? "已付款" :
                 order.status === 3 ? "已完成" :
                 "已取消"
               }</span>

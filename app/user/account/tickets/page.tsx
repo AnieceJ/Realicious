@@ -1,7 +1,9 @@
 "use client";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Ticket as TicketIcon } from "lucide-react";
-import TicketItem from "./_components/TicketItem";
+import Container from "../../_components/container";
+import Left from "../_components/left";
+import TicketItem from "@/app/shop/tickets/_components/TicketItem";
 import { getTickets, type Ticket } from "@/lib/shop/tickets";
 import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
@@ -13,7 +15,7 @@ const FILTERS = [
   { key: "3", label: "已過期" },
 ] as const;
 
-export default function TicketPage() {
+export default function AccountTickets() {
   const { user } = useUser();
   const userId = user?.id;
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -36,18 +38,18 @@ export default function TicketPage() {
   }, [tickets, activeFilter]);
 
   return (
-    <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
-      <div className="max-w-7xl mx-auto px-4">
+    <Container className="bg-white flex-col sm:flex-row overflow-hidden">
+      <Left />
+      <div className="w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
         <PageHeader icon={<TicketIcon className="h-5 w-5" />} title="我的票券" />
 
         {/* 篩選標籤 */}
-        <div className="flex flex-row gap-4 mb-6">
+        <div className="flex flex-row gap-3 mb-6">
           {FILTERS.map((f) => (
             <button
               key={f.key}
               onClick={() => setActiveFilter(f.key)}
-              className={`px-6 py-2 font-bold text-base border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-all ${
+              className={`px-5 py-2 font-bold text-sm border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-all ${
                 activeFilter === f.key
                   ? "bg-[#89502E] text-white"
                   : "bg-[#FCF9F6] text-[#3D2419] hover:bg-[#FBDF58]"
@@ -59,16 +61,14 @@ export default function TicketPage() {
         </div>
 
         {/* 票券列表 */}
-        <div className="w-full">
-          {filteredTickets.length === 0 ? (
-            <p className="text-center py-10 text-gray-500">暫無票券</p>
-          ) : (
-            filteredTickets.map((ticket) => (
+        {filteredTickets.length === 0 ? (
+          <p className="text-center py-10 text-gray-500">暫無票券</p>
+        ) : (
+          filteredTickets.map((ticket) => (
               <TicketItem key={ticket.id} ticket={ticket} onRefresh={fetchTickets} />
-            ))
-          )}
-        </div>
+          ))
+        )}
       </div>
-    </div>
+    </Container>
   );
 }

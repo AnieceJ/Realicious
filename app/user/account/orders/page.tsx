@@ -1,15 +1,17 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
+import { ClipboardList } from "lucide-react";
 import Container from "../../_components/container";
 import Left from "../_components/left";
 import OrderItem from "@/app/shop/orders/_components/OrderItem";
 import { getOrders, type Order } from "@/lib/shop/orders";
 import { useUser } from "@/app/context/user";
+import PageHeader from "@/app/_components/PageHeader";
 
 const FILTERS = [
   { key: "all", label: "全部訂單" },
   { key: "1", label: "待付款" },
-  { key: "2", label: "處理中" },
+  { key: "2", label: "已付款" },
   { key: "3", label: "已完成" },
 ] as const;
 
@@ -34,7 +36,7 @@ export default function AccountOrders() {
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left />
       <div className="w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
-        <h2 className="text-3xl font-bold text-[#3D2419] mb-6">訂單紀錄</h2>
+        <PageHeader icon={<ClipboardList className="h-5 w-5" />} title="訂單紀錄" />
 
         {/* 篩選標籤 */}
         <div className="flex flex-row gap-3 mb-6">

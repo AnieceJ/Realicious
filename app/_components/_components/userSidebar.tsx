@@ -1,6 +1,6 @@
 "use client";
 
-import { FaUser, FaBook, FaShoppingCart } from "react-icons/fa";
+import { FaUser, FaBook, FaShoppingCart, FaTicketAlt } from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { GiChicken } from "react-icons/gi";
 import { MdOutlineLogout } from "react-icons/md";
@@ -120,6 +120,14 @@ export default function UserSidebar() {
                   >
                     <FaShoppingCart />
                     <span className="ml-4">訂單記錄</span>
+                  </Link>
+                  <Link
+                    onClick={() => setIsOpening(false)}
+                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
+                    href={`/user/account/tickets`}
+                  >
+                    <FaTicketAlt />
+                    <span className="ml-4">我的票券</span>
                   </Link>
                   <Link
                     onClick={() => setIsOpening(false)}

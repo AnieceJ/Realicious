@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function FinishedAction() {
   return (
     <div className="flex flex-row gap-4 w-full">
-      <Link href="/shop/tickets"
+      <Link href="/user/account/tickets"
         className="flex items-center justify-center w-full px-4 py-2.5 mt-8
                   bg-[#964590] text-[#FFFFFF] font-bold text-base
                   border-[3px] border-[#3D2419]

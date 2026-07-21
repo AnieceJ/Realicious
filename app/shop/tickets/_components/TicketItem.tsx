@@ -9,13 +9,26 @@ const TYPE_LABEL: Record<string, string> = {
   cash: "現金折價",
 };
 
-export default function TicketItem({ ticket }: { ticket: Ticket }) {
+const API_BASE = "http://localhost:3001";
+
+export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRefresh?: () => void }) {
   const [showQR, setShowQR] = useState(false);
+  const [acting, setActing] = useState(false);
   const date = new Date(ticket.created_at).toLocaleDateString("zh-TW");
   const expiresAt = ticket.expires_at
     ? new Date(ticket.expires_at).toLocaleDateString("zh-TW")
     : null;
   const isUsable = ticket.status === 1;
+
+  const demoAction = async (action: "redeem" | "expire") => {
+    if (!ticket.redeem_code || acting) return;
+    setActing(true);
+    const endpoint = action === "redeem" ? "redeem" : "expire";
+    await fetch(`${API_BASE}/tickets/${endpoint}/${ticket.redeem_code}`, { method: "PUT" });
+    setActing(false);
+    setShowQR(false);
+    onRefresh?.();
+  };
 
   return (
     <>
@@ -38,14 +51,14 @@ export default function TicketItem({ ticket }: { ticket: Ticket }) {
                   <div className="text-xs text-[#3D2419]/50 font-medium">{date}</div>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-1 mt-1">
-                <span className="text-xs bg-[#3D2419] text-white px-2 py-0.5">
+              <div className="flex flex-wrap gap-2 mt-1">
+                <span className="inline-flex items-center bg-[#3D2419]/10 px-2.5 py-0.5 text-xs font-semibold text-[#3D2419]">
                   {TYPE_LABEL[ticket.type] || ticket.type}
                 </span>
-                <span className={`px-2 py-0.5 text-xs font-black border-[2px] border-[#3D2419] ${
-                  ticket.status === 1 ? "bg-green-400 text-white" :
-                  ticket.status === 2 ? "bg-gray-400 text-white" :
-                  "bg-red-300 text-white"
+                <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold ${
+                  ticket.status === 1 ? "bg-green-100 text-green-800" :
+                  ticket.status === 2 ? "bg-gray-100 text-gray-600" :
+                  "bg-red-100 text-red-700"
                 }`}>
                   {ticket.status === 1 ? "未使用" :
                    ticket.status === 2 ? "已使用" :
@@ -108,6 +121,28 @@ export default function TicketItem({ ticket }: { ticket: Ticket }) {
                 有效期限：{expiresAt}
               </p>
             )}
+
+            {/* Demo 按鈕群 */}
+            <div className="flex flex-col gap-2 mt-4 pt-4 border-t-2 border-dashed border-gray-300">
+              <p className="text-xs text-gray-400 text-center">— Demo 功能 —</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => demoAction("redeem")}
+                  disabled={acting}
+                  className="flex-1 py-2 text-xs font-bold text-white bg-blue-500 border-2 border-blue-700 shadow-[2px_2px_0px_0px_#1e40af] hover:bg-blue-600 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer disabled:opacity-50"
+                >
+                  模擬核銷
+                </button>
+                <button
+                  onClick={() => demoAction("expire")}
+                  disabled={acting}
+                  className="flex-1 py-2 text-xs font-bold text-white bg-red-400 border-2 border-red-600 shadow-[2px_2px_0px_0px_#dc2626] hover:bg-red-500 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer disabled:opacity-50"
+                >
+                  設為過期
+                </button>
+              </div>
+            </div>
+
             <button
               onClick={() => setShowQR(false)}
               className="w-full mt-4 py-2.5 font-bold text-sm text-[#3D2419] bg-white border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-gray-100 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"

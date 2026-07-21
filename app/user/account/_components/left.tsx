@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { FaUser, FaBook, FaShoppingCart, FaClipboardList } from "react-icons/fa";
+import { FaUser, FaBook, FaShoppingCart, FaClipboardList, FaTicketAlt } from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { GiChicken } from "react-icons/gi";
 
@@ -58,6 +58,16 @@ export default function Left() {
         >
           <FaClipboardList />
           <span className="ml-4">訂單紀錄</span>
+        </Link>
+        <Link
+          onClick={() => {
+            setIsOpening(!isOpening);
+          }}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/tickets`)}`}
+          href={`/user/account/tickets`}
+        >
+          <FaTicketAlt />
+          <span className="ml-4">我的票券</span>
         </Link>
         <Link
           onClick={() => {
