@@ -12,7 +12,7 @@ export default function FinishedAction() {
                   hover:opacity-90 active:translate-x-[2px] active:translate-y-[2px] transition-all"
       >
         <span className="text-3xl text-center">
-          票券中心<br />TICKET CENTER
+          票券中心
         </span>
       </Link>
       <Link href="/shop"
@@ -23,7 +23,7 @@ export default function FinishedAction() {
                   hover:opacity-90 active:translate-x-[2px] active:translate-y-[2px] transition-all"
       >
         <span className="text-3xl text-center">
-          回到商品列表<br />MARKETPLACE
+          回到商品列表
         </span>
       </Link>
       <Link href="/user/account/orders"
@@ -34,7 +34,7 @@ export default function FinishedAction() {
                   hover:opacity-90 active:translate-x-[2px] active:translate-y-[2px] transition-all"
       >
         <span className="text-3xl text-center">
-          訂單總表<br />ORDER DETAILS
+          訂單紀錄
         </span>
       </Link>
     </div>

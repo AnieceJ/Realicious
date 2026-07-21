@@ -18,7 +18,7 @@ export default function OrderItem({ order }: { order: Order }) {
   const date = new Date(order.created_at).toLocaleDateString("zh-TW");
 
   return (
-    <div className="w-full max-w-4xl mx-auto mb-6">
+    <div className="w-full mb-6">
       <div className="flex flex-col w-full p-5 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] select-none">
         <div className="flex flex-row items-center justify-between w-full">
           <div className="flex flex-col items-start gap-1.5 shrink-0 w-48 text-left">

@@ -4,6 +4,7 @@ import Container from "../../_components/container";
 import Left from "../_components/left";
 import OrderItem from "@/app/shop/orders/_components/OrderItem";
 import { getOrders, type Order } from "@/lib/shop/orders";
+import { useUser } from "@/app/context/user";
 
 const FILTERS = [
   { key: "all", label: "全部訂單" },
@@ -13,14 +14,16 @@ const FILTERS = [
 ] as const;
 
 export default function AccountOrders() {
+  const { user } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
-    getOrders().then((res) => {
+    if (!user?.id) return;
+    getOrders(Number(user.id)).then((res) => {
       if (res.success) setOrders(res.data);
     });
-  }, []);
+  }, [user?.id]);
 
   const filteredOrders = useMemo(() => {
     if (activeFilter === "all") return orders;

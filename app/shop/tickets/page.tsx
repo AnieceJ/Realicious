@@ -1,40 +1,39 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
-import OrderItem from "./_components/OrderItem";
-import { getOrders, type Order } from "@/lib/shop/orders";
+import TicketItem from "./_components/TicketItem";
+import { getTickets, type Ticket } from "@/lib/shop/tickets";
 import { useUser } from "@/app/context/user";
 
 const FILTERS = [
-  { key: "all", label: "全部訂單" },
-  { key: "1", label: "待付款" },
-  { key: "2", label: "處理中" },
-  { key: "3", label: "已完成" },
+  { key: "all", label: "全部票券" },
+  { key: "1", label: "未使用" },
+  { key: "2", label: "已使用" },
+  { key: "3", label: "已過期" },
 ] as const;
 
-export default function OrderPage() {
+export default function TicketPage() {
   const { user } = useUser();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     if (!user?.id) return;
-    getOrders(Number(user.id)).then((res) => {
-      if (res.success) setOrders(res.data);
+    getTickets(Number(user.id)).then((res) => {
+      if (res.success) setTickets(res.data);
     });
   }, [user?.id]);
 
-  const filteredOrders = useMemo(() => {
-    if (activeFilter === "all") return orders;
-    return orders.filter((o) => String(o.status) === activeFilter);
-  }, [orders, activeFilter]);
+  const filteredTickets = useMemo(() => {
+    if (activeFilter === "all") return tickets;
+    return tickets.filter((t) => String(t.status) === activeFilter);
+  }, [tickets, activeFilter]);
 
   return (
     <div className="relative min-h-screen">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex flex-row justify-between mt-8 mb-8">
-          <h2 className="text-4xl">我的訂單</h2>
-          <div className="bg-purple-300 w-50 h-20">電子雞</div>
+          <h2 className="text-4xl">票券中心</h2>
         </div>
 
         {/* 篩選標籤 */}
@@ -54,13 +53,13 @@ export default function OrderPage() {
           ))}
         </div>
 
-        {/* 訂單列表 */}
+        {/* 票券列表 */}
         <div className="w-full">
-          {filteredOrders.length === 0 ? (
-            <p className="text-center py-10 text-gray-500">尚無訂單</p>
+          {filteredTickets.length === 0 ? (
+            <p className="text-center py-10 text-gray-500">暫無票券</p>
           ) : (
-            filteredOrders.map((order) => (
-              <OrderItem key={order.id} order={order} />
+            filteredTickets.map((ticket) => (
+              <TicketItem key={ticket.id} ticket={ticket} />
             ))
           )}
         </div>

@@ -8,6 +8,7 @@ import CheckoutSummary from "./_components/CheckoutSummary";
 import { getCartItems, type CartItem } from "@/lib/shop/cart";
 import { createOrder } from "@/lib/shop/orders";
 import { paymentMethods } from "@/lib/shop/payment";
+import { useUser } from "@/app/context/user";
 
 const EMPTY: CartItem[] = [];
 let cached = EMPTY;
@@ -36,13 +37,15 @@ function getServerSnapshot() {
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user } = useUser();
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
   const [address, setAddress] = useState("");
 
   const handlePayment = async (methodId: "ecpay" | "linepay" | "mock") => {
     setShowPayment(false);
-    const order = await createOrder(items, address);
+    console.log("當前 user:", user);
+    const order = await createOrder(items, address, Number(user?.id) || undefined);
     if (!order.success) { alert("訂單建立失敗"); return; }
 
     localStorage.setItem("realicious-pending-order", String(order.orderId));
