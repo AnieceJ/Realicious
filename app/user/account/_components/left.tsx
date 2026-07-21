@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { FaUser, FaBook, FaShoppingCart } from "react-icons/fa";
+import { FaUser, FaBook, FaShoppingCart, FaClipboardList, FaTicketAlt } from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { GiChicken } from "react-icons/gi";
 
@@ -16,7 +16,7 @@ export default function Left() {
   };
 
   return (
-    <div className="w-95 h-180 bg-[#FCF9F6] border flex flex-col items-center">
+    <div className="w-95 h-180 bg-[#FCF9F6] border-r-2 flex flex-col items-center">
       <h2 className="text-[24px] my-4">個人中心</h2>
       <div className="w-full">
         <Link
@@ -53,13 +53,23 @@ export default function Left() {
           onClick={() => {
             setIsOpening(!isOpening);
           }}
-          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/cart`)}`}
-          href={`/user/account/cart`}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/orders`)}`}
+          href={`/user/account/orders`}
         >
-          <FaShoppingCart />
-          <span className="ml-4">購買記錄</span>
+          <FaClipboardList />
+          <span className="ml-4">訂單紀錄</span>
         </Link>
         <Link
+          onClick={() => {
+            setIsOpening(!isOpening);
+          }}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center ${getLink(`/user/account/tickets`)}`}
+          href={`/user/account/tickets`}
+        >
+          <FaTicketAlt />
+          <span className="ml-4">我的票券</span>
+        </Link>
+        {/* <Link
           onClick={() => {
             setIsOpening(!isOpening);
           }}
@@ -68,7 +78,7 @@ export default function Left() {
         >
           <GiChicken />
           <span className="ml-4">我的小雞</span>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

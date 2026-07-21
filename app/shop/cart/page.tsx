@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import OrderItem from "./_components/OrderItem";
 import OrderSummary from "./_components/OrderSummary";
@@ -7,21 +7,43 @@ import EmptyCart from "./_components/EmptyCart";
 import { clearCart, getCartItems, type CartItem } from "@/lib/shop/cart";
 import { useConfirm } from "../_components/ConfirmModal";
 
+const EMPTY: CartItem[] = [];
+let cached = EMPTY;
+
+function subscribe(cb: () => void) {
+  window.addEventListener("cart-updated", cb);
+  return () => window.removeEventListener("cart-updated", cb);
+}
+
+function getSnapshot() {
+  const latest = getCartItems();
+  if (latest.length === 0 && cached.length === 0) return cached;
+  if (latest.length !== cached.length) { cached = latest; return cached; }
+  for (let i = 0; i < latest.length; i++) {
+    if (latest[i].id !== cached[i].id || latest[i].qty !== cached[i].qty) {
+      cached = latest;
+      return cached;
+    }
+  }
+  return cached;
+}
+
+function getServerSnapshot() {
+  return EMPTY;
+}
+
 export default function CartPage() {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [expanded, setExpanded] = useState(false);
+  const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [expanded, setExpanded] = React.useState(false);
   const { confirmComponent, showConfirm } = useConfirm();
 
-  const refresh = () => setItems([...getCartItems()]);
-
-  useEffect(() => { refresh(); }, []);
-
+  const refresh = () => {}; // 自動同步，不需要手動更新
   const MAX_VISIBLE = 3;
   const showItems = expanded ? items : items.slice(0, MAX_VISIBLE);
   const hiddenCount = items.length - MAX_VISIBLE;
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen scroll-smooth">
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       {confirmComponent}
       <div className="max-w-7xl mx-auto">

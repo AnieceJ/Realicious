@@ -4,18 +4,20 @@ import Container from "../_components/container";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 // 1. 引入 useSearchParams
-import { useRouter, useSearchParams } from "next/navigation"; 
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   resetPasswordSchema,
   ResetPasswordInput,
 } from "@/validations/validate";
+import { useAlert } from "../context/alert";
 
 export default function ForgetPassword() {
+  const { showAlert, closeAlert } = useAlert();
   const router = useRouter();
   // 2. 初始化 searchParams 語法
-  const searchParams = useSearchParams(); 
-  
+  const searchParams = useSearchParams();
+
   // 3. 從網址取出 token 和 email (對應前一頁傳過來的參數名)
   const token = searchParams.get("token");
   const email = searchParams.get("email");
@@ -36,13 +38,18 @@ export default function ForgetPassword() {
   // 表單送出
   const onSubmit = async (data: ResetPasswordInput) => {
     if (submit) return; // 防止快速重複點擊
-    
+    showAlert("loading", "驗證中...", "請稍候");
     if (!token || !email) {
-      alert("驗證憑證已失效或網址不正確，請重新申請驗證碼。");
-      router.replace("/user/forgetPassword"); // 丟回輸入驗證碼那一頁
-      return;
+      showAlert(
+        "error",
+        "異常狀態",
+        "驗證憑證已失效或網址不正確，請重新申請驗證碼。",
+      );
+      setTimeout(() => {
+        router.replace("/user/forgetPassword"); // 丟回輸入驗證碼那一頁
+        return;
+      }, 2000);
     }
-
     setSubmit(true);
     try {
       // 4. 將路由改為我們寫好的後端驗證節點
@@ -54,21 +61,24 @@ export default function ForgetPassword() {
         body: JSON.stringify({
           email: email,
           resetToken: token,
-          newPassword: data.password, 
+          newPassword: data.password,
         }),
       });
       const result = await res.json();
 
       if (res.ok && result.success) {
-        alert(`重置成功`);
-        router.replace("/user/login");
+        showAlert("success", "重置成功", "請重新登入");
+        setTimeout(() => {
+          closeAlert();
+          router.replace("/user/login");
+        }, 2500);
       } else {
-        alert(result.message || "修改失敗");
+        showAlert("error", "修改失敗", result.message);
         setSubmit(false);
       }
     } catch (error) {
       console.error("發送驗證碼連線失敗:", error);
-      alert("連線伺服器失敗，請稍後再試");
+      showAlert("error", "連線伺服器失敗，請稍後再試");
       setSubmit(false);
     }
   };
@@ -106,7 +116,7 @@ export default function ForgetPassword() {
                 placeholder="請再次輸入密碼"
               />
             </div>
-            <div className="w-auto h-4">
+            <div className="w-auto h-4 mb-4">
               {errors.check && (
                 <p className="text-red-500 text-sm mt-1 w-90 text-left">
                   {String(errors.check.message)}

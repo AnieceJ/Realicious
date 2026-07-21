@@ -1,27 +1,49 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/app/context/user";
+import { useAlert } from "../context/alert";
 
 import Link from "next/link";
 import Image from "next/image";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import Container from "../_components/container";
 import loginAd from "@/public/user/login.png";
-import google from "@/public/user/google-logo.svg"
-import {button_shadow} from '../_components/button'
-
-import { loginSchema ,LoginInput} from "@/validations/validate";
-import { zodResolver } from "@hookform/resolvers/zod";
+import google from "@/public/user/google-logo.svg";
+import { button_shadow } from "../_components/button";
+import { loginSchema, LoginInput } from "@/validations/validate";
+import { RiLoginBoxLine } from "react-icons/ri";
 
 export default function Login() {
   const router = useRouter();
   const { login } = useUser();
+  const { showAlert, closeAlert } = useAlert();
+
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
+
+  useEffect(() => {
+    if (error === "server_error") {
+      // 觸發 Alert 提示
+      showAlert("error", "登入異常", "Google 驗證失敗，請重新登入。");
+      router.replace("/user/login", { scroll: false });
+    }
+    if (error === "user_not_found") {
+      // 觸發 Alert 提示
+      showAlert("error", "登入異常", "用戶不存在");
+      router.replace("/user/login", { scroll: false });
+    }
+    if (error === "oauth_failed") {
+      // 觸發 Alert 提示
+      showAlert("error", "登入異常", "請稍後再試");
+      router.replace("/user/login", { scroll: false });
+    }
+  }, [error, showAlert, router]); // 當 error 存在時觸發
 
   const [loginError, setLoginError] = useState(false); // 登入錯誤處理
-
   const [shakeAccount, setShakeAccount] = useState(false); // Email 欄位錯誤特效
   const [shakePassword, setShakePassword] = useState(false); // Password 欄位錯誤特效
   const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
@@ -36,7 +58,7 @@ export default function Login() {
       setShakePassword(true);
       setTimeout(() => setShakePassword(false), 400); // 0.4秒後關掉
     }
-  }
+  };
 
   // 使用 RHF
   const {
@@ -49,25 +71,50 @@ export default function Login() {
   });
 
   // 表單送出
-  const onSubmit = (data: LoginInput) => {
-    
+  const onSubmit = async (data: LoginInput) => {
     if (submit) return; // 防止快速重複點擊
-    setLoginError(false); // 登入中特效
+
+    setLoginError(false);
     setSubmit(true);
+
     const account = data.account;
     const password = data.password;
 
-    // 模擬延遲登入
-    setTimeout(async () => {
-      const onLogin = await login(account, password);
+    // 1. 第一時間立刻跳出「進行中」彈窗
+    showAlert("loading", "登入中...", "請稍候...");
+
+    try {
+      // 💡 關鍵優化：讓後端 API 請求與「最少等待 1000ms」的承諾同時執行
+      // Promise.all 會等待陣列裡的所有事情都做完，才繼續往下走
+      const [onLogin] = await Promise.all([
+        login(account, password), // 執行後端登入
+        new Promise((resolve) => setTimeout(resolve, 1000)), // 強制最少定格 1 秒
+      ]);
+
+      // 走到這裡，代表至少過了 1 秒，且後端也回傳結果了，時間點被完美「統一」了！
+
       if (onLogin.success) {
-        alert(onLogin.message);
-        router.replace("/");
+        // 2. 成功狀態：切換為成功彈窗（不再需要再等 1 秒才切換）
+        showAlert("success", "登入成功！", "即將為您跳轉至首頁...");
+
+        // 成功彈窗維持 2 秒鐘，讓使用者看清楚綠色勾勾，然後自動跳轉
+        setTimeout(() => {
+          closeAlert();
+          router.refresh();
+          router.replace("/");
+        }, 2000);
       } else {
-        setLoginError(true); // 登入失敗，回復原狀
+        showAlert("error", "登入失敗", "帳號或密碼輸入錯誤");
+
+        setLoginError(true);
         setSubmit(false);
       }
-    }, 1000);
+    } catch {
+      // 4. 意外錯誤狀態（例如斷網、伺服器掛掉）
+      showAlert("error", "連線異常", "系統發生錯誤，請稍後再試。");
+      setLoginError(true);
+      setSubmit(false);
+    }
   };
 
   return (
@@ -104,11 +151,11 @@ export default function Login() {
                 placeholder="請輸入電子郵件"
               />
               <div className="w-auto h-4">
-              {errors.account && (
-                <p className={`text-red-500 text-sm mt-1 w-90 text-left`}>
-                  {String(errors.account.message)}
-                </p>
-              )}
+                {errors.account && (
+                  <p className={`text-red-500 text-sm mt-1 w-90 text-left`}>
+                    {String(errors.account.message)}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex flex-col items-start mb-4">
@@ -123,29 +170,29 @@ export default function Login() {
                 placeholder="請輸入密碼"
               />
               <div className="w-auto h-4">
-              {errors.password && (
-                <p className="text-red-500 text-sm mt-1 w-90 text-left">
-                  {String(errors.password.message)}
-                </p>
-              )}
+                {errors.password && (
+                  <p className="text-red-500 text-sm mt-1 w-90 text-left">
+                    {String(errors.password.message)}
+                  </p>
+                )}
               </div>
             </div>
             <div className="w-full h-10 flex justify-between">
               <div className="">
-              {loginError && (
-                <span className={`text-red-500 text-sm `}>
-                  帳號或密碼錯誤
-                </span>
-              )}
+                {/* {loginError && (
+                  <span className={`text-red-500 text-sm `}>
+                    帳號或密碼錯誤
+                  </span>
+                )} */}
               </div>
-                <Link
-                className=" text-[16px] w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
+              <Link
+                className=" text-[16px] text-center h-6 align-middle w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
                 href={`/user/forgetPassword`}
               >
                 忘記密碼
               </Link>
             </div>
-            
+
             <button
               onClick={() => {}}
               type="submit"
@@ -158,25 +205,29 @@ export default function Login() {
 
           <h2 className="text-[20px] mb-4">--OR--</h2>
           <div className="flex justify-center items-center">
-            <Link href={'http://localhost:3001/user/api/auth/google'} className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}>
-            <Image
-            className=" object-contain object-bottom w-10 mr-4"
-            src={google}
-            alt="廣告"
-            width={30}
-            height={30}
-            priority
-          />
-            <span>google 登入</span></Link>
-          
-          <Link
-            className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
-            href={`/user/register`}
-          >
-            按此註冊
-          </Link>
+            <Link
+              href={"http://localhost:3001/user/api/auth/google"}
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
+            >
+              <Image
+                className=" object-contain object-bottom w-10 mr-2"
+                src={google}
+                alt="廣告"
+                width={30}
+                height={30}
+                priority
+              />
+              <span>google 登入</span>
+            </Link>
+
+            <Link
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
+              href={`/user/register`}
+            >
+              <RiLoginBoxLine className="text-4xl mr-2" />
+              按此註冊
+            </Link>
           </div>
-            
         </div>
       </div>
     </Container>

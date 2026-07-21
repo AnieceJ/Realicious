@@ -1,7 +1,9 @@
 "use client";
 import React, { useEffect, useState, useMemo } from "react";
 import { ClipboardList } from "lucide-react";
-import OrderItem from "./_components/OrderItem";
+import Container from "../../_components/container";
+import Left from "../_components/left";
+import OrderItem from "@/app/shop/orders/_components/OrderItem";
 import { getOrders, type Order } from "@/lib/shop/orders";
 import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
@@ -13,7 +15,7 @@ const FILTERS = [
   { key: "3", label: "已完成" },
 ] as const;
 
-export default function OrderPage() {
+export default function AccountOrders() {
   const { user } = useUser();
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
@@ -31,18 +33,18 @@ export default function OrderPage() {
   }, [orders, activeFilter]);
 
   return (
-    <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
-      <div className="max-w-7xl mx-auto px-4">
-        <PageHeader icon={<ClipboardList className="h-5 w-5" />} title="我的訂單" />
+    <Container className="bg-white flex-col sm:flex-row overflow-hidden">
+      <Left />
+      <div className="w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
+        <PageHeader icon={<ClipboardList className="h-5 w-5" />} title="訂單紀錄" />
 
         {/* 篩選標籤 */}
-        <div className="flex flex-row gap-4 mb-6">
+        <div className="flex flex-row gap-3 mb-6">
           {FILTERS.map((f) => (
             <button
               key={f.key}
               onClick={() => setActiveFilter(f.key)}
-              className={`px-6 py-2 font-bold text-base border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-all ${
+              className={`px-5 py-2 font-bold text-sm border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-all ${
                 activeFilter === f.key
                   ? "bg-[#89502E] text-white"
                   : "bg-[#FCF9F6] text-[#3D2419] hover:bg-[#FBDF58]"
@@ -54,16 +56,14 @@ export default function OrderPage() {
         </div>
 
         {/* 訂單列表 */}
-        <div className="w-full">
-          {filteredOrders.length === 0 ? (
-            <p className="text-center py-10 text-gray-500">尚無訂單</p>
-          ) : (
-            filteredOrders.map((order) => (
-              <OrderItem key={order.id} order={order} />
-            ))
-          )}
-        </div>
+        {filteredOrders.length === 0 ? (
+          <p className="text-center py-10 text-gray-500">尚無訂單</p>
+        ) : (
+          filteredOrders.map((order) => (
+            <OrderItem key={order.id} order={order} />
+          ))
+        )}
       </div>
-    </div>
+    </Container>
   );
 }

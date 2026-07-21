@@ -8,8 +8,10 @@ import Cookies from "js-cookie";
 import Container from "../_components/container";
 import Left from "./_components/left";
 import AvatarUploader from "./_components/avatarUploader";
+import {button_revise,button_cancel, button_submit} from '../_components/button'
+import { useAlert } from "../context/alert";
+import { useRouter } from "next/navigation";
 
-// 1. 定義符合你後端 /profile/full 回傳的資料型態
 interface FullProfile {
   avatar: string;
   first_name: string;
@@ -22,7 +24,6 @@ interface FullProfile {
   birthday: string;
 }
 
-// 與你規劃一模一樣的 defaultValues
 const defaultValues: FullProfile = {
   avatar: "",
   first_name: "",
@@ -40,6 +41,8 @@ const API_URL =
 
 export default function ProfileForm() {
   const { user, setUser } = useUser();
+  const { showAlert, closeAlert } = useAlert();
+  const router = useRouter()
   // 控制是否為編輯模式
   const [isEditing, setIsEditing] = useState(false);
   // 畫面上正在輸入的資料
@@ -49,7 +52,7 @@ export default function ProfileForm() {
   // 載入狀態
   const [loading, setLoading] = useState(true);
 
-  // 2. 進入頁面時，Fetch 剛剛新加的 API
+  // 進入頁面時，Fetch 會員資料
   useEffect(() => {
     const fetchFullProfile = async () => {
       const token = Cookies.get("token");
@@ -68,7 +71,11 @@ export default function ProfileForm() {
           setOriginalData(result.data);
         }
       } catch (error) {
+        showAlert("error",'伺服器異常')
         console.error("抓取詳細資料失敗:", error);
+        setTimeout(()=>{
+          router.push('/')
+        },2000)
       } finally {
         setLoading(false);
       }
@@ -110,16 +117,19 @@ export default function ProfileForm() {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        alert("資料更新成功！");
+        showAlert("success", "資料更新成功！");
         // 更新成功後，把當前資料變成「新的原始資料」
         setOriginalData(formData);
         setIsEditing(false);
+        setTimeout(()=>{
+          closeAlert()
+        },2000)
       } else {
-        alert(result.message || "更新失敗");
+      showAlert("error", "更新失敗！",result.message);
       }
     } catch (error) {
       console.error("發送更新 API 失敗:", error);
-      alert("系統發生錯誤，請稍後再試");
+      showAlert("error", "系統發生錯誤，請稍後再試");
     }
   };
 
@@ -129,7 +139,6 @@ export default function ProfileForm() {
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left></Left>
       <div className="w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
-        <h2 className="text-xl font-bold mb-4">個人詳細資料</h2>
         {/* 放入大頭貼組件 */}
         <AvatarUploader
           currentAvatar={formData.avatar}
@@ -158,7 +167,7 @@ export default function ProfileForm() {
               value={formData.last_name}
               onChange={handleInputChange}
               disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              className="mt-1 block w-full border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
             />
           </div>
 
@@ -268,13 +277,13 @@ export default function ProfileForm() {
           </div>
 
           {/* 下方的按鈕切換邏輯 */}
-          <div className="flex justify-end space-x-2 pt-4">
+          <div className="flex justify-start space-x-2 pt-4">
             {!isEditing ? (
               // 模式 A：唯讀狀態，只顯示「修改」按鈕
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                className={`${button_revise}`}
               >
                 修改資料
               </button>
@@ -284,13 +293,15 @@ export default function ProfileForm() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
+                className={`${button_cancel} mr-8 `}
+
                 >
                   取消
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                className={`${button_submit}`}
+
                 >
                   送出變更
                 </button>
