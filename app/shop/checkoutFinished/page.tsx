@@ -19,7 +19,7 @@ export default function CheckoutFinishedPage() {
     const isSuccess = rtnCode === "1" || (searchParams.get("from") === "linepay" && !isCancelled);
 
     if (isSuccess) {
-      const pendingId = localStorage.getItem("realicious-pending-order") || "";
+      const pendingId = localStorage.getItem("realicious-pending-order") || searchParams.get("orderId") || "";
       const cart = getCartItems().length > 0 ? getCartItems() : getLastOrder();
       itemsRef.current = cart;
       setOrderId(pendingId);

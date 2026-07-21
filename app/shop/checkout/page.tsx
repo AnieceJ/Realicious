@@ -51,7 +51,7 @@ export default function CheckoutPage() {
       await paymentMethods[methodId].checkout(order.orderId);
       // mock 付款成功後留在頁面，手動導向完成頁
       if (methodId === "mock") {
-        router.push("/shop/checkoutFinished?RtnCode=1");
+        router.push(`/shop/checkoutFinished?RtnCode=1&orderId=${order.orderId}`);
       }
     } catch {
       alert("付款導向失敗");
