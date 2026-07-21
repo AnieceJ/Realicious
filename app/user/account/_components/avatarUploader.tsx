@@ -4,7 +4,7 @@ import { useState, useRef, MouseEvent } from "react";
 import AvatarEditor, { AvatarEditorRef } from "react-avatar-editor";
 import Cookies from "js-cookie";
 import Image, { StaticImageData } from "next/image";
-import defaultAvatar from "@/public/user/Avatar.svg";
+import defaultAvatar from "@/public/user/Avatar.png";
 import { IoMdPhotos } from "react-icons/io";
 
 interface AvatarUploaderProps {

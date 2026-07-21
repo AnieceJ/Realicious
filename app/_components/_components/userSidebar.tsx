@@ -6,7 +6,7 @@ import { GiChicken } from "react-icons/gi";
 import { MdOutlineLogout } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
-import defaultAvatar from "@/public/user/Avatar.svg";
+import defaultAvatar from "@/public/user/Avatar.png";
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";

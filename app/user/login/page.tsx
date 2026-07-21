@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/app/context/user";
 import { useAlert } from "../context/alert";
 
@@ -22,8 +22,21 @@ export default function Login() {
   const { login } = useUser();
   const { showAlert, closeAlert } = useAlert();
 
-  const [loginError, setLoginError] = useState(false); // 登入錯誤處理
+  const searchParams = useSearchParams();
+  const error = searchParams.get("error");
 
+  useEffect(() => {
+    if (error === "server_error") {
+      // 觸發 Alert 提示
+      showAlert("error", "登入異常", "Google 驗證失敗，請重新登入。");
+      router.replace("/user/login", { scroll: false });
+    }
+    }, [error, showAlert, router]); // 當 error 存在時觸發
+  // if (error === "server_error") {
+  //   showAlert("error", "登入異常！", "請重新登入");
+  // }
+
+  const [loginError, setLoginError] = useState(false); // 登入錯誤處理
   const [shakeAccount, setShakeAccount] = useState(false); // Email 欄位錯誤特效
   const [shakePassword, setShakePassword] = useState(false); // Password 欄位錯誤特效
   const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
@@ -51,54 +64,51 @@ export default function Login() {
   });
 
   // 表單送出
-const onSubmit = async (data: LoginInput) => {
-  if (submit) return; // 防止快速重複點擊
-  
-  setLoginError(false);
-  setSubmit(true);
-  
-  const account = data.account;
-  const password = data.password;
+  const onSubmit = async (data: LoginInput) => {
+    if (submit) return; // 防止快速重複點擊
 
-  // 1. 第一時間立刻跳出「進行中」彈窗
-  showAlert("loading", "登入中...", "請稍候...");
+    setLoginError(false);
+    setSubmit(true);
 
-  try {
-    // 💡 關鍵優化：讓後端 API 請求與「最少等待 1000ms」的承諾同時執行
-    // Promise.all 會等待陣列裡的所有事情都做完，才繼續往下走
-    const [onLogin] = await Promise.all([
-      login(account, password), // 執行後端登入
-      new Promise((resolve) => setTimeout(resolve, 1000)), // 強制最少定格 1 秒
-    ]);
+    const account = data.account;
+    const password = data.password;
 
-    // 走到這裡，代表至少過了 1 秒，且後端也回傳結果了，時間點被完美「統一」了！
+    // 1. 第一時間立刻跳出「進行中」彈窗
+    showAlert("loading", "登入中...", "請稍候...");
 
-    if (onLogin.success) {
-      // 2. 成功狀態：切換為成功彈窗（不再需要再等 1 秒才切換）
-      showAlert("success", "登入成功！", "即將為您跳轉至首頁...");
-      
-      // 成功彈窗維持 2 秒鐘，讓使用者看清楚綠色勾勾，然後自動跳轉
-      setTimeout(() => {
-        closeAlert();
-        router.refresh();
-        router.replace("/");
-      }, 2000);
+    try {
+      // 💡 關鍵優化：讓後端 API 請求與「最少等待 1000ms」的承諾同時執行
+      // Promise.all 會等待陣列裡的所有事情都做完，才繼續往下走
+      const [onLogin] = await Promise.all([
+        login(account, password), // 執行後端登入
+        new Promise((resolve) => setTimeout(resolve, 1000)), // 強制最少定格 1 秒
+      ]);
 
-    } else {
-      
-      showAlert("error", "登入失敗", "帳號或密碼輸入錯誤");
-      
-      setLoginError(true); 
+      // 走到這裡，代表至少過了 1 秒，且後端也回傳結果了，時間點被完美「統一」了！
+
+      if (onLogin.success) {
+        // 2. 成功狀態：切換為成功彈窗（不再需要再等 1 秒才切換）
+        showAlert("success", "登入成功！", "即將為您跳轉至首頁...");
+
+        // 成功彈窗維持 2 秒鐘，讓使用者看清楚綠色勾勾，然後自動跳轉
+        setTimeout(() => {
+          closeAlert();
+          router.refresh();
+          router.replace("/");
+        }, 2000);
+      } else {
+        showAlert("error", "登入失敗", "帳號或密碼輸入錯誤");
+
+        setLoginError(true);
+        setSubmit(false);
+      }
+    } catch {
+      // 4. 意外錯誤狀態（例如斷網、伺服器掛掉）
+      showAlert("error", "連線異常", "系統發生錯誤，請稍後再試。");
+      setLoginError(true);
       setSubmit(false);
     }
-
-  } catch {
-    // 4. 意外錯誤狀態（例如斷網、伺服器掛掉）
-    showAlert("error", "連線異常", "系統發生錯誤，請稍後再試。");
-    setLoginError(true);
-    setSubmit(false);
-  }
-};
+  };
 
   return (
     <Container>
