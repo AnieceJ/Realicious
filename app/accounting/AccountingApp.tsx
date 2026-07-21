@@ -1,5 +1,11 @@
 "use client";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBurger, faMugHot, faTrainSubway, faBook, faGamepad, faShirt,
+  faSackDollar, faGift, faCircleQuestion,faBoxOpen, faCalendarDay, faPen, faXmark, faCheck,
+  faLock, faRibbon, faCrown, faHatCowboy,
+} from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BudgetCalendar from "./BudgetCalendar";
 import ChickGround, { groundClearance } from "./pixel/ChickGround";
@@ -47,15 +53,15 @@ const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"];
 const SPRITE = 128;
 const GROUND_H = 44;
 
-const CATS: Record<string, { emoji: string; type: "income" | "expense" }> = {
-  餐飲: { emoji: "🍔", type: "expense" },
-  飲品: { emoji: "☕", type: "expense" },
-  交通: { emoji: "🚇", type: "expense" },
-  學習: { emoji: "📚", type: "expense" },
-  娛樂: { emoji: "🎮", type: "expense" },
-  服飾: { emoji: "👕", type: "expense" },
-  薪資: { emoji: "💰", type: "income" },
-  其他收入: { emoji: "🧧", type: "income" },
+const CATS: Record<string, { icon: typeof faBurger; type: "income" | "expense" }> = {
+  餐飲: { icon: faBurger, type: "expense" },
+  飲品: { icon: faMugHot, type: "expense" },
+  交通: { icon: faTrainSubway, type: "expense" },
+  學習: { icon: faBook, type: "expense" },
+  娛樂: { icon: faGamepad, type: "expense" },
+  服飾: { icon: faShirt, type: "expense" },
+  薪資: { icon: faSackDollar, type: "income" },
+  其他收入: { icon: faGift, type: "income" },
 };
 const WEEK = ["日", "一", "二", "三", "四", "五", "六"];
 
@@ -372,9 +378,7 @@ const addTx = async () => {
       />
       <CoinBurst fire={burst} originRef={stageRef} />
 
-      {/* ============ 狀態卡（橫的、薄的）============
-           小雞本人不在這裡 —— 她住在畫面底部的地面上。
-           這張卡只放「數字」：HP、連續天數、今天記了沒。 */}
+
       <section className={`${CARD} p-4 md:p-5`} aria-label="小雞狀態">
           <div className="flex items-center gap-3 mb-4">
             <div className="flex-1 h-[3px] bg-black" />
@@ -402,7 +406,9 @@ const addTx = async () => {
                 className="group flex items-center gap-1.5 px-1"
               >
                 <span className="text-[15px] font-black">{petName}</span>
-                <span className="text-[11px] opacity-30 group-hover:opacity-100">✎</span>
+                <span className="text-[11px] opacity-30 group-hover:opacity-100">
+                <FontAwesomeIcon icon={faPen} />
+                </span>
               </button>
             )}
             <div className="flex-1 h-[3px] bg-black" />
@@ -432,7 +438,7 @@ const addTx = async () => {
                 : junkMode
                   ? `預算超支，${petName}正陪你一起吃土…`
                   : pet.loggedToday
-                    ? `✓ 今天已記帳，${petName}很滿足`
+                    ? ` 今天已記帳，${petName}很滿足`
                     : `今天還沒記帳，${petName}餓了…`}
             </div>
 
@@ -441,7 +447,7 @@ const addTx = async () => {
               onClick={() => setShowWardrobe(true)}
               className={`${BTN} text-[12px] font-black px-3 py-1.5 bg-[#FFD45C]`}
             >
-              👗 衣櫃
+              <FontAwesomeIcon icon={faBoxOpen} /> 衣櫃
             </button>
           </div>
       </section>
@@ -512,7 +518,7 @@ const addTx = async () => {
               onClick={() => setShowBudget(true)}
               className="text-[12px] font-bold text-[#BB0015] underline underline-offset-2"
             >
-              ✎ 設定
+              <FontAwesomeIcon icon={faPen} /> 設定
             </button>
           </div>
           <div className="h-3.5 bg-[#E3E3E3] border-2 border-black">
@@ -562,7 +568,9 @@ const addTx = async () => {
         
         {/* 選到的日期 */}
         <div className="flex justify-between items-center mb-3 text-[13px] font-bold">
-          <span>📅 {fmtDay(selected)}</span>
+              <span>
+                <FontAwesomeIcon icon={faCalendarDay} /> {fmtDay(selected)}
+              </span>
           <span>
             支出 <span className="text-[#BB0015]">${spent.toLocaleString()}</span>
             {earned > 0 && <span className="ml-2">收入 ${earned.toLocaleString()}</span>}
@@ -583,7 +591,7 @@ const addTx = async () => {
                 style={{ animationDelay: `${i * 40}ms` }}
               >
                 <div className="w-9 h-9 shrink-0 border-2 border-black grid place-items-center text-[18px] bg-[#FCF9F6]">
-                  {CATS[tx.category]?.emoji ?? "❓"}
+                  <FontAwesomeIcon icon={CATS[tx.category]?.icon ?? faCircleQuestion} />
                 </div>
                 <div className="flex-1 min-w-0 text-[14px] font-bold truncate">{tx.name}</div>
                 <span className="text-[11px] font-bold px-2 py-1 bg-[#E3E3E3] border-2 border-black shrink-0">
@@ -602,14 +610,14 @@ const addTx = async () => {
                   aria-label="編輯"
                   className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-black text-[14px]"
                 >
-                  ✎
+                  <FontAwesomeIcon icon={faPen} />
                 </button>
                 <button
                   onClick={() => delTx(tx.id)}
                   aria-label="刪除"
                   className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-[#BB0015] text-[16px]"
                 >
-                  ✕
+                  <FontAwesomeIcon icon={faXmark} />
                 </button>
               </div>
             ))
@@ -657,7 +665,7 @@ const addTx = async () => {
             >
               {catsOfType.map((k) => (
                 <option key={k} value={k}>
-                  {CATS[k].emoji} {k}
+                  <FontAwesomeIcon icon={CATS[k].icon} /> {k}
                 </option>
               ))}
             </select>
@@ -824,7 +832,9 @@ const addTx = async () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <span className="text-[15px] font-black">👗 {petName}的衣櫃</span>
+              <span className="text-[15px] font-black">
+                <FontAwesomeIcon icon={faBoxOpen} /> {petName}的衣櫃
+              </span>
               <button
                 onClick={() => setShowWardrobe(false)}
                 className="w-7 h-7 grid place-items-center border-2 border-black bg-white font-black"
@@ -862,7 +872,19 @@ const addTx = async () => {
                     }`}
                   >
                     <div className="text-[20px] leading-none mb-1">
-                      {unlocked ? (on ? "✓" : "🎀") : "🔒"}
+                      <FontAwesomeIcon
+                        icon={
+                          !unlocked
+                            ? faLock
+                            : on
+                              ? faCheck
+                              : it.id === "crown"
+                                ? faCrown
+                                : it.id === "cap"
+                                  ? faHatCowboy
+                                  : faRibbon
+                        }
+                      />
                     </div>
                     {it.name}
                     {!unlocked && (
@@ -888,11 +910,19 @@ const addTx = async () => {
                     : "bg-white hover:-translate-y-0.5"
               }`}
             >
-              {pet.streak < 7
-                ? "🔒 圍巾 · 連續 7 天解鎖"
-                : equippedNeck === "scarf"
-                  ? "✓ 已戴圍巾（再點脫下）"
-                  : "🧣 戴上圍巾"}
+              {pet.streak < 7 ? (
+                <>
+                  <FontAwesomeIcon icon={faLock} /> 圍巾 · 連續 7 天解鎖
+                </>
+              ) : equippedNeck === "scarf" ? (
+                <>
+                  <FontAwesomeIcon icon={faCheck} /> 已戴圍巾（再點脫下）
+                </>
+              ) : (
+                <>
+                  <FontAwesomeIcon icon={faRibbon} /> 戴上圍巾
+                </>
+              )}
             </button>
 
             <div className="text-[10px] font-bold text-black/40 mt-4 text-center">
