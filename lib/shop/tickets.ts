@@ -5,6 +5,7 @@ export type Ticket = {
   user_id: number;
   product_id: number | null;
   order_id: number | null;
+  redeem_code: string | null;
   name: string;
   type: "product" | "discount" | "cash";
   status: number; // 1:未使用 2:已使用 3:已過期
