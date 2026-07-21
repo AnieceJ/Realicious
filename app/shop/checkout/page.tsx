@@ -53,8 +53,8 @@ export default function CheckoutPage() {
       if (methodId === "mock") {
         router.push("/shop/checkoutFinished?RtnCode=1");
       }
-    } catch (e: any) {
-      alert(e.message || "付款導向失敗");
+    } catch {
+      alert("付款導向失敗");
     }
   };
 
@@ -107,7 +107,7 @@ export default function CheckoutPage() {
                 <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
                   <path d="M6 2h12v20H6V2zm2 2v14h8V4H8zm3 15h2v2h-2v-2z" />
                 </svg>
-                 行動支付
+                行動支付
               </button>
               <hr className="border-t-2 border-[#3D2419]/20 my-3" />
               <button

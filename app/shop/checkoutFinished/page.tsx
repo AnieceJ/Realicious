@@ -14,20 +14,26 @@ export default function CheckoutFinishedPage() {
   const [status, setStatus] = useState<"loading" | "success" | "fail">("loading");
 
   useEffect(() => {
-    const pendingId = localStorage.getItem("realicious-pending-order") || "";
     const rtnCode = searchParams.get("RtnCode");
     const isCancelled = searchParams.get("cancel") === "1";
     const isSuccess = rtnCode === "1" || (searchParams.get("from") === "linepay" && !isCancelled);
 
-    if (isSuccess || pendingId) {
+    if (isSuccess) {
+      const pendingId = localStorage.getItem("realicious-pending-order") || "";
       const cart = getCartItems();
       itemsRef.current = cart;
       setOrderId(pendingId);
       saveLastOrder(cart);
       clearCart();
       localStorage.removeItem("realicious-pending-order");
+
+      if (pendingId) {
+        fetch(`http://localhost:3001/payment/confirm/${pendingId}`, { method: "PUT" }).catch(() => {});
+      }
+
       setStatus("success");
     } else {
+      localStorage.removeItem("realicious-pending-order");
       setStatus("fail");
     }
   }, [searchParams]);
