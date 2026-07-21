@@ -7,6 +7,8 @@ import Cookies from "js-cookie";
 
 import Container from "../_components/container";
 import AvatarUploader from "../account/_components/avatarUploader";
+import { button_revise } from "../_components/button";
+import { useAlert } from "../context/alert";
 
 interface FullProfile {
   avatar: string;
@@ -38,7 +40,8 @@ const API_URL =
 export default function OnboardingForm() {
   const { user, setUser } = useUser();
   const router = useRouter();
-  
+  const { showAlert, closeAlert } = useAlert();
+
   // 🌟 控制目前步驟：1 代表第一頁（歡迎/基本資料），2 代表第二頁（聯絡與其他資料）
   const [step, setStep] = useState<1 | 2>(1);
   const [formData, setFormData] = useState<FullProfile>(defaultValues);
@@ -60,9 +63,22 @@ export default function OnboardingForm() {
 
         if (res.ok && result.success) {
           setFormData(result.data);
+        } else {
+          showAlert("loading", "連線異常", result.message);
+          setTimeout(() => {
+            router.refresh();
+            router.replace("/");
+            return;
+          }, 2000);
         }
       } catch (error) {
         console.error("抓取詳細資料失敗:", error);
+        showAlert("loading", "連線異常", "系統發生錯誤，請稍後再試。");
+        setTimeout(() => {
+          router.refresh();
+          router.replace("/");
+          return;
+        }, 2000);
       } finally {
         setLoading(false);
       }
@@ -84,7 +100,7 @@ export default function OnboardingForm() {
     const token = Cookies.get("token");
     try {
       const res = await fetch(`${API_URL}/profile/full`, {
-        method: "PUT", 
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -92,10 +108,22 @@ export default function OnboardingForm() {
         body: JSON.stringify(formData),
       });
       const result = await res.json();
-      return { success: res.ok && result.success, message: result.message ,user: result.user};
+      return {
+        success: res.ok && result.success,
+        message: result.message,
+        user: result.user,
+      };
     } catch (error) {
       console.error("發送更新 API 失敗:", error);
       return { success: false, message: "系統發生錯誤" };
+    }
+  };
+  // 跳過處理：直接去下一頁，或是直接去首頁
+  const handleSkip = (target: "step2" | "home") => {
+    if (target === "step2") {
+      setStep(2);
+    } else {
+      router.push("/");
     }
   };
 
@@ -111,10 +139,10 @@ export default function OnboardingForm() {
         Cookies.set("user", JSON.stringify(updatedUser), { expires: 1 });
         return updatedUser;
       });
-      
+
       setStep(2); // 進到第二頁
     } else {
-      alert(result.message || "儲存失敗");
+      showAlert("error", "儲存失敗", result.message);
     }
   };
 
@@ -129,38 +157,45 @@ export default function OnboardingForm() {
         Cookies.set("user", JSON.stringify(updatedUser), { expires: 1 });
         return updatedUser;
       });
-
-      alert("恭喜完成會員設定！");
-      // router.push("/"); 
-      window.location.href = "/";
+      showAlert("success", "太棒了", "恭喜完成會員設定！");
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
     } else {
-      alert(result.message || "儲存失敗");
+      showAlert("error", "儲存失敗", result.message);
     }
   };
 
-
-  if (loading) return <div className="p-6 text-center">正在準備您的專屬迎新頁面...</div>;
+  if (loading)
+    return <div className="p-6 text-center">正在準備您的專屬迎新頁面...</div>;
 
   return (
     // 移除 Left 組件，改用乾淨的置中卡片設計，專注於引導填寫
     <Container className="bg-white justify-center items-center py-10">
-      <div className="w-full max-w-lg p-6 border border-gray-100 rounded-xl shadow-md">
-        
-        {/* 🌟 步驟進度條提示 */}
+      <div className="w-full max-w-lg p-6 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#FCF9F6]">
+        {/* 步驟進度條提示 */}
         <div className="flex justify-between items-center mb-6 text-xs text-gray-400">
-          <span className={`${step === 1 ? "text-blue-600 font-bold" : ""}`}>1. 基本頭像</span>
+          <span className={`${step === 1 ? "text-blue-600 font-bold" : ""}`}>
+            1. 基本資料
+          </span>
           <div className="flex-1 h-[2px] bg-gray-200 mx-4">
-            <div className={`h-full bg-blue-600 transition-all duration-300 ${step === 2 ? "w-full" : "w-0"}`}></div>
+            <div
+              className={`h-full bg-blue-600 transition-all duration-300 ${step === 2 ? "w-full" : "w-0"}`}
+            ></div>
           </div>
-          <span className={`${step === 2 ? "text-blue-600 font-bold" : ""}`}>2. 聯絡資訊</span>
+          <span className={`${step === 2 ? "text-blue-600 font-bold" : ""}`}>
+            2. 詳細資訊
+          </span>
         </div>
 
         {/* ==================== 第一頁：歡迎與基本檔案 ==================== */}
         {step === 1 && (
           <div>
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">歡迎加入！✨</h2>
-              <p className="text-sm text-gray-500 mt-1">讓我們簡單認識一下你，設定個漂亮的檔案吧！</p>
+              <h2 className="text-2xl font-bold text-gray-800">歡迎加入</h2>
+              <p className="text-sm text-gray-500 mt-1">
+                讓我們簡單認識一下你，設定個漂亮的檔案吧！
+              </p>
             </div>
 
             {/* 大頭貼 */}
@@ -169,9 +204,11 @@ export default function OnboardingForm() {
                 currentAvatar={formData.avatar}
                 onUploadSuccess={(newUrl) => {
                   setFormData((prev) => ({ ...prev, avatar: newUrl }));
-                  setUser(prev => ({ ...prev, avatar: newUrl }));
+                  setUser((prev) => ({ ...prev, avatar: newUrl }));
                   const updatedUser = { ...user, avatar: newUrl };
-                  Cookies.set("user", JSON.stringify(updatedUser), { expires: 1 });
+                  Cookies.set("user", JSON.stringify(updatedUser), {
+                    expires: 1,
+                  });
                 }}
               />
             </div>
@@ -179,7 +216,9 @@ export default function OnboardingForm() {
             <form onSubmit={handleStep1Submit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">姓氏</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    姓氏
+                  </label>
                   <input
                     type="text"
                     name="last_name"
@@ -190,7 +229,9 @@ export default function OnboardingForm() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">姓名</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    姓名
+                  </label>
                   <input
                     type="text"
                     name="first_name"
@@ -203,7 +244,9 @@ export default function OnboardingForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">暱稱</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  暱稱
+                </label>
                 <input
                   type="text"
                   name="nick_name"
@@ -225,7 +268,9 @@ export default function OnboardingForm() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-sm"
+                  // className={`${button_revise}`}
+                  // className="px-6 py-2 bg-blue-600 text-white  font-medium hover:bg-blue-700 transition"
+                  className="bg-[#FFD45C] hover:bg-[#fbc632] w-25 h-10 border-2 border-black shadow-[0px_3px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:shadow-[0px_2px_0px_0px_rgba(0,0,0,1)]"
                 >
                   下一步
                 </button>
@@ -239,13 +284,17 @@ export default function OnboardingForm() {
           <div>
             <div className="mb-6">
               <h2 className="text-xl font-bold text-gray-800">完善聯絡資料</h2>
-              <p className="text-sm text-gray-500 mt-1">填寫完成後即可享受網站的所有完整功能。</p>
+              <p className="text-sm text-gray-500 mt-1">
+                填寫完成後即可享受網站的所有完整功能。
+              </p>
             </div>
 
             <form onSubmit={handleStep2Submit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">縣市</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    縣市
+                  </label>
                   <input
                     type="text"
                     name="city"
@@ -256,7 +305,9 @@ export default function OnboardingForm() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">鄉鎮</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    鄉鎮
+                  </label>
                   <input
                     type="text"
                     name="district"
@@ -269,7 +320,9 @@ export default function OnboardingForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">詳細地址</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  詳細地址
+                </label>
                 <input
                   type="text"
                   name="address"
@@ -281,7 +334,9 @@ export default function OnboardingForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">電話</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  電話
+                </label>
                 <input
                   type="text"
                   name="phone"
@@ -293,7 +348,9 @@ export default function OnboardingForm() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">生日</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  生日
+                </label>
                 <input
                   type="date"
                   name="birthday"
@@ -322,16 +379,16 @@ export default function OnboardingForm() {
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition shadow-sm"
+                    className="w-25 h-10 border-2 border-black shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] text-white  bg-[#F02A2D] hover:bg-[#e50004] cursor-pointer hover:shadow-[0px_2px_0px_0px_rgba(0,0,0,1)]"
+                    // className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition shadow-sm"
                   >
-                    開啟體驗
+                    完成填寫
                   </button>
                 </div>
               </div>
             </form>
           </div>
         )}
-
       </div>
     </Container>
   );
