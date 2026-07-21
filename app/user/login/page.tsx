@@ -31,10 +31,17 @@ export default function Login() {
       showAlert("error", "登入異常", "Google 驗證失敗，請重新登入。");
       router.replace("/user/login", { scroll: false });
     }
-    }, [error, showAlert, router]); // 當 error 存在時觸發
-  // if (error === "server_error") {
-  //   showAlert("error", "登入異常！", "請重新登入");
-  // }
+    if (error === "user_not_found") {
+      // 觸發 Alert 提示
+      showAlert("error", "登入異常", "用戶不存在");
+      router.replace("/user/login", { scroll: false });
+    }
+    if (error === "oauth_failed") {
+      // 觸發 Alert 提示
+      showAlert("error", "登入異常", "請稍後再試");
+      router.replace("/user/login", { scroll: false });
+    }
+  }, [error, showAlert, router]); // 當 error 存在時觸發
 
   const [loginError, setLoginError] = useState(false); // 登入錯誤處理
   const [shakeAccount, setShakeAccount] = useState(false); // Email 欄位錯誤特效
