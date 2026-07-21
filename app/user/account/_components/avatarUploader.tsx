@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import Image, { StaticImageData } from "next/image";
 import defaultAvatar from "@/public/user/Avatar.png";
 import { IoMdPhotos } from "react-icons/io";
+import { useAlert } from "../../context/alert";
 
 interface AvatarUploaderProps {
   currentAvatar: string | null | undefined;
@@ -21,11 +22,10 @@ export default function AvatarUploader({
   onUploadSuccess,
 }: AvatarUploaderProps) {
   const editorRef = useRef<AvatarEditorRef>(null);
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [scale, setScale] = useState<number>(1);
   const [isUploading, setIsUploading] = useState<boolean>(false);
-
+  const { showAlert, closeAlert } = useAlert();
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
@@ -78,15 +78,15 @@ export default function AvatarUploader({
         const result = await res.json();
 
         if (res.ok && result.success) {
-          alert("大頭貼更新成功！");
+          showAlert("success",'大頭貼更新成功！')
           onUploadSuccess(result.avatar);
           handleCancel();
         } else {
-          alert(result.message || "上傳失敗");
+          showAlert('error',"上傳失敗",result.message)
         }
       } catch (error) {
         console.error("上傳大頭貼 API 失敗:", error);
-        alert("連線伺服器失敗");
+        showAlert('error',"伺服器連線失敗",'請稍後再試')
       } finally {
         setIsUploading(false);
       }

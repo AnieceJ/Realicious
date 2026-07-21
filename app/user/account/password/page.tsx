@@ -1,6 +1,11 @@
 "use client";
 import Container from "../../_components/container";
 import Left from "../_components/left";
+import {
+  button_revise,
+  button_cancel,
+  button_submit,
+} from "../../_components/button";
 
 import { useState, useEffect } from "react";
 import { useAlert } from "../../context/alert";
@@ -53,7 +58,7 @@ export default function Password() {
       showAlert("error", errorMap[error] || "操作失敗");
       router.replace(window.location.pathname);
     }
-  }, [router,searchParams,showAlert]);
+  }, [router, searchParams, showAlert]);
 
   // 2. 載入帳號基本安全資料
   useEffect(() => {
@@ -115,9 +120,14 @@ export default function Password() {
       const result = await res.json();
 
       if (res.ok && result.success) {
-        showAlert("success", accountInfo.hasPassword ? "密碼修改成功！請重新登入" : "密碼設定成功！請重新登入");
+        showAlert(
+          "success",
+          accountInfo.hasPassword
+            ? "密碼修改成功！請重新登入"
+            : "密碼設定成功！請重新登入",
+        );
         setIsPasswordModalOpen(false);
-        
+
         // 清除 JWT Token 並跳轉至登入頁
         Cookies.remove("token");
         setTimeout(() => {
@@ -142,19 +152,22 @@ export default function Password() {
         // 引導去後端的 Google 綁定路由，並帶上 Token
         window.location.href = `${API_URL}/auth/google/bind?token=${token}`;
       } else {
-        // 解除綁定 API
-        const res = await fetch(`${API_URL}/auth/google/unbind`, {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const result = await res.json();
-
-        if (res.ok && result.success) {
-          showAlert("success", "已成功解除 Google 綁定");
-          setAccountInfo((prev) => ({ ...prev, isGoogleLinked: false }));
-        } else {
-          showAlert("error", result.message || "解除綁定失敗");
+        const unbind =async()=>{
+          // 解除綁定 API
+          const res = await fetch(`${API_URL}/auth/google/unbind`, {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const result = await res.json();
+          
+          if (res.ok && result.success) {
+            showAlert("success", "已成功解除 Google 綁定");
+            setAccountInfo((prev) => ({ ...prev, isGoogleLinked: false }));
+          } else {
+            showAlert("error", result.message || "解除綁定失敗");
+          }
         }
+        showAlert('confirm','溫馨提示',"你確定要解除綁定嗎？",()=>{unbind()})
       }
     } catch (error) {
       showAlert("error", "操作失敗，請稍後再試");
@@ -166,19 +179,25 @@ export default function Password() {
   return (
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left />
-      
+
       {/* 主要內容區塊 */}
       <div className="w-[70%] h-180 p-6 overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">帳號與安全設定</h2>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+          帳號與安全設定
+        </h2>
 
         <div className="space-y-6 max-w-lg">
           {/* 1. 電子郵件顯示 */}
           <div className="flex justify-between items-center pb-4 border-b">
             <div>
-              <p className="text-sm text-gray-500">電子郵件（帳號）</p>
-              <p className="text-base font-medium text-gray-800">{accountInfo.email}</p>
+              <p className="text-sm text-gray-500">電子郵件</p>
+              <p className="text-base font-medium text-gray-800">
+                {accountInfo.email}
+              </p>
             </div>
-            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">不可修改</span>
+            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+              不可修改
+            </span>
           </div>
 
           {/* 2. 修改 / 設定密碼按鈕 */}
@@ -191,7 +210,8 @@ export default function Password() {
             </div>
             <button
               onClick={() => setIsPasswordModalOpen(true)}
-              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              className={`${button_revise}`}
+              // className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
             >
               {accountInfo.hasPassword ? "修改密碼" : "設定密碼"}
             </button>
@@ -204,18 +224,25 @@ export default function Password() {
               <p className="text-base font-medium text-gray-800 flex items-center gap-2">
                 Google 帳號
                 {accountInfo.isGoogleLinked ? (
-                  <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-200">已綁定</span>
+                  <span className="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded border border-green-200">
+                    已綁定
+                  </span>
                 ) : (
-                  <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded border">未綁定</span>
+                  <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded border">
+                    未綁定
+                  </span>
                 )}
               </p>
             </div>
             <button
               onClick={handleToggleGoogleLink}
-              className={`px-4 py-2 text-sm rounded-md transition ${
-                accountInfo.isGoogleLinked
-                  ? "border border-red-500 text-red-500 hover:bg-red-50"
-                  : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+              // className={`px-4 py-2 text-sm rounded-md transition ${
+              //   accountInfo.isGoogleLinked
+              //     ? "border border-red-500 text-red-500 hover:bg-red-50"
+              //     : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+              // }`}
+              className={`${
+                accountInfo.isGoogleLinked ? button_cancel : button_submit
               }`}
             >
               {accountInfo.isGoogleLinked ? "解除綁定" : "綁定 Google"}
@@ -234,12 +261,19 @@ export default function Password() {
                 {/* 僅在已有密碼時顯示舊密碼欄位 */}
                 {accountInfo.hasPassword && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">舊密碼</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      舊密碼
+                    </label>
                     <input
                       type="password"
                       required
                       value={passwords.oldPassword}
-                      onChange={(e) => setPasswords({ ...passwords, oldPassword: e.target.value })}
+                      onChange={(e) =>
+                        setPasswords({
+                          ...passwords,
+                          oldPassword: e.target.value,
+                        })
+                      }
                       className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -252,17 +286,29 @@ export default function Password() {
                     type="password"
                     required
                     value={passwords.newPassword}
-                    onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswords({
+                        ...passwords,
+                        newPassword: e.target.value,
+                      })
+                    }
                     className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">確認密碼</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    確認密碼
+                  </label>
                   <input
                     type="password"
                     required
                     value={passwords.confirmPassword}
-                    onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+                    onChange={(e) =>
+                      setPasswords({
+                        ...passwords,
+                        confirmPassword: e.target.value,
+                      })
+                    }
                     className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

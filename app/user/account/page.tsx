@@ -293,7 +293,7 @@ export default function ProfileForm() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                className={`${button_cancel} `}
+                className={`${button_cancel} mr-8 `}
 
                 >
                   取消

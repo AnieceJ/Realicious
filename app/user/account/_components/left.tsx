@@ -59,7 +59,7 @@ export default function Left() {
           <FaShoppingCart />
           <span className="ml-4">購買記錄</span>
         </Link>
-        <Link
+        {/* <Link
           onClick={() => {
             setIsOpening(!isOpening);
           }}
@@ -68,7 +68,7 @@ export default function Left() {
         >
           <GiChicken />
           <span className="ml-4">我的小雞</span>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

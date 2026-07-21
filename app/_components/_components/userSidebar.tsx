@@ -121,14 +121,14 @@ export default function UserSidebar() {
                     <FaShoppingCart />
                     <span className="ml-4">購買記錄</span>
                   </Link>
-                  <Link
+                  {/* <Link
                     onClick={() => setIsOpening(false)}
                     className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
                     href={`/user/account/pet`}
                   >
                     <GiChicken />
                     <span className="ml-4">我的小雞</span>
-                  </Link>
+                  </Link> */}
                   <button
                     onClick={() => {
                       setIsOpening(false);
