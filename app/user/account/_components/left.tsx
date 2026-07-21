@@ -16,7 +16,7 @@ export default function Left() {
   };
 
   return (
-    <div className="w-95 h-180 bg-[#FCF9F6] border flex flex-col items-center">
+    <div className="w-95 h-180 bg-[#FCF9F6] border-r-2 flex flex-col items-center">
       <h2 className="text-[24px] my-4">個人中心</h2>
       <div className="w-full">
         <Link

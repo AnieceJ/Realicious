@@ -1,22 +1,27 @@
 "use client";
 
-import { useState, useRef } from "react";
-import AvatarEditor,{ AvatarEditorRef } from "react-avatar-editor";
+import { useState, useRef, MouseEvent } from "react";
+import AvatarEditor, { AvatarEditorRef } from "react-avatar-editor";
 import Cookies from "js-cookie";
-import Image, { StaticImageData } from 'next/image'; // 🌟 1. 引入 StaticImageData 型別
+import Image, { StaticImageData } from "next/image";
 import defaultAvatar from "@/public/user/Avatar.svg";
+import { IoMdPhotos } from "react-icons/io";
 
 interface AvatarUploaderProps {
-  currentAvatar: string | null | undefined; // 🌟 2. 修正型別：後端可能傳回來 null 或 undefined
+  currentAvatar: string | null | undefined;
   onUploadSuccess: (newUrl: string) => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+// 取得後端 API 基礎網址
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
 
-export default function AvatarUploader({ currentAvatar, onUploadSuccess }: AvatarUploaderProps) {
-  
-const editorRef = useRef<AvatarEditorRef>(null);
-  
+export default function AvatarUploader({
+  currentAvatar,
+  onUploadSuccess,
+}: AvatarUploaderProps) {
+  const editorRef = useRef<AvatarEditorRef>(null);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [scale, setScale] = useState<number>(1);
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -30,6 +35,15 @@ const editorRef = useRef<AvatarEditorRef>(null);
   const handleCancel = () => {
     setSelectedFile(null);
     setScale(1);
+    const fileInput = document.getElementById("avatar-input") as HTMLInputElement;
+    if (fileInput) fileInput.value = "";
+  };
+
+  // 處理點擊背景遮罩取消
+  const handleBackdropClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      handleCancel();
+    }
   };
 
   const handleSaveAndUpload = async () => {
@@ -39,7 +53,7 @@ const editorRef = useRef<AvatarEditorRef>(null);
     const token = Cookies.get("token");
     const canvas = editorRef.current.getImageScaledToCanvas();
 
-    canvas.toBlob(async (blob:Blob | null) => {
+    canvas.toBlob(async (blob: Blob | null) => {
       if (!blob) {
         setIsUploading(false);
         return;
@@ -79,89 +93,116 @@ const editorRef = useRef<AvatarEditorRef>(null);
     }, selectedFile.type);
   };
 
-  // 🌟 3. 防禦性邏輯：嚴格檢查 currentAvatar 是否為合法網址/路徑
-  // 這樣能將 displayAvatar 的型別成功收窄成 string | StaticImageData，讓 TypeScript 不再抱怨
-  let displayAvatar: string | StaticImageData = defaultAvatar;
+   //  修改後的防禦性邏輯
+let displayAvatar: string | StaticImageData = defaultAvatar;
 
-  if (currentAvatar && typeof currentAvatar === "string" && currentAvatar.trim() !== "") {
-    // 確保它不是空字串，且是合法的路徑或網址格式
-    if (currentAvatar.startsWith("/") || currentAvatar.startsWith("http://") || currentAvatar.startsWith("https://")) {
-      displayAvatar = currentAvatar;
-    }
+if (currentAvatar && typeof currentAvatar === "string" && currentAvatar.trim() !== "") {
+  if (currentAvatar.startsWith("http://") || currentAvatar.startsWith("https://")) {
+    // 1. 如果後端給的就是完整網址，直接用
+    displayAvatar = currentAvatar;
+  } else {
+    // 2. 如果是相對路徑（例如 user/avatars/...），手動幫它加上 3001 的後端網域！
+    // 先把 API_URL 的 /user/api 尾巴去掉，只留下 http://localhost:3001
+    const backendBase = API_URL.replace("/user/api", ""); 
+    
+    // 確保斜線拼接正確（避免出現 // 的情況）
+    const cleanPath = currentAvatar.startsWith("/") ? currentAvatar : `/${currentAvatar}`;
+    
+    displayAvatar = `${backendBase}${cleanPath}`;
   }
+}
 
   return (
-    <div className="flex flex-col items-center space-y-4 p-4 border-b">
-      <h3 className="text-sm font-medium text-gray-700">個人頭像</h3>
-
-      {!selectedFile ? (
-        <div className="flex flex-col items-center space-y-3">
-          {/* 🌟 4. 這裡調整了容器的尺寸，與 Next.js Image 的尺寸匹配，並確保圓形 */}
-          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-gray-200 shadow-inner relative">
-            <Image
-              src={displayAvatar}
-              alt="Avatar"
-              className="w-full h-full object-cover rounded-full" // 🌟 加上 rounded-full 雙重保險
-              width={128}   // 🌟 5. 放大解析度：原本設 50 在 32 (128px) 的容器裡會很模糊，配合 w-32 改成 128
-              height={128}  // 🌟 必須同時提供 width 與 height
-              priority      // 🌟 提升載入權重，避免換電腦時因為延遲加載閃爍
-            />
-          </div>
-          <label className="cursor-pointer px-3 py-1.5 bg-gray-100 text-gray-700 rounded text-xs hover:bg-gray-200 transition">
-            更換頭像
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-          </label>
-        </div>
-      ) : (
-        <div className="flex flex-col items-center p-4 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-          <AvatarEditor
-            ref={editorRef}
-            image={selectedFile}
-            width={160}
-            height={160}
-            border={40}
-            borderRadius={100}
-            color={[255, 255, 255, 0.6]}
-            scale={scale}
-            rotate={0}
+    <div className="flex flex-col items-center p-4">
+      {/* 大頭貼與右下角圖示按鈕 */}
+      <div className="relative w-32 h-32">
+        {/* 大頭貼本體 */}
+        <div className="w-full h-full rounded-full overflow-hidden border-2 border-gray-200 shadow-inner">
+          <Image
+            src={displayAvatar}
+            alt="Avatar"
+            className="w-full h-full object-cover rounded-full"
+            width={128}
+            height={128}
+            priority
           />
+        </div>
 
-          <div className="w-full flex items-center space-x-2 my-3">
-            <span className="text-xs text-gray-500">縮小</span>
-            <input
-              type="range"
-              min="1"
-              max="3"
-              step="0.01"
-              value={scale}
-              onChange={(e) => setScale(parseFloat(e.target.value))}
-              className="w-full accent-blue-600"
-            />
-            <span className="text-xs text-gray-500">放大</span>
-          </div>
+        {/* 🌟 修正：將 negative-translate-x-1 改為正確的 Tailwind 語法 -translate-x-1 */}
+        <label className="absolute bottom-0 right-0 cursor-pointer p-2 bg-blue-600 text-white rounded-full shadow-md hover:bg-blue-700 transition transform -translate-x-1 translate-y-1 flex items-center justify-center border border-white z-10">
+          <IoMdPhotos size={18} />
+          <input
+            id="avatar-input"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
+        </label>
+      </div>
 
-          <div className="flex space-x-2 w-full justify-end">
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={isUploading}
-              className="px-3 py-1 bg-gray-300 text-gray-700 rounded text-xs hover:bg-gray-400"
-            >
-              取消
-            </button>
-            <button
-              type="button"
-              onClick={handleSaveAndUpload}
-              disabled={isUploading}
-              className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 disabled:bg-blue-400"
-            >
-              {isUploading ? "上傳中..." : "確認裁剪並上傳"}
-            </button>
+      {/* 調整大小的彈出視窗 (Modal) */}
+      {selectedFile && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in cursor-pointer"
+          onClick={handleBackdropClick}
+        >
+          <div
+            className="bg-white p-6 rounded-xl shadow-xl flex flex-col items-center max-w-sm w-full mx-4 cursor-default animate-pop-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-sm font-medium text-gray-700 mb-4">
+              調整大頭貼大小
+            </h3>
+
+            <div className="overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+              <AvatarEditor
+                ref={editorRef}
+                image={selectedFile}
+                width={160}
+                height={160}
+                border={40}
+                borderRadius={100}
+                color={[255, 255, 255, 0.6]}
+                scale={scale}
+                rotate={0}
+              />
+            </div>
+
+            {/* 縮放拉條 */}
+            <div className="w-full flex items-center space-x-2 my-4">
+              <span className="text-xs text-gray-400">縮小</span>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.01"
+                value={scale}
+                onChange={(e) => setScale(parseFloat(e.target.value))}
+                className="w-full accent-blue-600 cursor-pointer"
+              />
+              <span className="text-xs text-gray-400">放大</span>
+            </div>
+
+            {/* 操作按鈕 */}
+            <div className="flex space-x-3 w-full justify-end">
+              <button
+                type="button"
+                onClick={handleCancel}
+                disabled={isUploading}
+                className="px-4 py-2 bg-gray-100 text-gray-600 rounded-md text-xs font-medium hover:bg-gray-200 transition"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveAndUpload}
+                disabled={isUploading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md text-xs font-medium hover:bg-blue-700 transition disabled:bg-blue-400"
+              >
+                {isUploading ? "上傳中..." : "確認並上傳"}
+              </button>
+            </div>
           </div>
         </div>
       )}

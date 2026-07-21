@@ -114,7 +114,7 @@ export default function CheckoutPage() {
                 onClick={() => handlePayment("mock")}
                 className="flex items-center justify-center gap-3 w-full py-3 bg-gray-100 text-gray-500 font-bold text-base border-[2px] border-gray-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.15)] hover:bg-gray-200 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
               >
-                ⚡ 模擬付款（測試用，跳過金流）
+                模擬付款（測試用，跳過金流）
               </button>
             </div>
             <button

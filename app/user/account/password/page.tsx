@@ -2,6 +2,7 @@
 import Container from "../../_components/container";
 import Left from "../_components/left";
 import { useState, ChangeEvent, FormEvent, MouseEvent } from "react";
+import {button_revise} from '../../_components/button'
 
 // 1. 定義會員資料的型別介面
 interface UserProfile {
@@ -69,6 +70,7 @@ export default function Account() {
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left />
       <div className="w-[70%] h-[720px] p-4 overflow-y-auto">
+        <h1 className="text-6xl">此頁尚未完成</h1>
         <form onSubmit={handleSubmit}>
           
           {/* 電子郵件 */}
@@ -121,7 +123,7 @@ export default function Account() {
             <button
               type="button"
               onClick={handleEditToggle}
-              className="bg-[#FFD45C] hover:bg-[#fbc632] border w-[100px] h-[40px] border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mr-8 cursor-pointer hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                className={`${button_revise}`}
             >
               {isEdit ? "取消" : "修改"}
             </button>
