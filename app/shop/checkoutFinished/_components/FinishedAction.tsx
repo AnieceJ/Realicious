@@ -26,7 +26,7 @@ export default function FinishedAction() {
           回到商品列表<br />MARKETPLACE
         </span>
       </Link>
-      <Link href="/shop/orders"
+      <Link href="/user/account/orders"
         className="flex items-center justify-center w-full px-4 py-2.5 mt-8
                   bg-[#893f4a] text-[#FFFFFF] font-bold text-base
                   border-[3px] border-[#3D2419]
