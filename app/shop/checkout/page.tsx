@@ -92,13 +92,13 @@ export default function CheckoutPage() {
             <h3 className="text-2xl font-bold text-[#3D2419] text-center mb-6">選擇支付方式</h3>
             <div className="flex flex-col gap-4">
               <button
-                onClick={() => handlePayment("ecpay")}
+                onClick={() => handlePayment("newebpay")}
                 className="flex items-center justify-center gap-3 w-full py-5 bg-slate-200 text-slate-600 font-bold text-xl border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-slate-300 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
               >
                 <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
                   <path d="M2 5h20v14H2V5zm2 2v2h16V7H4zm0 4v6h16v-6H4zm2 2h4v2H6v-2z" />
                 </svg>
-                線上刷卡
+                線上刷卡（藍新）
               </button>
               <button
                 onClick={() => handlePayment("linepay")}
@@ -114,7 +114,7 @@ export default function CheckoutPage() {
                 onClick={() => handlePayment("mock")}
                 className="flex items-center justify-center gap-3 w-full py-3 bg-gray-100 text-gray-500 font-bold text-base border-[2px] border-gray-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.15)] hover:bg-gray-200 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
               >
-                ⚡ 模擬付款（測試用，跳過金流）
+                模擬付款（測試用，跳過金流）
               </button>
             </div>
             <button
