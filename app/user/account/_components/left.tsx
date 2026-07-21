@@ -69,7 +69,7 @@ export default function Left() {
           <FaTicketAlt />
           <span className="ml-4">我的票券</span>
         </Link>
-        <Link
+        {/* <Link
           onClick={() => {
             setIsOpening(!isOpening);
           }}
@@ -78,7 +78,7 @@ export default function Left() {
         >
           <GiChicken />
           <span className="ml-4">我的小雞</span>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

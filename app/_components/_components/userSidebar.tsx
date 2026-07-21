@@ -6,7 +6,7 @@ import { GiChicken } from "react-icons/gi";
 import { MdOutlineLogout } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
-import defaultAvatar from "@/public/user/Avatar.svg";
+import defaultAvatar from "@/public/user/Avatar.png";
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -129,14 +129,14 @@ export default function UserSidebar() {
                     <FaTicketAlt />
                     <span className="ml-4">我的票券</span>
                   </Link>
-                  <Link
+                  {/* <Link
                     onClick={() => setIsOpening(false)}
                     className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
                     href={`/user/account/pet`}
                   >
                     <GiChicken />
                     <span className="ml-4">我的小雞</span>
-                  </Link>
+                  </Link> */}
                   <button
                     onClick={() => {
                       setIsOpening(false);

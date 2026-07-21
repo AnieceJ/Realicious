@@ -7,7 +7,6 @@ import Cookies from "js-cookie";
 
 import Container from "../_components/container";
 import AvatarUploader from "../account/_components/avatarUploader";
-import { button_revise } from "../_components/button";
 import { useAlert } from "../context/alert";
 
 interface FullProfile {
@@ -225,7 +224,7 @@ export default function OnboardingForm() {
                     value={formData.last_name}
                     onChange={handleInputChange}
                     placeholder="例如：陳"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -238,7 +237,7 @@ export default function OnboardingForm() {
                     value={formData.first_name}
                     onChange={handleInputChange}
                     placeholder="例如：小明"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                   />
                 </div>
               </div>
@@ -253,7 +252,7 @@ export default function OnboardingForm() {
                   value={formData.nick_name}
                   onChange={handleInputChange}
                   placeholder="想被怎麼稱呼呢？"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -301,7 +300,7 @@ export default function OnboardingForm() {
                     value={formData.city}
                     onChange={handleInputChange}
                     placeholder="台北市"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                   />
                 </div>
                 <div>
@@ -314,7 +313,7 @@ export default function OnboardingForm() {
                     value={formData.district}
                     onChange={handleInputChange}
                     placeholder="信義區"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                   />
                 </div>
               </div>
@@ -329,7 +328,7 @@ export default function OnboardingForm() {
                   value={formData.address}
                   onChange={handleInputChange}
                   placeholder="信義路五段 X 號"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -343,7 +342,7 @@ export default function OnboardingForm() {
                   value={formData.phone || ""}
                   onChange={handleInputChange}
                   placeholder="0912345678"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -356,7 +355,7 @@ export default function OnboardingForm() {
                   name="birthday"
                   value={formData.birthday}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className=" mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 

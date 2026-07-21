@@ -12,8 +12,6 @@ import {button_revise,button_cancel, button_submit} from '../_components/button'
 import { useAlert } from "../context/alert";
 import { useRouter } from "next/navigation";
 
-
-// 1. 定義符合你後端 /profile/full 回傳的資料型態
 interface FullProfile {
   avatar: string;
   first_name: string;
@@ -26,7 +24,6 @@ interface FullProfile {
   birthday: string;
 }
 
-// 與你規劃一模一樣的 defaultValues
 const defaultValues: FullProfile = {
   avatar: "",
   first_name: "",
@@ -55,7 +52,7 @@ export default function ProfileForm() {
   // 載入狀態
   const [loading, setLoading] = useState(true);
 
-  // 2. 進入頁面時，Fetch 剛剛新加的 API
+  // 進入頁面時，Fetch 會員資料
   useEffect(() => {
     const fetchFullProfile = async () => {
       const token = Cookies.get("token");
@@ -296,7 +293,7 @@ export default function ProfileForm() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                className={`${button_cancel} `}
+                className={`${button_cancel} mr-8 `}
 
                 >
                   取消
