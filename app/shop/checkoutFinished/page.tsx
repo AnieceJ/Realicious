@@ -5,7 +5,7 @@ import Link from "next/link";
 import FinishedPhoto from "./_components/FinishedPhoto";
 import FinishedOrderList from "./_components/FinishedOrderList";
 import FinishedAction from "./_components/FinishedAction";
-import { clearCart, getCartItems, saveLastOrder, type CartItem } from "@/lib/shop/cart";
+import { clearCart, getCartItems, getLastOrder, saveLastOrder, type CartItem } from "@/lib/shop/cart";
 
 export default function CheckoutFinishedPage() {
   const searchParams = useSearchParams();
@@ -20,12 +20,17 @@ export default function CheckoutFinishedPage() {
 
     if (isSuccess) {
       const pendingId = localStorage.getItem("realicious-pending-order") || "";
-      const cart = getCartItems();
+      const cart = getCartItems().length > 0 ? getCartItems() : getLastOrder();
       itemsRef.current = cart;
       setOrderId(pendingId);
       saveLastOrder(cart);
       clearCart();
       localStorage.removeItem("realicious-pending-order");
+
+      console.log("=== 完成頁除錯 ===");
+      console.log("RtnCode:", rtnCode);
+      console.log("pendingId:", pendingId);
+      console.log("cart items:", cart);
 
       if (pendingId) {
         fetch(`http://localhost:3001/payment/confirm/${pendingId}`, { method: "PUT" }).catch(() => {});
