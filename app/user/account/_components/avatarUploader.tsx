@@ -209,7 +209,7 @@ export default function AvatarUploader({
           onClick={handleBackdropClick}
         >
           <div
-            className="flex w-full max-w-sm flex-col items-center rounded-xl bg-white p-6 shadow-xl cursor-default mx-4 animate-pop-in"
+            className="border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] h-130 flex w-full max-w-sm flex-col items-center bg-white p-6 cursor-default mx-4 animate-pop-in"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="mb-4 text-base font-bold text-gray-800">修改大頭貼</h3>
@@ -242,13 +242,13 @@ export default function AvatarUploader({
 
             {/* === Tab 1: 選擇預設圖片 === */}
             {activeTab === "default" && (
-              <div className="grid grid-cols-4 gap-3 py-4 w-full">
+              <div className="grid grid-cols-2 gap-3 py-4 px-4 w-full justify-items-center place-items-center">
                 {DEFAULT_AVATARS.map((url, index) => (
                   <button
                     key={index}
                     type="button"
                     onClick={() => setSelectedDefault(url)}
-                    className={`relative h-14 w-14 overflow-hidden rounded-full border-2 transition ${
+                    className={`relative h-30 w-30 overflow-hidden rounded-full border-2 transition ${
                       selectedDefault === url
                         ? "border-blue-600 ring-2 ring-blue-300"
                         : "border-gray-200 opacity-60 hover:opacity-100"
