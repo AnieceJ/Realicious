@@ -157,7 +157,7 @@ export default function ArticleEditPage() {
 
 	return (
 		<main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
-			<div className="overflow-hidden border-4 border-black bg-white shadow-[6px_6px_0px_-1px_#000]">
+			<div className=" border-4 border-black bg-white shadow-[6px_6px_0px_-1px_#000]">
 				<header className="border-b-4 border-black bg-black px-5 py-4 text-white sm:px-8">
 					<p className="text-sm font-bold tracking-widest text-button-yellow">
 						ARTICLE
@@ -225,7 +225,7 @@ export default function ArticleEditPage() {
 					</div>
 					<section>
 						<p className="mb-3 text-xl font-black">文章內容</p>
-						<div className="overflow-hidden border-2 border-black bg-white">
+						<div className=" border-2 border-black bg-white">
 							<div className="article-editor">
 								{!isEditMode || content !== "" ? (
 									<ClientSideCustomEditor

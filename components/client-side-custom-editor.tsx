@@ -8,13 +8,11 @@ const CustomEditor = dynamic(() => import("@/components/custom-editor"), {
 	ssr: false,
 });
 
-// 🎯 定義 Props 的型別介面
 interface ClientSideCustomEditorProps {
 	value?: string;
 	onChange: (html: string) => void;
 }
 
-// 🎯 幫參數加上剛定義好的型別
 export default function ClientSideCustomEditor({
 	value = "",
 	onChange,
