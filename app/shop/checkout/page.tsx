@@ -92,13 +92,13 @@ export default function CheckoutPage() {
             <h3 className="text-2xl font-bold text-[#3D2419] text-center mb-6">選擇支付方式</h3>
             <div className="flex flex-col gap-4">
               <button
-                onClick={() => handlePayment("newebpay")}
+                onClick={() => handlePayment("ecpay")}
                 className="flex items-center justify-center gap-3 w-full py-5 bg-slate-200 text-slate-600 font-bold text-xl border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-slate-300 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
               >
                 <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
                   <path d="M2 5h20v14H2V5zm2 2v2h16V7H4zm0 4v6h16v-6H4zm2 2h4v2H6v-2z" />
                 </svg>
-                線上刷卡（藍新）
+                線上刷卡
               </button>
               <button
                 onClick={() => handlePayment("linepay")}
