@@ -177,7 +177,7 @@ export default function AvatarUploader({
   }
 
   return (
-    <div className="flex flex-col items-center p-4">
+    <div className="w-32 h-32">
       {/* 大頭貼與點擊彈窗按鈕 */}
       <div className="relative h-32 w-32">
         <div className="h-full w-full overflow-hidden rounded-full border-2 border-gray-200 shadow-inner">
