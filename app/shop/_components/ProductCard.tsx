@@ -2,12 +2,28 @@ import React, { useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
 import { addToCart } from "@/lib/shop/cart";
+import { addFavorite, removeFavorite } from "@/lib/shop/favorites";
+import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { user } = useUser();
   const [favorited, setFavorited] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const { toastComponent, showToast } = useToast();
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user?.id) return;
+    const userId = Number(user.id);
+    if (favorited) {
+      await removeFavorite(userId, product.id);
+      setFavorited(false);
+    } else {
+      await addFavorite(userId, product.id);
+      setFavorited(true);
+    }
+  };
 
   return (
     <>
@@ -45,7 +61,7 @@ export default function ProductCard({ product }: { product: Product }) {
             加入購物車
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); setFavorited(!favorited); }}
+            onClick={toggleFavorite}
             className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#3D2419] shadow-md hover:bg-red-50 transition-colors cursor-pointer"
           >
             <svg className="w-5 h-5 transition-all" viewBox="0 0 24 24"
