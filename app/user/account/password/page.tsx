@@ -11,6 +11,8 @@ import { useState, useEffect } from "react";
 import { useAlert } from "../../context/alert";
 import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
+import PageHeader from "@/app/_components/PageHeader";
+import { AiFillSafetyCertificate } from "react-icons/ai";
 
 interface AccountInfo {
   email: string;
@@ -152,22 +154,24 @@ export default function Password() {
         // 引導去後端的 Google 綁定路由，並帶上 Token
         window.location.href = `${API_URL}/auth/google/bind?token=${token}`;
       } else {
-        const unbind =async()=>{
+        const unbind = async () => {
           // 解除綁定 API
           const res = await fetch(`${API_URL}/auth/google/unbind`, {
             method: "POST",
             headers: { Authorization: `Bearer ${token}` },
           });
           const result = await res.json();
-          
+
           if (res.ok && result.success) {
             showAlert("success", "已成功解除 Google 綁定");
             setAccountInfo((prev) => ({ ...prev, isGoogleLinked: false }));
           } else {
             showAlert("error", result.message || "解除綁定失敗");
           }
-        }
-        showAlert('confirm','溫馨提示',"你確定要解除綁定嗎？",()=>{unbind()})
+        };
+        showAlert("confirm", "溫馨提示", "你確定要解除綁定嗎？", () => {
+          unbind();
+        });
       }
     } catch (error) {
       showAlert("error", "操作失敗，請稍後再試");
@@ -181,11 +185,14 @@ export default function Password() {
       <Left />
 
       {/* 主要內容區塊 */}
-      <div className="w-[70%] h-180 p-6 overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-6 text-gray-800">
+      <div className="w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
+        {/* <h2 className="text-2xl font-bold mb-6 text-gray-800">
           帳號與安全設定
-        </h2>
-
+        </h2> */}
+        <PageHeader
+          icon={<AiFillSafetyCertificate className="h-5 w-5" />}
+          title="帳號與安全設定"
+        />
         <div className="space-y-6 max-w-lg">
           {/* 1. 電子郵件顯示 */}
           <div className="flex justify-between items-center pb-4 border-b">

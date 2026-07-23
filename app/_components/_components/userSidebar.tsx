@@ -2,32 +2,36 @@
 
 import { FaUser, FaBook, FaShoppingCart, FaTicketAlt } from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
-import { GiChicken } from "react-icons/gi";
 import { MdOutlineLogout } from "react-icons/md";
+import { FaXmark } from "react-icons/fa6";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-regular-svg-icons";
 import defaultAvatar from "@/public/user/Avatar.png";
 
-import { useState, useEffect } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { useUser } from "@/app/context/user";
 import Link from "next/link";
 import Image from "next/image";
 import { useAlert } from "@/app/user/context/alert";
 
+// 💡 建立一個檢查 Client 端的 Hook
+const emptySubscribe = () => () => {};
+function useIsClient() {
+  return useSyncExternalStore(
+    emptySubscribe,
+    () => true, // Client 端回傳 true
+    () => false, // Server 端 (SSR) 回傳 false
+  );
+}
 
 export default function UserSidebar() {
-  const { showAlert, closeAlert } = useAlert();
+  const { user, logout } = useUser();
+  const { showAlert } = useAlert();
+  const isMounted = useIsClient(); // 💡 乾淨取代 useEffect + useState
 
   const [isOpening, setIsOpening] = useState<boolean>(false);
-  const { user, logout } = useUser();
-  const [isMounted, setIsMounted] = useState<boolean>(false);
-
   const headerAvatar = user?.avatar ? `${user.avatar}` : defaultAvatar;
-
-  useEffect(() => {
-    setIsMounted(true); // 💡 這裡直接設 true 即可，確保客戶端已掛載
-  }, []);
 
   return (
     <>
@@ -43,7 +47,6 @@ export default function UserSidebar() {
       {isMounted &&
         createPortal(
           <>
-            {/* 側邊欄內容：既然已經移到最外層，建議 top 改成 0，讓它真正填滿右側 */}
             <div
               className={`fixed z-50 top-0 right-0 w-90 bg-[#FCF9F6] h-full shadow-2xl ${
                 isOpening ? "translate-x-0" : "translate-x-full"
@@ -51,27 +54,13 @@ export default function UserSidebar() {
             >
               <div className="">
                 <div className="flex items-center bg-gray-100">
-                  {/* ❌ 這裡就是新加入的「X」關閉按鈕 */}
+                  {/* 「X」關閉按鈕 */}
                   <button
                     onClick={() => setIsOpening(false)}
                     className="absolute top-4 right-4 p-2 text-gray-500 hover:text-black hover:bg-gray-200/50 rounded-full cursor-pointer transition-colors"
                     aria-label="Close sidebar"
                   >
-                    {/* 這裡你可以換成專案裡既有的圖示，例如 FontAwesomeIcon 或 react-icons */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={2}
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+                    <FaXmark className="text-2xl" />
                   </button>
                   <div className="w-25 h-25 ml-6 mr-2 my-6 rounded-full">
                     <Image
@@ -103,7 +92,7 @@ export default function UserSidebar() {
                     href={`/user/account/password`}
                   >
                     <AiFillSafetyCertificate />
-                    <span className="ml-4">帳號密碼</span>
+                    <span className="ml-4">帳戶安全</span>
                   </Link>
                   <Link
                     onClick={() => setIsOpening(false)}
@@ -129,18 +118,12 @@ export default function UserSidebar() {
                     <FaTicketAlt />
                     <span className="ml-4">我的票券</span>
                   </Link>
-                  {/* <Link
-                    onClick={() => setIsOpening(false)}
-                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
-                    href={`/user/account/pet`}
-                  >
-                    <GiChicken />
-                    <span className="ml-4">我的小雞</span>
-                  </Link> */}
                   <button
                     onClick={() => {
                       setIsOpening(false);
-                      showAlert("confirm","確定要登出嗎？",'',()=>{logout()})
+                      showAlert("confirm", "確定要登出嗎？", "", () => {
+                        logout();
+                      });
                     }}
                     className="w-full h-12.5 text-red-600 border-gray-700 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
                   >
@@ -151,7 +134,7 @@ export default function UserSidebar() {
               </div>
             </div>
 
-            {/* 遮罩：這時候的 fixed inset-0 就能真正完美覆蓋全螢幕了！ */}
+            {/* 遮罩 */}
             <div
               onClick={() => setIsOpening(false)}
               className={`fixed inset-0 bg-black/40 z-40 ${isOpening ? "" : "hidden"}`}

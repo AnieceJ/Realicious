@@ -13,18 +13,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Container from "../_components/container";
 import loginAd from "@/public/user/login.png";
 import google from "@/public/user/google-logo.svg";
-import { button_shadow } from "../_components/button";
+import { button_shadow, user_input } from "@/app/user/_components/button";
 import { loginSchema, LoginInput } from "@/validations/validate";
 import { RiLoginBoxLine } from "react-icons/ri";
+import PasswordToggleIcon from "../_components/PasswordToggleIcon";
 
 export default function Login() {
   const router = useRouter();
   const { login } = useUser();
   const { showAlert, closeAlert } = useAlert();
-
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
-
+  
   useEffect(() => {
     if (error === "server_error") {
       // 觸發 Alert 提示
@@ -42,12 +42,13 @@ export default function Login() {
       router.replace("/user/login", { scroll: false });
     }
   }, [error, showAlert, router]); // 當 error 存在時觸發
-
+  
   const [loginError, setLoginError] = useState(false); // 登入錯誤處理
   const [shakeAccount, setShakeAccount] = useState(false); // Email 欄位錯誤特效
   const [shakePassword, setShakePassword] = useState(false); // Password 欄位錯誤特效
   const [submit, setSubmit] = useState(false); // 表單送出中的按鈕的效果
-
+  const [showPassword, setShowPassword] = useState(false);
+  
   // RHF有錯誤訊息時觸發晃動
   const onError = (errors: any) => {
     if (errors.account) {
@@ -119,11 +120,11 @@ export default function Login() {
 
   return (
     <Container>
-      <div className="flex justify-center items-center sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+      <div className="bg-[#FCF9F6] flex justify-center items-center border-3 sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         {/* 廣告 */}
-        <div className="w-0 h-0 sm:w-150 sm:h-180">
+        <div className="w-0 h-0 sm:w-150 sm:h-180 flex justify-center items-center">
           <Image
-            className=" object-contain object-bottom h-180"
+            className=" object-contain object-bottom h-170"
             src={loginAd}
             alt="廣告"
             width={600}
@@ -132,7 +133,7 @@ export default function Login() {
           />
         </div>
 
-        <div className="w-110 h-180 bg-white flex flex-col items-center">
+        <div className="w-110 h-180 bg-[#FCF9F6] flex flex-col items-center">
           <h1 className="text-[24px] my-5">登入</h1>
 
           <form
@@ -145,7 +146,7 @@ export default function Login() {
               </label>
               <input
                 {...register("account")}
-                className={`${errors.account ? "border-red-500" : ""} ${shakeAccount ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
+                className={`${errors.account ? "border-red-500" : ""} ${shakeAccount ? "animate-shake" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
                 type="text"
                 id="email"
                 placeholder="請輸入電子郵件"
@@ -162,13 +163,19 @@ export default function Login() {
               <label className="text-[20px] mb-2" htmlFor="password">
                 密碼
               </label>
-              <input
-                {...register("password")}
-                className={`${errors.password ? "border-red-500" : ""} ${shakePassword ? "animate-shake" : ""} border w-90 h-12 text-[16px] px-2 `}
-                type="password"
-                id="password"
-                placeholder="請輸入密碼"
-              />
+              <div className="relative w-full">
+                <input
+                  {...register("password")}
+                  className={`${errors.password ? "border-red-500" : ""} ${shakePassword ? "animate-shake" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="請輸入密碼"
+                />
+                <PasswordToggleIcon
+                  show={showPassword}
+                  onToggle={() => setShowPassword((prev) => !prev)}
+                />
+              </div>
               <div className="w-auto h-4">
                 {errors.password && (
                   <p className="text-red-500 text-sm mt-1 w-90 text-left">
@@ -207,7 +214,7 @@ export default function Login() {
           <div className="flex justify-center items-center">
             <Link
               href={"http://localhost:3001/user/api/auth/google"}
-              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center `}
             >
               <Image
                 className=" object-contain object-bottom w-10 mr-2"
@@ -221,7 +228,7 @@ export default function Login() {
             </Link>
 
             <Link
-              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center border `}
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center `}
               href={`/user/register`}
             >
               <RiLoginBoxLine className="text-4xl mr-2" />

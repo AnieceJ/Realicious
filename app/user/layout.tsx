@@ -9,7 +9,8 @@ export default function UserLayout({
 }>) {
   return (
     <div>
-      <AlertProvider>{children}</AlertProvider>;
+      {/* <AlertProvider>{children}</AlertProvider>; */}
+      {children};
     </div>
   );
 }

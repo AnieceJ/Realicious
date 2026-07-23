@@ -11,6 +11,8 @@ import {
   ResetPasswordInput,
 } from "@/validations/validate";
 import { useAlert } from "../context/alert";
+import { user_input } from "@/app/user/_components/button";
+import PasswordToggleIcon from "../_components/PasswordToggleIcon";
 
 export default function ForgetPassword() {
   const { showAlert, closeAlert } = useAlert();
@@ -25,6 +27,8 @@ export default function ForgetPassword() {
   const API_URL =
     process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
   const [submit, setSubmit] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordCheck, setShowPasswordCheck] = useState(false);
 
   const {
     register,
@@ -86,7 +90,7 @@ export default function ForgetPassword() {
   return (
     <Container>
       <div className="flex justify-center items-center sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-        <div className="w-108 h-180 bg-white border flex flex-col items-center">
+        <div className="w-108 h-180 bg-[#FCF9F6] border-2 flex flex-col items-center">
           <h1 className="text-[24px] my-10">重置密碼</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -96,25 +100,37 @@ export default function ForgetPassword() {
               <label className="text-[20px] mb-2" htmlFor="password">
                 密碼
               </label>
-              <input
-                {...register("password", { required: "這是必填欄位" })}
-                className={`${errors.password ? "border-red-500" : ""} border w-90 h-12 text-[16px] px-2 `}
-                type="password"
-                id="password"
-                placeholder="請輸入密碼"
-              />
+              <div className="relative w-full">
+                <input
+                  {...register("password", { required: "這是必填欄位" })}
+                  className={`${errors.password ? "border-red-500" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="密碼６位元以上 需包含英文與數字"
+                />
+                <PasswordToggleIcon
+                  show={showPassword}
+                  onToggle={() => setShowPassword((prev) => !prev)}
+                />
+              </div>
             </div>
             <div className="flex flex-col items-start mb-1">
               <label className="text-[20px] mb-2" htmlFor="check">
                 密碼確認
               </label>
-              <input
-                {...register("check", { required: "這是必填欄位" })}
-                className={`${errors.check ? "border-red-500" : ""} border w-90 h-12 text-[16px] px-2 `}
-                type="password"
-                id="check"
-                placeholder="請再次輸入密碼"
-              />
+              <div className="relative w-full">
+                <input
+                  {...register("check", { required: "這是必填欄位" })}
+                  className={`${errors.check ? "border-red-500" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
+                  type={showPasswordCheck ? "text" : "password"}
+                  id="check"
+                  placeholder="請再次輸入密碼"
+                />
+                <PasswordToggleIcon
+                  show={showPasswordCheck}
+                  onToggle={() => setShowPasswordCheck((prev) => !prev)}
+                />
+              </div>
             </div>
             <div className="w-auto h-4 mb-4">
               {errors.check && (

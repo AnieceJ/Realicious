@@ -8,9 +8,15 @@ import Cookies from "js-cookie";
 import Container from "../_components/container";
 import Left from "./_components/left";
 import AvatarUploader from "./_components/avatarUploader";
-import {button_revise,button_cancel, button_submit} from '../_components/button'
+import {
+  button_revise,
+  button_cancel,
+  button_submit,
+} from "../_components/button";
 import { useAlert } from "../context/alert";
 import { useRouter } from "next/navigation";
+import { FaUser } from "react-icons/fa";
+import PageHeader from "@/app/_components/PageHeader";
 
 interface FullProfile {
   avatar: string;
@@ -42,7 +48,7 @@ const API_URL =
 export default function ProfileForm() {
   const { user, setUser } = useUser();
   const { showAlert, closeAlert } = useAlert();
-  const router = useRouter()
+  const router = useRouter();
   // 控制是否為編輯模式
   const [isEditing, setIsEditing] = useState(false);
   // 畫面上正在輸入的資料
@@ -71,11 +77,11 @@ export default function ProfileForm() {
           setOriginalData(result.data);
         }
       } catch (error) {
-        showAlert("error",'伺服器異常')
+        showAlert("error", "伺服器異常");
         console.error("抓取詳細資料失敗:", error);
-        setTimeout(()=>{
-          router.push('/')
-        },2000)
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
       } finally {
         setLoading(false);
       }
@@ -121,11 +127,11 @@ export default function ProfileForm() {
         // 更新成功後，把當前資料變成「新的原始資料」
         setOriginalData(formData);
         setIsEditing(false);
-        setTimeout(()=>{
-          closeAlert()
-        },2000)
+        setTimeout(() => {
+          closeAlert();
+        }, 2000);
       } else {
-      showAlert("error", "更新失敗！",result.message);
+        showAlert("error", "更新失敗！", result.message);
       }
     } catch (error) {
       console.error("發送更新 API 失敗:", error);
@@ -139,6 +145,8 @@ export default function ProfileForm() {
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left></Left>
       <div className="w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
+        <div className="flex justify-between mb-4">
+           <PageHeader icon={<FaUser className="h-5 w-5" />} title="個人資料" />
         {/* 放入大頭貼組件 */}
         <AvatarUploader
           currentAvatar={formData.avatar}
@@ -147,47 +155,49 @@ export default function ProfileForm() {
             setFormData((prev) => ({ ...prev, avatar: newUrl }));
             setOriginalData((prev) => ({ ...prev, avatar: newUrl }));
             // 2. 🌟 關鍵：同步更新全域 Context！這樣一來，Header 就會立刻收到通知並換圖
-          setUser(prev => ({ ...prev, avatar: newUrl }));
-          
-          // 3. 順便把新的 user 狀態更新進本地 Cookie，保證下次重新整理也是對的
-          const updatedUser = { ...user, avatar: newUrl };
-          Cookies.set("user", JSON.stringify(updatedUser), { expires: 1 });
+            setUser((prev) => ({ ...prev, avatar: newUrl }));
+
+            // 3. 順便把新的 user 狀態更新進本地 Cookie，保證下次重新整理也是對的
+            const updatedUser = { ...user, avatar: newUrl };
+            Cookies.set("user", JSON.stringify(updatedUser), { expires: 1 });
           }}
         />
-
+        </div>
+       
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 姓氏欄位 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              姓氏
-            </label>
-            <input
-              type="text"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleInputChange}
-              disabled={!isEditing}
-              className="mt-1 block w-full border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
-            />
-          </div>
-
-          {/* 姓名欄位 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              姓名
-            </label>
-            <input
-              type="text"
-              name="first_name"
-              value={formData.first_name}
-              onChange={handleInputChange}
-              disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
-            />
+          <div className="flex justify-between items-center">
+            {/* 姓氏欄位 */}
+            <div className="w-[49%]">
+              <label className="block text-sm font-medium text-gray-700">
+                姓氏
+              </label>
+              <input
+                type="text"
+                name="last_name"
+                value={formData.last_name}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              />
+            </div>
+            {/* 姓名欄位 */}
+            <div className="w-[49%] ">
+              <label className="block text-sm font-medium text-gray-700">
+                姓名
+              </label>
+              <input
+                type="text"
+                name="first_name"
+                value={formData.first_name}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="w-full mt-1 block rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              />
+            </div>
           </div>
 
           {/* 暱稱欄位 */}
-          <div>
+          <div className="">
             <label className="block text-sm font-medium text-gray-700">
               暱稱
             </label>
@@ -200,35 +210,36 @@ export default function ProfileForm() {
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
             />
           </div>
+          <div className="flex justify-between items-center">
+            {/* 縣市欄位 */}
+            <div className="w-[49%]">
+              <label className="block text-sm font-medium text-gray-700">
+                縣市
+              </label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              />
+            </div>
 
-          {/* 縣市欄位 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              縣市
-            </label>
-            <input
-              type="text"
-              name="city"
-              value={formData.city}
-              onChange={handleInputChange}
-              disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
-            />
-          </div>
-
-          {/* 鄉鎮欄位 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              鄉鎮
-            </label>
-            <input
-              type="text"
-              name="district"
-              value={formData.district}
-              onChange={handleInputChange}
-              disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
-            />
+            {/* 鄉鎮欄位 */}
+            <div className="w-[49%]">
+              <label className="block text-sm font-medium text-gray-700">
+                鄉鎮
+              </label>
+              <input
+                type="text"
+                name="district"
+                value={formData.district}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              />
+            </div>
           </div>
 
           {/* 詳細地址欄位 */}
@@ -293,17 +304,12 @@ export default function ProfileForm() {
                 <button
                   type="button"
                   onClick={handleCancel}
-                className={`${button_cancel} mr-8 `}
-
+                  className={`${button_cancel} mr-8 `}
                 >
                   取消
                 </button>
-                <button
-                  type="submit"
-                className={`${button_submit}`}
-
-                >
-                  送出變更
+                <button type="submit" className={`${button_submit}`}>
+                  確認送出
                 </button>
               </>
             )}
