@@ -13,7 +13,6 @@ import { getProducts, type Product } from "@/lib/shop/product";
 const PAGE_LIMIT = 9;
 
 const categoryNames: Record<string, string> = { "1": "電子雞服裝", "2": "電子票券", "3": "虛擬頭像框" };
-const tagLabels: Record<string, string> = { "鍋": "火鍋", "麥丹勞": "速食", "饗食": "吃到飽", "炸雞": "炸物", "電子雞服裝": "電子雞服裝", "虛擬頭像框": "虛擬頭像框" };
 
 export default function ShopPage() {
   const searchParams = useSearchParams();
@@ -36,7 +35,7 @@ export default function ShopPage() {
       (p) => p.price >= minPrice && p.price <= maxPrice
     );
     if (categoryId) list = list.filter((p) => String(p.category_id) === categoryId);
-    if (tagKeywords.length > 0) list = list.filter((p) => tagKeywords.some((kw) => p.name.includes(kw)));
+    if (tagKeywords[0]) list = list.filter((p) => p.name.includes(tagKeywords[0]));
     if (filters.onSale) list = list.filter((p) => p.discount < 1);
     if (filters.inStock) list = list.filter((p) => p.stock_qty > 0);
     if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
@@ -126,20 +125,14 @@ export default function ShopPage() {
           {/* 右側主內容區 */}
           <div className="flex-1 flex flex-col gap-4">
             <div>
-              <CategoryFilter activeKeywords={tagKeywords} onTagToggle={(kw) => {
-                setTagKeywords((prev) => prev.includes(kw) ? prev.filter((k) => k !== kw) : [...prev, kw]);
+              <CategoryFilter activeKeyword={tagKeywords[0] || ""} onTagChange={(kw) => {
+                setTagKeywords(kw ? [kw] : []);
               }} />
             </div>
 
             {/* 已選取的篩選條件標籤 */}
-            {(tagKeywords.length > 0 || minPrice > 0 || maxPrice < 5000 || filters.onSale || filters.inStock) && (
+            {(minPrice > 0 || maxPrice < 5000 || filters.onSale || filters.inStock) && (
               <div className="flex flex-wrap items-center gap-2">
-                {tagKeywords.map((kw) => (
-                  <span key={kw} className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
-                    {tagLabels[kw] || kw}
-                    <button onClick={() => setTagKeywords((prev) => prev.filter((k) => k !== kw))} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
-                  </span>
-                ))}
                 {(minPrice > 0 || maxPrice < 5000) && (
                   <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
                     ${minPrice}–${maxPrice}
@@ -158,12 +151,6 @@ export default function ShopPage() {
                     <button onClick={() => setFilters((f) => ({ ...f, inStock: false }))} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
                   </span>
                 )}
-                <button
-                  onClick={() => { setKeyword(""); setCategoryId(""); setTagKeywords([]); setMinPrice(0); setMaxPrice(5000); setFilters({ onSale: false, inStock: false }); }}
-                  className="text-sm text-gray-500 hover:text-red-500 underline cursor-pointer"
-                >
-                  清除全部
-                </button>
               </div>
             )}
 
