@@ -103,7 +103,7 @@ export default function ShopPage() {
           </div>
           <div className="flex-1 flex items-center gap-4">
             <div className="flex-1">
-              <Searchbar onSearch={(keyword) => setKeyword(keyword)} />
+              <Searchbar value={keyword} onSearch={(kw) => setKeyword(kw)} />
             </div>
             <div className="flex-shrink-0">
               <Sort onSort={(id) => {
@@ -119,6 +119,7 @@ export default function ShopPage() {
           <div className="w-64 flex-shrink-0">
             <SidebarFilter activeCategoryId={categoryId} onCategoryChange={(id) => {
               setCategoryId((prev) => prev === id ? "" : id);
+              if (id === "") setKeyword("");
             }} onPriceChange={(min, max) => { setMinPrice(min); setMaxPrice(max) }} onFilterChange={(f) => setFilters(f)}/>
           </div>
 
@@ -131,14 +132,8 @@ export default function ShopPage() {
             </div>
 
             {/* 已選取的篩選條件標籤 */}
-            {(keyword || tagKeywords.length > 0 || minPrice > 0 || maxPrice < 5000 || filters.onSale || filters.inStock) && (
+            {(tagKeywords.length > 0 || minPrice > 0 || maxPrice < 5000 || filters.onSale || filters.inStock) && (
               <div className="flex flex-wrap items-center gap-2">
-                {keyword && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
-                    {keyword}
-                    <button onClick={() => setKeyword("")} className="ml-1 hover:text-red-500 cursor-pointer">✕</button>
-                  </span>
-                )}
                 {tagKeywords.map((kw) => (
                   <span key={kw} className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFD3B6] text-[#3D2419] text-sm font-bold border-2 border-[#3D2419]">
                     {tagLabels[kw] || kw}
