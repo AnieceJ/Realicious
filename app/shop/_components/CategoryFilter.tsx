@@ -17,6 +17,8 @@ export default function CategoryFilter({
   const clampedMax = Math.min(maxPrice, priceMax);
   const [slideMin, setSlideMin] = useState(Math.min(minPrice, priceMax));
   const [slideMax, setSlideMax] = useState(clampedMax);
+  const [minStr, setMinStr] = useState(String(minPrice));
+  const [maxStr, setMaxStr] = useState(String(maxPrice));
   const committing = useRef(false);
   const raf = useRef(0);
 
@@ -39,9 +41,6 @@ export default function CategoryFilter({
   useEffect(() => {
     if (!committing.current) { setSlideMin(minPrice); setSlideMax(maxPrice); setMinStr(String(minPrice)); setMaxStr(String(maxPrice)); }
   }, [minPrice, maxPrice]);
-
-  const [minStr, setMinStr] = useState(String(minPrice));
-  const [maxStr, setMaxStr] = useState(String(maxPrice));
 
   const applyInput = () => {
     const min = Math.max(0, parseInt(minStr) || 0);
@@ -67,7 +66,7 @@ export default function CategoryFilter({
       {/* 全部商品（重置） */}
       <button
         onClick={onReset}
-        className="px-3 py-1 text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors bg-[#FFD3B6] text-[#3D2419] hover:bg-[#ffbe94]"
+        className="px-3 py-1 text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors bg-[#ffffff] text-[#3D2419] hover:bg-[#ffbe94]"
       >
         全部商品
       </button>
