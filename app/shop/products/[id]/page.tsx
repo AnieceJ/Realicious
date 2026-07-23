@@ -4,13 +4,12 @@ import { useParams } from "next/navigation";
 import Breadcrumbs from "../../_components/Breadcrumbs";
 import ProductPhoto from "./_components/ProductPhoto";
 import Hashtag from "./_components/Hashtag";
-import SpecSelector from "./_components/SpecSelector";
-import ProductAddOns from "./_components/ProductAddOns";
 import QuantityPicker from "../../_components/QuantityPicker";
 import CartButtons from "../../_components/CartButtons";
 import Favorite from "../../_components/Favorite";
 import PurchaseButton from "./_components/PurchaseButton";
 import ProductDescription from "./_components/ProductDescription";
+import TicketInfo from "./_components/TicketInfo";
 import { getProductById, type Product } from "@/lib/shop/product";
 import { getFavorites } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
@@ -65,18 +64,16 @@ export default function ProductsPage() {
         <div className="flex flex-row gap-8 items-start">
           {/* 左側：商品大圖區區塊 */}
           <div className="shrink-0">
-            <ProductPhoto />
+            <ProductPhoto key={product.id} mainImage={product.main_img} images={product.images} productName={product.name} />
           </div>
 
           {/* 右側：購買決策區塊 */}
           <div className="flex-1 flex flex-col items-start text-left w-full select-none">
             
             {/* 實心對話框文字字卡（全面直角） */}
-            <div className="w-full bg-[#FCF9F6] border-[3px] border-[#3D2419] p-5 shadow-[4px_4px_0px_0px_#3D2419] mb-6">
+            <div className="w-full bg-[#FCF9F6] border-[3px] border-[#3D2419] px-5 pt-4 pb-6 shadow-[4px_4px_0px_0px_#3D2419] mb-6">
               {/* 標籤列 */}
-              <div className="mb-3">
-                <Hashtag productName={product.name} />
-              </div>
+              <Hashtag productName={product.name} />
               
               {/* 商品名稱 */}
               <h2 className="text-3xl font-black text-[#3D2419] tracking-wide leading-tight">
@@ -84,7 +81,7 @@ export default function ProductsPage() {
               </h2>
               
               {/* 像素風分割虛線 */}
-              <hr className="border-t-[2px] border-dashed border-[#3D2419]/20 my-3" />
+              <hr className="border-t-[2px] border-dashed border-[#3D2419]/20 mt-3 mb-5" />
               
               {/* 價格 */}
               <div className="text-3xl font-black text-[#8C5230] tracking-wider">
@@ -94,10 +91,7 @@ export default function ProductsPage() {
 
             {/* 下方選項控制區：寬度對齊大卡片 */}
             <div className="w-full flex flex-col gap-6 pl-1">
-              {/* 規格選取器 */}
-              <div>
-                <SpecSelector />
-              </div>
+              <TicketInfo />
 
               {/* 數量選擇器 */}
               <div className="flex items-center gap-4 text-base font-bold text-[#3D2419]">

@@ -1,5 +1,11 @@
 const API_BASE = "http://localhost:3001";
 
+export type ProductImage = {
+  url: string;
+  alt_text?: string | null;
+  is_main: number;
+};
+
 export type Product = {
   id: number;
   name: string;
@@ -10,6 +16,7 @@ export type Product = {
   category_name: string;
   description?: string;
   main_img?: string;
+  images?: ProductImage[];
 };
 
 export async function getProducts(params?: {
