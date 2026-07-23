@@ -12,7 +12,7 @@ export async function createOrder(items: { id: number; name: string; price: numb
 export type Order = {
   id: number;
   user_id: number;
-  status: string;
+  status: number | string;
   created_at: string;
   user_name: string;
   total_price: number;

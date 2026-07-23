@@ -23,11 +23,11 @@ export default function Hashtag({ productName }: HashtagProps) {
   );
 
   if (matchedTags.length === 0) {
-    return <div className="h-[38px]" />;
+    return null;
   }
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 mb-3">
       {matchedTags.map((tag) => (
         <div key={tag.label}
           onClick={() => router.push(`/shop?keyword=${encodeURIComponent(tag.keyword)}`)}

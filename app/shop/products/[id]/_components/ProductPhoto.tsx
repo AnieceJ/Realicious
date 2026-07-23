@@ -1,36 +1,76 @@
-import React from "react";
+"use client";
 
-export default function ProductPhoto() {
+import React, { useMemo, useState } from "react";
+import type { ProductImage } from "@/lib/shop/product";
+
+const API_BASE = "http://localhost:3001";
+const EMPTY_IMAGES: ProductImage[] = [];
+
+// 商品副圖尚未完整建立前，先以商城已上傳的 Demo 食物圖補足縮圖互動。
+const DEMO_IMAGES = [
+  "/images/optimized/養生鍋.webp",
+  "/images/optimized/炸雞桶.webp",
+  "/images/optimized/煎餃.webp",
+  "/images/optimized/雙層漢堡.webp",
+  "/images/optimized/比薩1.webp",
+];
+
+function toImageUrl(path: string) {
+  return path.startsWith("http") ? path : `${API_BASE}${path}`;
+}
+
+type ProductPhotoProps = {
+  mainImage?: string;
+  images?: ProductImage[];
+  productName: string;
+};
+
+export default function ProductPhoto({ mainImage, images = EMPTY_IMAGES, productName }: ProductPhotoProps) {
+  const photoPaths = useMemo(() => {
+    const productImages = [...images]
+      .sort((a, b) => Number(b.is_main) - Number(a.is_main))
+      .map((image) => image.url);
+    const paths = [mainImage, ...productImages, ...DEMO_IMAGES].filter(
+      (path): path is string => Boolean(path)
+    );
+    return [...new Set(paths)].slice(0, 5);
+  }, [images, mainImage]);
+  const [selectedImage, setSelectedImage] = useState(photoPaths[0]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  if (!selectedImage) return null;
+
   return (
-    // 左上商品圖片區塊含左右
-    <div className="flex flex-row w-150 h-130 gap-3">
-      <div className="flex flex-col items-center w-30 gap-3">
-        <div className="bg-purple-300 w-20 h-20 px-4 py-2.5 
-                  text-[#3D2419] font-bold text-base
-                  border-[3px] border-[#3D2419]
-                  shadow-[4px_4px_0px_0px_#3D2419]"></div>
-        <div className="bg-purple-300 w-20 h-20 px-4 py-2.5 
-                  text-[#3D2419] font-bold text-base
-                  border-[3px] border-[#3D2419]
-                  shadow-[4px_4px_0px_0px_#3D2419]"></div>
-        <div className="bg-purple-300 w-20 h-20 px-4 py-2.5 
-                  text-[#3D2419] font-bold text-base
-                  border-[3px] border-[#3D2419]
-                  shadow-[4px_4px_0px_0px_#3D2419]"></div>
-        <div className="bg-purple-300 w-20 h-20 px-4 py-2.5 
-                  text-[#3D2419] font-bold text-base
-                  border-[3px] border-[#3D2419]
-                  shadow-[4px_4px_0px_0px_#3D2419]"></div>
-        <div className="bg-purple-300 w-20 h-20 px-4 py-2.5 
-                text-[#3D2419] font-bold text-base
-                  border-[3px] border-[#3D2419]
-                  shadow-[4px_4px_0px_0px_#3D2419]"></div>
+    <div className="flex w-[600px] h-[520px] gap-3">
+      <div className="flex flex-col w-20 gap-3">
+        {photoPaths.map((path, index) => (
+          <button
+            key={path}
+            type="button"
+            aria-label={`查看商品圖片 ${index + 1}`}
+            onClick={() => {
+              setSelectedImage(path);
+              setIsLoading(true);
+            }}
+            className={`h-20 w-20 overflow-hidden border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-transform hover:translate-x-[1px] hover:translate-y-[1px] ${
+              selectedImage === path ? "ring-4 ring-[#FBDF58]" : ""
+            }`}
+          >
+            <img src={toImageUrl(path)} alt={`${productName} 縮圖 ${index + 1}`} loading="lazy" className="h-full w-full object-cover" />
+          </button>
+        ))}
       </div>
-      <div className="flex items-center justify-center w-full h-full px-4 py-2.5 
-                  bg-[#FCF9F6] text-[#3D2419] font-bold text-base
-                  border-[3px] border-[#3D2419]
-                  shadow-[4px_4px_0px_0px_#3D2419]">
-        <span>商品封面圖</span>
+      <div className="relative h-full flex-1 overflow-hidden bg-[#FCF9F6] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
+        {isLoading && (
+          <div className="absolute inset-0 animate-pulse bg-linear-to-br from-[#F2E8DF] via-[#FCF9F6] to-[#E6D4C5]" aria-label="圖片載入中" />
+        )}
+        <img
+          src={toImageUrl(selectedImage)}
+          alt={productName}
+          onLoad={() => setIsLoading(false)}
+          onError={() => setIsLoading(false)}
+          className={`h-full w-full object-cover transition-opacity duration-300 ${isLoading ? "opacity-0" : "opacity-100"}`}
+        />
       </div>
     </div>
   );
