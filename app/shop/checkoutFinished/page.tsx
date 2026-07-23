@@ -32,7 +32,8 @@ export default function CheckoutFinishedPage() {
       console.log("pendingId:", pendingId);
       console.log("cart items:", cart);
 
-      if (pendingId) {
+      if (pendingId && !sessionStorage.getItem("confirm-sent-" + pendingId)) {
+        sessionStorage.setItem("confirm-sent-" + pendingId, "1");
         fetch(`http://localhost:3001/payment/confirm/${pendingId}`, { method: "PUT" }).catch(() => {});
       }
 

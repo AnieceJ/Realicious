@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 
-import { FaUser, FaBook, FaClipboardList, FaTicketAlt } from "react-icons/fa";
+import { FaUser, FaBook, FaClipboardList, FaTicketAlt, FaHeart } from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 
 export default function Left() {
@@ -67,6 +67,16 @@ export default function Left() {
         >
           <FaTicketAlt />
           <span className="ml-4">我的票券</span>
+        </Link>
+        <Link
+          onClick={() => {
+            setIsOpening(!isOpening);
+          }}
+          className={` w-full h-12.5 text-left pl-8 cursor-pointer flex items-center ${getLink(`/user/account/favorites`)}`}
+          href={`/user/account/favorites`}
+        >
+          <FaHeart />
+          <span className="ml-4">我的收藏</span>
         </Link>
       </div>
     </div>
