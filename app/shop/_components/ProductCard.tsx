@@ -6,9 +6,9 @@ import { addFavorite, removeFavorite } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, favoritedProductIds = [] }: { product: Product; favoritedProductIds?: number[] }) {
   const { user } = useUser();
-  const [favorited, setFavorited] = useState(false);
+  const [favorited, setFavorited] = useState(favoritedProductIds.includes(product.id));
   const [showCart, setShowCart] = useState(false);
   const { toastComponent, showToast } = useToast();
 

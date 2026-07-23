@@ -8,11 +8,15 @@ import CategoryFilter from "./_components/CategoryFilter";
 import FeaturedProductSection from "./_components/FeaturedProductSection";
 import ProductCard from "./_components/ProductCard";
 import { getProducts, type Product } from "@/lib/shop/product";
+import { getFavorites } from "@/lib/shop/favorites";
+import { useUser } from "@/app/context/user";
 
 export default function ShopPage() {
+  const { user } = useUser();
   const searchParams = useSearchParams();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [favoriteProductIds, setFavoriteProductIds] = useState<number[]>([]);
   const [categoryId, setCategoryId] = useState("")
   const [keyword, setKeyword] = useState(searchParams.get("keyword") || "")
   const [tagKeyword, setTagKeyword] = useState("")
@@ -53,6 +57,13 @@ export default function ShopPage() {
       if (res.success) setAllProducts(res.data);
     });
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    getFavorites(Number(user.id)).then((res) => {
+      if (res.success) setFavoriteProductIds(res.data.map((f: { product_id: number }) => f.product_id));
+    });
+  }, [user?.id]);
 
   useEffect(() => {
     getProducts({ keyword, page: 1 }).then((res) => {
@@ -126,7 +137,7 @@ export default function ShopPage() {
         {/* 商品網格 */}
         <div className="grid grid-cols-3 gap-8">
           {sortedProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard key={p.id} product={p} favoritedProductIds={favoriteProductIds} />
           ))}
         </div>
 

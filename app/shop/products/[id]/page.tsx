@@ -12,18 +12,29 @@ import Favorite from "../../_components/Favorite";
 import PurchaseButton from "./_components/PurchaseButton";
 import ProductDescription from "./_components/ProductDescription";
 import { getProductById, type Product } from "@/lib/shop/product";
+import { getFavorites } from "@/lib/shop/favorites";
+import { useUser } from "@/app/context/user";
 
 export default function ProductsPage() {
+  const { user } = useUser();
   const params = useParams();
   const id = params.id as string;
   const [product, setProduct] = useState<Product | null>(null);
   const [qty, setQty] = useState(1);
+  const [isFavorited, setIsFavorited] = useState(false);
 
   useEffect(() => {
     getProductById(id).then((res) => {
       if (res.success) setProduct(res.data);
     });
   }, [id]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    getFavorites(Number(user.id)).then((res) => {
+      if (res.success) setIsFavorited(res.data.some((f: { product_id: number }) => f.product_id === Number(id)));
+    });
+  }, [user?.id, id]);
 
   if (!product) {
     return (
@@ -104,7 +115,7 @@ export default function ProductsPage() {
                 </div>
                 {/* 愛心按鈕保持方形緊貼在旁 */}
                 <div className="shrink-0">
-                  <Favorite />
+                  <Favorite productId={product.id} initialFavorited={isFavorited} />
                 </div>
               </div>
 
