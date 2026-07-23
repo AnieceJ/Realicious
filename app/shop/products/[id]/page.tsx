@@ -130,7 +130,7 @@ export default function ProductsPage() {
 
         {/* 商品大描述區塊 */}
         <div className="mt-16 border-t-[3px] border-[#3D2419] pt-12">
-          <ProductDescription />
+          <ProductDescription description={product.description} />
         </div>
       </div>
     </div>
