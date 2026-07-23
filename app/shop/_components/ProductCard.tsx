@@ -6,6 +6,9 @@ import { addFavorite, removeFavorite } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
+const API_BASE = "http://localhost:3001";
+const FALLBACK_IMAGE = `${API_BASE}/images/optimized/吃到飽.webp`;
+
 export default function ProductCard({ product, favoritedProductIds = [] }: { product: Product; favoritedProductIds?: number[] }) {
   const { user } = useUser();
   const [favorited, setFavorited] = useState(favoritedProductIds.includes(product.id));
@@ -35,8 +38,12 @@ export default function ProductCard({ product, favoritedProductIds = [] }: { pro
       {/* 點圖片跳轉詳細頁 */}
       <Link href={`/shop/products/${product.id}`} className="absolute inset-0 block cursor-pointer">
         <img
-          src={`http://localhost:3001${product.main_img}`}
+          src={product.main_img ? `${API_BASE}${product.main_img}` : FALLBACK_IMAGE}
           alt={product.name}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = FALLBACK_IMAGE;
+          }}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </Link>
