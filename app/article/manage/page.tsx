@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Eye, SquarePen, House } from "lucide-react";
+import { Eye, SquarePen, House } from "lucide-react";
 import Pagination from "@/components/articlePagination";
 import { Button } from "@/components/ui/button";
 import SearchBar from "../_components/search_bar";
@@ -33,6 +33,7 @@ import {
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import Cookies from "js-cookie";
 
 interface SubCategory {
 	id: number;
@@ -86,14 +87,18 @@ export default function ArticleManagePage() {
 		keyword?: string,
 	) => {
 		const params = new URLSearchParams();
-		params.append("user_id", "1");
+		// params.append("user_id", "1");
+		const token = Cookies.get("token");
 		if (subCategoryId) {
 			params.append("sub_cat_id", String(subCategoryId));
 		}
 		if (keyword?.trim()) {
 			params.append("keyword", keyword);
 		}
-		const res = await fetch(`/api/article/user-articles?${params.toString()}`);
+		const res = await fetch(`/api/article/user-articles?${params.toString()}`, {
+			method: "GET",
+			headers: { Authorization: `Bearer ${token}` },
+		});
 		if (!res.ok) throw new Error("Fetch failed");
 		const data: UserArticlesResponse = await res.json();
 		setUserArticles(data.articles);
@@ -122,9 +127,12 @@ export default function ArticleManagePage() {
 		const isConfirm = window.confirm("確定要刪除嗎？");
 		if (!isConfirm) return;
 		try {
+			const token = Cookies.get("token");
 			const response = await fetch(`/api/article/articles/${articleId}`, {
 				method: "DELETE",
+				headers: { Authorization: `Bearer ${token}` },
 			});
+			console.log(response);
 			if (!response.ok) {
 				throw new Error("後端刪除失敗");
 			}

@@ -14,8 +14,8 @@ import {
 	BreadcrumbList,
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { useUser } from "@/app/context/user";
 import { useToast } from "../_components/article_toast";
+import Cookies from "js-cookie";
 
 interface ArticlePage {
 	id: string;
@@ -40,12 +40,12 @@ interface Comment {
 export default function ArticlePages({ params }: ArticleDetailPageProps) {
 	const { id } = React.use(params);
 	const router = useRouter();
-	const { user, loading: userLoading } = useUser();
 	const [page, setPage] = React.useState<ArticlePage | null>(null);
 	const [loading, setLoading] = React.useState(true);
 	const [isSaved, setIsSaved] = React.useState(false);
 	const [savingArticle, setSavingArticle] = React.useState(false);
 	const [comments, setComments] = React.useState<Comment[]>([]);
+	const hasToken = Boolean(Cookies.get("token"));
 	const { toastComponent, showToast } = useToast();
 	// 留言送出
 	const [inputText, setInputText] = React.useState("");
@@ -72,13 +72,13 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		};
 
 		const checkIfSaved = async () => {
-			if (!user?.id) return;
+			const token = Cookies.get("token");
+			if (!token) return;
 
 			try {
-				// 用列表 API 檢查當前文章是否已保存
-				const response = await fetch(
-					`/api/article/articles?user_id=${user.id}`,
-				);
+				const response = await fetch("/api/article/articles", {
+					headers: { Authorization: `Bearer ${token}` },
+				});
 				if (response.ok) {
 					const data = await response.json();
 					const article = data.article.find((a: ArticlePage) => a.id === id);
@@ -106,7 +106,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		fetchSingleArticle();
 		checkIfSaved();
 		fetchComments();
-	}, [id, user?.id]);
+	}, [id, hasToken]);
 
 	const handleShare = async () => {
 		if (!page) return;
@@ -142,7 +142,8 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 
 	// 儲存文章
 	const handleSaveArticle = async () => {
-		if (!user?.id) {
+		const token = Cookies.get("token");
+		if (!token) {
 			alert("請先登入才能儲存文章");
 			return;
 		}
@@ -153,9 +154,11 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		try {
 			const response = await fetch("/api/article/saved-articles", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
 				body: JSON.stringify({
-					user_id: String(user.id),
 					saved_article_id: String(id),
 				}),
 			});
@@ -179,7 +182,8 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 	// 新增留言
 	const handleSaveComment = async () => {
 		if (!inputText.trim()) return;
-		if (!user?.id) {
+		const token = Cookies.get("token");
+		if (!token) {
 			alert("登入才能留言哦！");
 			return;
 		}
@@ -187,10 +191,12 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		try {
 			const response = await fetch("/api/article/comments", {
 				method: "POST",
-				headers: { "Content-Type": "application/json" },
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
 				body: JSON.stringify({
 					article_id: id,
-					user_id: String(user.id),
 					content: inputText.trim(),
 				}),
 			});
@@ -291,9 +297,9 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 								</button>
 								<button
 									onClick={handleSaveArticle}
-									disabled={savingArticle || userLoading}
+									disabled={savingArticle}
 									className="w-9 h-9 flex items-center justify-center gap-2 border-black border-2 bg-white shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] hover:opacity-75 transition-opacity disabled:opacity-50"
-									title={user?.id ? "點擊儲存文章" : "請先登入"}
+									title={hasToken ? "點擊儲存文章" : "請先登入"}
 								>
 									{isSaved ? (
 										<FontAwesomeIcon icon={faBookmark} />
@@ -326,11 +332,11 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 												<div className="flex gap-4">
 													<div className="shrink-0">
 														<Image
-															src="/article/braised-pork.jpg"
+															src="/article/chicken_happy.png"
 															alt="profile"
 															className="rounded-full object-cover border border-black"
-															width={32}
-															height={32}
+															width={60}
+															height={60}
 														/>
 													</div>
 													<div className="flex-1">
@@ -359,15 +365,15 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 										value={inputText}
 										onChange={(e) => setInputText(e.target.value)}
 										placeholder={
-											user?.id ? "想說什麼嗎？" : "請先登入以發表留言"
+											hasToken ? "想說什麼嗎？" : "請先登入以發表留言"
 										}
-										disabled={!user?.id}
+										disabled={!hasToken}
 										className="w-full p-3 border-black border-2 mt-2 bg-white focus:outline-none text-sm resize-none disabled:bg-gray-100 disabled:cursor-not-allowed"
 									></textarea>
 									<div className="flex justify-end mt-2">
 										<button
 											onClick={handleSaveComment}
-											disabled={!user?.id || submitting || !inputText.trim()}
+											disabled={!hasToken || submitting || !inputText.trim()}
 											className="bg-black text-white px-6 py-1.5 text-sm font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
 										>
 											{submitting ? "傳送中..." : "送出留言"}

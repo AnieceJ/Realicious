@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ClientSideCustomEditor from "@/components/client-side-custom-editor";
+import Cookies from "js-cookie";
 
 interface SubCategory {
 	id: number;
@@ -108,19 +109,22 @@ export default function ArticleEditPage() {
 				: "/api/article/articles";
 
 			const method = isEditMode ? "PUT" : "POST";
-
+			const token = Cookies.get("token");
 			const payload = {
 				title: title.trim(),
 				content,
-				userId: 1,
+				// userId: 1,
 				subCategoryId: Number(subCategoryId),
-				// sub_category_id: Number(subCategoryId),
 				status: 1,
 			};
 
 			const response = await fetch(url, {
 				method: method,
-				headers: { "Content-Type": "application/json" },
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+
 				body: JSON.stringify(payload),
 			});
 

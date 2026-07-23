@@ -1,38 +1,108 @@
+"use client";
+
+import * as React from "react";
+import Image from "next/image";
+import Link from "next/link";
+
+const Default_Img = [
+	"/article/Ramen.png",
+	"/article/FriedChicken.png",
+	"/article/KoreanChicken.png",
+];
+
+interface PopularArticle {
+	id: string;
+	title: string;
+	content: string;
+	updated_at: string;
+	_count: {
+		saved_article: number;
+	};
+}
+
+interface PopularArticlesResponse {
+	popular_article: PopularArticle[];
+}
+
 export default function ArticleSection() {
+	const [popular_articles, setPopularArticles] = React.useState<
+		PopularArticle[]
+	>([]);
+	const [loading, setLoading] = React.useState(true);
+
+	React.useEffect(() => {
+		const fetchArticles = async () => {
+			try {
+				setLoading(true);
+				const response = await fetch("/api/article/popular-articles");
+				if (!response.ok) throw new Error("Fetch failed");
+				const data: PopularArticlesResponse = await response.json();
+				setPopularArticles(data.popular_article ?? []);
+			} catch (error) {
+				if ((error as Error).name !== "AbortError") {
+					console.error("Error fetching popular articles:", error);
+				}
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchArticles();
+	}, []);
+
 	return (
-		<section className="">
+		<section>
 			<div className="max-w-7xl mx-auto">
 				<div className="mb-12">
 					<p className="text-[#BB0015] font-bold">POPULAR</p>
-
 					<h2 className="text-4xl font-bold mt-2">熱門文章</h2>
 				</div>
 
 				<div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-					{[1, 2, 3].map((item) => (
-						<article
-							key={item}
-							className="shadow hover:shadow-xl transition overflow-hidden bg-white hover:-translate-y-2"
-						>
-							<div className="aspect-video bg-gray-200" />
+					{loading ? (
+						<p className="text-slate-500">文章載入中...</p>
+					) : popular_articles.length === 0 ? (
+						<p className="text-slate-500">目前沒有文章。</p>
+					) : (
+						popular_articles.map((popular_article, index) => {
+							const imageSrc = Default_Img[index % Default_Img.length];
 
-							<div className="p-6">
-								<h3 className="font-bold text-xl line-clamp-2">
-									台北最好吃的漢堡推薦
-								</h3>
-
-								<p className="mt-3 text-slate-500 line-clamp-2">
-									分享近期吃過最值得推薦的美式漢堡店， 從價格到份量一次整理...
-								</p>
-
-								<div className="mt-5 flex justify-between text-sm text-slate-400">
-									<span>福利熊</span>
-
-									<span>2026/07/14</span>
-								</div>
-							</div>
-						</article>
-					))}
+							return (
+								<Link
+									key={popular_article.id}
+									href={`/article/${popular_article.id}`}
+									className="block shadow hover:shadow-xl transition overflow-hidden bg-white hover:-translate-y-2"
+								>
+									<article className="flex flex-col h-full w-full">
+										<div className="relative w-full aspect-video bg-gray-200 shrink-0 overflow-hidden">
+											<Image
+												src={imageSrc}
+												alt={popular_article.title}
+												fill
+												loading="eager"
+												sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+												className="w-full h-full object-cover"
+											/>
+										</div>
+										<div className="p-6 flex flex-col flex-1">
+											<h3 className="font-bold text-xl line-clamp-2 h-14 leading-snug">
+												{popular_article.title}
+											</h3>
+											<p className="mt-3 text-slate-500 line-clamp-2 h-10 text-sm leading-relaxed">
+												{popular_article.content}
+											</p>
+											<div className="mt-auto pt-5 flex justify-between text-sm text-slate-400 border-t border-slate-100">
+												<span>
+													收藏 {popular_article._count.saved_article} 次
+												</span>
+												<span>{popular_article.updated_at}</span>
+											</div>
+										</div>
+									</article>
+								</Link>
+							);
+						})
+					)}
 				</div>
 			</div>
 		</section>

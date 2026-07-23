@@ -147,7 +147,11 @@
 	border: 0;
 	border-bottom: 1px solid var(--ck-color-base-border);
 	border-radius: 0;
-	overflow-x: auto;
+	/* CKEditor 的下拉面板位於工具列內；不可用 overflow 裁切它。 */
+	overflow: visible;
+	flex-wrap: wrap;
+	position: relative;
+	z-index: 1;
 }
 
 .article-editor .ck-editor__editable {
@@ -174,6 +178,13 @@
 .article-editor .ck-content ol {
 	list-style-type: decimal !important;
 	padding-left: 2.5em !important;
+}
+
+/* CKEditor 預設浮層為 z-index: 1000，會蓋過網站的固定 header。 */
+:root {
+	--ck-z-default: 1 !important;
+	--ck-z-panel: 20 !important;
+	--ck-z-dialog: 25 !important;
 }
 
 .article-content {
@@ -346,8 +357,8 @@
 
 .article-editor {
 	position: relative;
-	z-index: 1000;
 }
-.ck-dropdown__panel {
-	z-index: 99999 !important;
+.article-editor .ck-dropdown__panel {
+	/* 高於可編輯區與工具列，但低於 header（z-30）與 sidebar（z-50）。 */
+	z-index: 21 !important;
 }
