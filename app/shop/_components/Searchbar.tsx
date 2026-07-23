@@ -1,11 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type SearchbarProps = {
+  value: string;
   onSearch: (keyword: string) => void;
 };
 
-export default function Searchbar({ onSearch }: SearchbarProps) {
-  const [input, setInput] = useState("");
+export default function Searchbar({ value, onSearch }: SearchbarProps) {
+  const [input, setInput] = useState(value || "");
+
+  useEffect(() => {
+    setInput(value);
+  }, [value]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.nativeEvent.isComposing) onSearch(input.trim());
