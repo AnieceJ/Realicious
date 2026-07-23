@@ -343,3 +343,11 @@
 		height: var(--plate-size);
 	}
 }
+
+.article-editor {
+	position: relative;
+	z-index: 1000;
+}
+.ck-dropdown__panel {
+	z-index: 99999 !important;
+}

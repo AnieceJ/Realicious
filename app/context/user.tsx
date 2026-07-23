@@ -20,7 +20,7 @@ interface UserContextType {
     password: string,
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
-  setUser: React.Dispatch<React.SetStateAction<User>>
+  setUser: React.Dispatch<React.SetStateAction<User>>;
 }
 
 const FAKE_USER_INIT: User = {
@@ -34,7 +34,8 @@ const FAKE_USER_INIT: User = {
 const UserContext = createContext<UserContextType | null>(null);
 UserContext.displayName = "UserContext";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -45,6 +46,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const handleLocalLogout = () => {
     Cookies.remove("token");
     Cookies.remove("user");
+    localStorage.removeItem("realicious-cart"); // 跟商城相關
     setUser(null);
   };
 
@@ -59,7 +61,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         if (tokenFromUrl) {
           // 有的話，立刻寫入 Cookie
           Cookies.set("token", tokenFromUrl, { expires: 1 });
-          
+
           // 清除網址列上的 ?token=xxx，保持網址美觀
           const newUrl = window.location.pathname;
           window.history.replaceState({}, document.title, newUrl);
@@ -105,7 +107,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, []);
 
-  // 🟢 登入 (保持你原本的優良邏輯，微調 Authorization 的部分)
+  // 🟢 登入
   const login = async (account: string, password: string) => {
     try {
       const res = await fetch(`${API_URL}/login`, {
@@ -125,7 +127,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         setUser(data.user);
 
-        router.refresh();
+        // router.refresh();
         return { success: true, message: "登入成功" };
       } else {
         return { success: false, message: data.message || "登入失敗" };
@@ -138,20 +140,16 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   // 🔴 登出
   const logout = () => {
-    const result = confirm("確定要登出嗎？");
-    if (result) {
-      handleLocalLogout();
-
-      fetch(`${API_URL}/logout`, { method: "POST" }).catch(console.error);
-
-      router.push("/user/login");
-      router.refresh();
-    }
+    handleLocalLogout();
+    fetch(`${API_URL}/logout`, { method: "POST" }).catch(console.error); // 目前沒功能
+    window.location.href = '/user/login';
+    // router.push("/user/login");
+    // router.refresh();
   };
 
   return (
     // 🆕 把 loading 一併傳下去，讓切換路由或頂層組件可以判斷是否正在驗證中
-    <UserContext.Provider value={{ user, loading, login, logout ,setUser }}>
+    <UserContext.Provider value={{ user, loading, login, logout, setUser }}>
       {children}
     </UserContext.Provider>
   );

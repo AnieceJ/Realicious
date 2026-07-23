@@ -1,10 +1,9 @@
 "use client";
 import * as React from "react";
-import { ChevronLeft, Eye } from "lucide-react";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { Eye, House } from "lucide-react";
+import Pagination from "@/components/articlePagination";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import SearchBar from "./_components/search_bar";
 import Link from "next/link";
 import {
 	Menubar,
@@ -75,16 +74,38 @@ export default function ArticlePage() {
 	const [savedCounts, setSavedCounts] = React.useState<{
 		[key: string]: number;
 	}>({});
+	const [currentPage, setCurrentPage] = React.useState(1);
+	const itemsPerPage = 10;
+	const updatePageInUrl = (page: number) => {
+		const params = new URLSearchParams(window.location.search);
+		params.set("page", String(page));
+		window.history.replaceState(null, "", `/article?${params.toString()}`);
+	};
 
-	const fetchArticles = async (subCatId?: number) => {
-		let url = "/api/article/articles";
+	const fetchArticles = async (subCatId?: number, keyword?: string) => {
+		const params = new URLSearchParams();
+
+		//let url = "/api/article/articles";
 		if (subCatId !== undefined) {
-			url += `?sub_cat_id=${subCatId}`;
+			params.append("sub_cat_id", String(subCatId));
 		}
-		const artResponse = await fetch(url);
+		if (keyword?.trim()) {
+			params.append("keyword", keyword);
+		}
+		const query = params.toString();
+		const artResponse = await fetch(
+			query ? `/api/article/articles?${query}` : "/api/article/articles",
+		);
 		const artData: ArticlesResponse = await artResponse.json();
 		setArticles(artData.article);
+		return artData.article;
 	};
+	const totalPages = Math.ceil(articles.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const paginatedArticles = articles.slice(
+		startIndex,
+		startIndex + itemsPerPage,
+	);
 
 	React.useEffect(() => {
 		const initAllData = async () => {
@@ -95,7 +116,17 @@ export default function ArticlePage() {
 				const catData: CategoriesResponse = await catResponse.json();
 				setCategories(catData.category);
 
-				await fetchArticles();
+				const initialArticles = await fetchArticles();
+				const page = Number(
+					new URLSearchParams(window.location.search).get("page"),
+				);
+				if (Number.isInteger(page) && page > 0) {
+					const maxPage = Math.max(
+						1,
+						Math.ceil(initialArticles.length / itemsPerPage),
+					);
+					setCurrentPage(Math.min(page, maxPage));
+				}
 			} catch (error) {
 				console.error("Error fetching categories:", error);
 			} finally {
@@ -118,185 +149,179 @@ export default function ArticlePage() {
 
 	return (
 		<>
-			<div className="max-w-7xl mx-auto w-full pt-4">
-				<div className="flex items-center w-full justify-between lg:flex-row md:flex-row md:items-center gap-4 p-3 bg-white border border-black">
-					<div className="flex gap-4 items-center">
-						<Link href="/">
-							<ChevronLeft
-								size={30}
-								className="bg-slate-100 h-10 border border-black"
-							/>
-						</Link>
-						<Menubar className="h-10 bg-black text-slate-100 border border-slate-100 justify-start shrink-0">
-							<MenubarMenu>
-								<MenubarTrigger
-									onClick={() => {
-										setSelectedSubCategory("");
-										fetchArticles();
-									}}
-								>
-									全部
-								</MenubarTrigger>
-							</MenubarMenu>
-							{loading ? (
-								<div className="px-3 text-sm text-gray-400 self-center">
-									載入中...
-								</div>
-							) : (
-								categories.map((cat) => (
-									<MenubarMenu key={cat.category_name}>
-										<MenubarTrigger>{cat.category_name}</MenubarTrigger>
-										<MenubarContent>
-											<MenubarRadioGroup
-												value={selectedSubCategory}
-												onValueChange={(value) => {
-													setSelectedSubCategory(value);
-													fetchArticles(Number(value));
+			<div className="min-h-screen">
+				<div className="max-w-7xl mx-auto w-full py-4">
+					<div className="relative border-2 border-black">
+						<div
+							className="absolute inset-0 opacity-[0.5] pointer-events-none"
+							style={{
+								backgroundImage: "url('/article/noise.png')",
+								backgroundRepeat: "repeat",
+								backgroundSize: "90px",
+							}}
+						/>
+						<div className="relative z-10">
+							<div className="flex items-center w-full justify-between lg:flex-row md:flex-row md:items-center gap-4 p-3 bg-black">
+								<div className="flex items-center">
+									<Link
+										href="/"
+										className="flex h-10 w-10 items-center justify-center bg-black text-white hover:bg-gray-800"
+									>
+										<House size={22} />
+									</Link>
+									<Menubar className="h-10 bg-black text-slate-100 border-0 justify-start shrink-0">
+										<MenubarMenu>
+											<MenubarTrigger
+												onClick={() => {
+													setSelectedSubCategory("");
+													setCurrentPage(1);
+													updatePageInUrl(1);
+													fetchArticles();
 												}}
 											>
-												{cat.sub_category.map((sub) => (
-													<MenubarRadioItem key={sub.id} value={String(sub.id)}>
-														{sub.sub_category_name}
-													</MenubarRadioItem>
-												))}
-											</MenubarRadioGroup>
-										</MenubarContent>
-									</MenubarMenu>
-								))
-							)}
-						</Menubar>
-					</div>
-					<Field orientation="horizontal" className="max-w-sm gap-0">
-						<Input
-							type="search"
-							placeholder="Search..."
-							className="border-b-gray-500 bg-gray-200"
-						/>
-						<Button className="border-0">Search</Button>
-					</Field>
-				</div>
-
-				{/* breadcrumb */}
-				<div className="flex p-4">
-					<Breadcrumb>
-						<BreadcrumbList>
-							<BreadcrumbItem>
-								<BreadcrumbLink render={<Link href="/">Home</Link>} />
-							</BreadcrumbItem>
-							<BreadcrumbSeparator />
-							<BreadcrumbItem>
-								<BreadcrumbPage>Article</BreadcrumbPage>
-							</BreadcrumbItem>
-						</BreadcrumbList>
-					</Breadcrumb>
-				</div>
-				{/* breadcrumb */}
-
-				{/* 文章列表 */}
-				<div className="bg-white p-6 border border-black">
-					<div className="flex flex-col">
-						{articles.length === 0 ? (
-							<p className="text-black text-center py-6">目前沒有任何文章。</p>
-						) : (
-							articles.map((art, idx) => (
-								<div
-									key={idx}
-									className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3 first:-mt-3"
-								>
-									<div className="flex justify-between items-start">
-										<h3 className="font-bold text-lg text-slate-900">
-											{art.title}
-										</h3>
-										<p className="whitespace-nowrap pt-1 text-xs text-gray-700">
-											{art.date}
-										</p>
-									</div>
-									{/* 內文 */}
-									<div>
-										<p className=" text-m wrap-break-word line-clamp-4">
-											{stripHtml(art.content)}
-										</p>
-									</div>
-									<div className="flex justify-between items-center mt-1.5">
-										<div className="flex items-center">
-											<Eye size={16} />
-											<div className="ml-1 text-sm">
-												收藏次數({savedCounts[art.id] || 0})
+												全部
+											</MenubarTrigger>
+										</MenubarMenu>
+										<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
+										{loading ? (
+											<div className="px-3 text-sm text-gray-400 self-center">
+												載入中...
 											</div>
-										</div>
-										<Link href={`/article/${art.id}`}>
-											<Button
-												variant="outline"
-												size="sm"
-												className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs"
-											>
-												閱讀全文
-											</Button>
-										</Link>
-									</div>
+										) : (
+											categories.map((cat, index) => (
+												<React.Fragment key={cat.category_name}>
+													<MenubarMenu key={cat.category_name}>
+														<MenubarTrigger>{cat.category_name}</MenubarTrigger>
+														<MenubarContent>
+															<MenubarRadioGroup
+																value={selectedSubCategory}
+																onValueChange={(value) => {
+																	setSelectedSubCategory(value);
+																	setCurrentPage(1);
+																	updatePageInUrl(1);
+																	fetchArticles(Number(value));
+																}}
+															>
+																{cat.sub_category.map((sub) => (
+																	<MenubarRadioItem
+																		key={sub.id}
+																		value={String(sub.id)}
+																	>
+																		{sub.sub_category_name}
+																	</MenubarRadioItem>
+																))}
+															</MenubarRadioGroup>
+														</MenubarContent>
+													</MenubarMenu>
+													{index < categories.length - 1 && (
+														<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
+													)}
+												</React.Fragment>
+											))
+										)}
+									</Menubar>
 								</div>
-							))
-						)}
+								<div className="flex items-center w-full lg:w-auto max-w-md gap-2 border-white border">
+									<SearchBar
+										onSearch={(keyword) => {
+											fetchArticles(
+												selectedSubCategory
+													? Number(selectedSubCategory)
+													: undefined,
+												keyword,
+											);
+											setCurrentPage(1);
+											updatePageInUrl(1);
+										}}
+									/>
+								</div>
+							</div>
+
+							{/* breadcrumb */}
+							<div className="p-4">
+								<div className="flex justify-between items-center">
+									<Breadcrumb>
+										<BreadcrumbList>
+											<BreadcrumbItem>
+												<BreadcrumbLink render={<Link href="/">Home</Link>} />
+											</BreadcrumbItem>
+											<BreadcrumbSeparator />
+											<BreadcrumbItem>
+												<BreadcrumbPage>Article</BreadcrumbPage>
+											</BreadcrumbItem>
+										</BreadcrumbList>
+									</Breadcrumb>
+									<Pagination
+										currentPage={currentPage}
+										totalPages={totalPages}
+										setCurrentPage={setCurrentPage}
+										onPageChange={updatePageInUrl}
+									/>
+								</div>
+								{/* breadcrumb */}
+								<div className="mt-4 border-b border-black" />
+							</div>
+
+							{/* 文章列表 */}
+							<div className="p-6">
+								<div className="flex flex-col">
+									{paginatedArticles.length === 0 ? (
+										<p className="text-black text-center py-6">
+											目前沒有任何文章。
+										</p>
+									) : (
+										paginatedArticles.map((art, idx) => (
+											<div
+												key={idx}
+												className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3 first:-mt-3"
+											>
+												<div className="flex justify-between items-start">
+													<h3 className="font-bold text-lg text-slate-900">
+														{art.title}
+													</h3>
+													<p className="whitespace-nowrap pt-1 text-xs text-gray-700">
+														{art.date}
+													</p>
+												</div>
+												{/* 內文 */}
+												<div>
+													<p className="article-content overflow-hidden wrap-break-word text-base line-clamp-3 text-gray-600">
+														{stripHtml(art.content)}
+													</p>
+												</div>
+												<div className="flex justify-between items-center mt-1.5">
+													<div className="flex items-center">
+														<Eye size={16} />
+														<div className="ml-1 text-sm">
+															收藏次數({savedCounts[art.id] || 0})
+														</div>
+													</div>
+													<Link href={`/article/${art.id}`}>
+														<Button
+															variant="outline"
+															size="sm"
+															className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs"
+														>
+															閱讀全文
+														</Button>
+													</Link>
+												</div>
+											</div>
+										))
+									)}
+								</div>
+							</div>
+							<div className="m-4 flex justify-end">
+								<Pagination
+									currentPage={currentPage}
+									totalPages={totalPages}
+									setCurrentPage={setCurrentPage}
+									onPageChange={updatePageInUrl}
+								/>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div className="m-4 flex justify-center">
-				<nav aria-label="Pagination" className="inline-flex shadow-xs">
-					<a
-						href="#"
-						className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
-					>
-						<span className="sr-only">Previous</span>
-						<ChevronLeftIcon aria-hidden="true" className="size-5" />
-					</a>
-					<a
-						href="#"
-						aria-current="page"
-						className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-					>
-						1
-					</a>
-					<a
-						href="#"
-						className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-					>
-						2
-					</a>
-					<a
-						href="#"
-						className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-					>
-						3
-					</a>
-					<span className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 border border-gray-300 focus:outline-offset-0">
-						...
-					</span>
-					<a
-						href="#"
-						className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
-					>
-						8
-					</a>
-					<a
-						href="#"
-						className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-					>
-						9
-					</a>
-					<a
-						href="#"
-						className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 border border-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-					>
-						10
-					</a>
-					<a
-						href="#"
-						className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 focus:z-20 focus:outline-offset-0"
-					>
-						<span className="sr-only">Next</span>
-						<ChevronRightIcon aria-hidden="true" className="size-5" />
-					</a>
-				</nav>
 			</div>
 		</>
 	);
