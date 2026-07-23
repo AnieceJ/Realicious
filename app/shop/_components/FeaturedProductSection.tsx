@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
 import { addToCart } from "@/lib/shop/cart";
+import { getFavorites, addFavorite, removeFavorite } from "@/lib/shop/favorites";
+import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
 interface FeaturedProductSectionProps {
@@ -9,8 +11,10 @@ interface FeaturedProductSectionProps {
 }
 
 export default function FeaturedProductSection({ products }: FeaturedProductSectionProps) {
+  const { user } = useUser();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [favorited, setFavorited] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
 
   const featuredList = products.slice(0, 3);
@@ -23,11 +27,31 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
     return () => clearInterval(timerRef.current);
   }, [paused, featuredList.length]);
 
+  useEffect(() => {
+    setFavorited(false);
+    if (!user?.id || !featuredList[currentIndex]) return;
+    getFavorites(Number(user.id)).then((res) => {
+      if (res.success) setFavorited(res.data.some((f: { product_id: number }) => f.product_id === featuredList[currentIndex].id));
+    });
+  }, [user?.id, currentIndex]);
+
   if (featuredList.length === 0) {
     return <div className="h-72 w-full bg-[#FFF9E6] border-[3px] border-[#3D2419] animate-pulse" />;
   }
 
   const currentProduct = featuredList[currentIndex];
+
+  const toggleFavorite = async () => {
+    if (!user?.id) return;
+    const userId = Number(user.id);
+    if (favorited) {
+      await removeFavorite(userId, currentProduct.id);
+      setFavorited(false);
+    } else {
+      await addFavorite(userId, currentProduct.id);
+      setFavorited(true);
+    }
+  };
 
   const handlePrev = () => {
     setCurrentIndex((prev) => (prev === 0 ? featuredList.length - 1 : prev - 1));
@@ -98,15 +122,27 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
           <p className="text-sm font-medium text-amber-950 mb-4 line-clamp-2">
             限時特惠主打商品！【{currentProduct.name}】現正熱賣中。
           </p>
-          <div className="flex items-center gap-3 mt-auto">
-            <span className="text-xl font-black text-amber-700 bg-amber-100/80 px-3 py-1 border-2 border-[#3D2419]">
+          <div className="flex items-center gap-2 mt-auto">
+            <span className="inline-flex items-center h-9 px-3 text-base font-black text-amber-700 bg-amber-100/80 border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]">
               ${currentProduct.price}
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
-              className="px-4 py-2 bg-purple-400 hover:bg-purple-500 active:translate-x-[1px] active:translate-y-[1px] text-[#3D2419] font-bold border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center h-9 px-4 bg-purple-400 hover:bg-purple-500 active:translate-x-[1px] active:translate-y-[1px] text-[#3D2419] font-bold text-sm border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer whitespace-nowrap"
             >
               加入購物車
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); toggleFavorite(); }}
+              className="flex items-center justify-center h-9 w-9 bg-white border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
+            >
+              <svg className="w-4 h-4 transition-all" viewBox="0 0 24 24"
+                fill={favorited ? "#ef4444" : "none"}
+                stroke={favorited ? "#ef4444" : "#3D2419"}
+                strokeWidth="2"
+              >
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
             </button>
           </div>
         </div>
