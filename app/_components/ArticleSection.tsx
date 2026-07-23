@@ -3,6 +3,8 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 
 const Default_Img = [
 	"/article/Ramen.png",
@@ -93,6 +95,7 @@ export default function ArticleSection() {
 											</p>
 											<div className="mt-auto pt-5 flex justify-between text-sm text-slate-400 border-t border-slate-100">
 												<span>
+													<FontAwesomeIcon icon={faBookmark} />
 													收藏 {popular_article._count.saved_article} 次
 												</span>
 												<span>{popular_article.updated_at}</span>

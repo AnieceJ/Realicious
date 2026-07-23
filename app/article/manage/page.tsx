@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Eye, SquarePen, House } from "lucide-react";
+import { SquarePen, House } from "lucide-react";
 import Pagination from "@/components/articlePagination";
 import { Button } from "@/components/ui/button";
 import SearchBar from "../_components/search_bar";
@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsis, faBookmark } from "@fortawesome/free-solid-svg-icons";
 import Cookies from "js-cookie";
 
 interface SubCategory {
@@ -360,10 +360,10 @@ export default function ArticleManagePage() {
 													dangerouslySetInnerHTML={{ __html: art.content }}
 												/>
 												<div className="flex justify-between items-end mt-1.5">
-													<div className="flex items-center text-gray-500">
-														<Eye size={16} />
+													<div className="flex items-center text-sm text-gray-500">
+														<FontAwesomeIcon icon={faBookmark} />
 														<div className="ml-1 text-sm">
-															收藏次數({savedCounts[art.id] || 0})
+															被收藏 {savedCounts[art.id] || 0} 次
 														</div>
 													</div>
 													<Link href={`/article/${art.id}`}>

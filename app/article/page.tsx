@@ -1,6 +1,8 @@
 "use client";
 import * as React from "react";
-import { Eye, House } from "lucide-react";
+import { House } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 import Pagination from "@/components/articlePagination";
 import { Button } from "@/components/ui/button";
 import SearchBar from "./_components/search_bar";
@@ -290,10 +292,10 @@ export default function ArticlePage() {
 													</p>
 												</div>
 												<div className="flex justify-between items-center mt-1.5">
-													<div className="flex items-center">
-														<Eye size={16} />
+													<div className="flex items-center text-sm text-gray-500">
+														<FontAwesomeIcon icon={faBookmark} />
 														<div className="ml-1 text-sm">
-															收藏次數({savedCounts[art.id] || 0})
+															被收藏 {savedCounts[art.id] || 0} 次
 														</div>
 													</div>
 													<Link href={`/article/${art.id}`}>
