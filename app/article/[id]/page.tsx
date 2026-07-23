@@ -2,7 +2,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Share2 } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
@@ -12,6 +12,7 @@ import {
 	BreadcrumbItem,
 	BreadcrumbLink,
 	BreadcrumbList,
+	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { useToast } from "../_components/article_toast";
@@ -37,9 +38,62 @@ interface Comment {
 	created_at: string;
 }
 
+const MY_ARTICLE_PATHS = ["/article/manage", "/user/account/article"] as const;
+const SAVED_ARTICLE_PATHS = ["/user/account/saved-articles"] as const;
+
+function getSafeReturnHref(
+	returnTo: string | null,
+	allowedPaths: readonly string[],
+	fallbackPath: string,
+): string {
+	if (
+		returnTo &&
+		allowedPaths.some(
+			(path) => returnTo === path || returnTo.startsWith(`${path}?`),
+		)
+	) {
+		return returnTo;
+	}
+
+	return fallbackPath;
+}
+
+function getArticleBreadcrumb(
+	articleSource: string | null,
+	returnTo: string | null,
+): { label: string; href: string } {
+	if (articleSource === "my-article") {
+		return {
+			label: "My Article",
+			href: getSafeReturnHref(
+				returnTo,
+				MY_ARTICLE_PATHS,
+				"/user/account/article",
+			),
+		};
+	}
+
+	if (articleSource === "saved-articles") {
+		return {
+			label: "Saved Articles",
+			href: getSafeReturnHref(
+				returnTo,
+				SAVED_ARTICLE_PATHS,
+				"/user/account/saved-articles",
+			),
+		};
+	}
+
+	return { label: "Article", href: "/article" };
+}
+
 export default function ArticlePages({ params }: ArticleDetailPageProps) {
 	const { id } = React.use(params);
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const articleSource = searchParams.get("from");
+	const returnTo = searchParams.get("returnTo");
+	const articleBreadcrumb = getArticleBreadcrumb(articleSource, returnTo);
 	const [page, setPage] = React.useState<ArticlePage | null>(null);
 	const [loading, setLoading] = React.useState(true);
 	const [isSaved, setIsSaved] = React.useState(false);
@@ -114,7 +168,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		const shareData = {
 			title: page.title,
 			text: `要不要一起吃：${page.title}`,
-			url: window.location.href,
+			url: `${window.location.origin}/article/${id}`,
 		};
 
 		try {
@@ -144,7 +198,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 	const handleSaveArticle = async () => {
 		const token = Cookies.get("token");
 		if (!token) {
-			alert("請先登入才能儲存文章");
+			showToast("請先登入才能儲存文章");
 			return;
 		}
 
@@ -167,13 +221,13 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 
 			if (response.ok) {
 				setIsSaved(data.isSaved);
-				alert(data.message);
+				showToast(data.message || "操作成功");
 			} else {
-				alert(`操作失敗：${data.message || "未知錯誤"}`);
+				showToast(`操作失敗：${data.message || "未知錯誤"}`);
 			}
 		} catch (error) {
 			console.error("Error saving article:", error);
-			alert("伺服器連線失敗");
+			showToast("伺服器連線失敗");
 		} finally {
 			setSavingArticle(false);
 		}
@@ -184,7 +238,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		if (!inputText.trim()) return;
 		const token = Cookies.get("token");
 		if (!token) {
-			alert("登入才能留言哦！");
+			showToast("登入才能留言哦！");
 			return;
 		}
 		setSubmitting(true);
@@ -205,11 +259,11 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 				setComments((prev) => [...prev, data.comment]);
 				setInputText("");
 			} else {
-				alert(`操作失敗：${data.error || "未知錯誤"}`);
+				showToast(`操作失敗：${data.error || "未知錯誤"}`);
 			}
 		} catch (error) {
 			console.error("Error submitting comment:", error);
-			alert("伺服器連線失敗");
+			showToast("伺服器連線失敗");
 		} finally {
 			setSubmitting(false);
 		}
@@ -248,7 +302,17 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 							</BreadcrumbItem>
 							<BreadcrumbSeparator />
 							<BreadcrumbItem>
-								<BreadcrumbLink render={<Link href="/article">Article</Link>} />
+								<BreadcrumbLink
+									render={
+										<Link href={articleBreadcrumb.href}>
+											{articleBreadcrumb.label}
+										</Link>
+									}
+								/>
+							</BreadcrumbItem>
+							<BreadcrumbSeparator />
+							<BreadcrumbItem>
+								<BreadcrumbPage>{page.category}</BreadcrumbPage>
 							</BreadcrumbItem>
 						</BreadcrumbList>
 					</Breadcrumb>

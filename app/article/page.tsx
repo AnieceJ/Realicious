@@ -4,7 +4,9 @@ import { House } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 import Pagination from "@/components/articlePagination";
+import ArticleThumbnail from "@/components/article-thumbnail";
 import { Button } from "@/components/ui/button";
+import { getArticleSummary } from "@/lib/article-preview";
 import SearchBar from "./_components/search_bar";
 import Link from "next/link";
 import {
@@ -50,23 +52,6 @@ interface ArticlesResponse {
 	article: Article[];
 }
 
-const stripHtml = (html: string) => {
-	if (typeof document === "undefined") {
-		// server-side fallback: remove tags and decode basic entities
-		return html
-			.replace(/<[^>]+>/g, "")
-			.replace(/&nbsp;/g, " ")
-			.replace(/&amp;/g, "&")
-			.replace(/&lt;/g, "<")
-			.replace(/&gt;/g, ">")
-			.replace(/&quot;/g, '"')
-			.replace(/&#39;/g, "'");
-	}
-	const div = document.createElement("div");
-	div.innerHTML = html;
-	return div.textContent || div.innerText || "";
-};
-
 export default function ArticlePage() {
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [articles, setArticles] = React.useState<Article[]>([]);
@@ -98,9 +83,13 @@ export default function ArticlePage() {
 		const artResponse = await fetch(
 			query ? `/api/article/articles?${query}` : "/api/article/articles",
 		);
+		if (!artResponse.ok) {
+			throw new Error(`Fetch articles failed: ${artResponse.status}`);
+		}
 		const artData: ArticlesResponse = await artResponse.json();
-		setArticles(artData.article);
-		return artData.article;
+		const nextArticles = Array.isArray(artData.article) ? artData.article : [];
+		setArticles(nextArticles);
+		return nextArticles;
 	};
 	const totalPages = Math.ceil(articles.length / itemsPerPage);
 	const startIndex = (currentPage - 1) * itemsPerPage;
@@ -265,48 +254,57 @@ export default function ArticlePage() {
 							</div>
 
 							{/* 文章列表 */}
-							<div className="p-6">
+							<div className="p-4 md:p-6">
 								<div className="flex flex-col">
 									{paginatedArticles.length === 0 ? (
 										<p className="text-black text-center py-6">
 											目前沒有任何文章。
 										</p>
 									) : (
-										paginatedArticles.map((art, idx) => (
+										paginatedArticles.map((art) => (
 											<div
-												key={idx}
-												className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3 first:-mt-3"
+												key={art.id}
+												className="flex gap-3 border-b border-black py-4 first:-mt-3 sm:gap-4"
 											>
-												<div className="flex justify-between items-start">
-													<h3 className="font-bold text-lg text-slate-900">
-														{art.title}
-													</h3>
-													<p className="whitespace-nowrap pt-1 text-xs text-gray-700">
-														{art.date}
-													</p>
+												<div className="relative min-h-36 w-32 shrink-0 self-stretch sm:w-40 md:w-44">
+													<ArticleThumbnail
+														content={art.content}
+														title={art.title}
+														width={176}
+														height={132}
+														className="absolute inset-0 h-full w-full border border-black bg-white object-cover"
+													/>
 												</div>
-												{/* 內文 */}
-												<div>
-													<p className="article-content overflow-hidden wrap-break-word text-base line-clamp-3 text-gray-600">
-														{stripHtml(art.content)}
-													</p>
-												</div>
-												<div className="flex justify-between items-center mt-1.5">
-													<div className="flex items-center text-sm text-gray-500">
-														<FontAwesomeIcon icon={faBookmark} />
-														<div className="ml-1 text-sm">
-															被收藏 {savedCounts[art.id] || 0} 次
-														</div>
+												<div className="flex min-w-0 flex-1 flex-col gap-2">
+													<div className="flex min-w-0 items-start justify-between gap-3">
+														<h3 className="min-w-0 flex-1 font-bold text-lg leading-6 text-slate-900">
+															{art.title}
+														</h3>
+														<p className="shrink-0 whitespace-nowrap pt-1 text-xs text-gray-700">
+															{art.date}
+														</p>
 													</div>
-													<Link href={`/article/${art.id}`}>
-														<Button
-															variant="outline"
-															size="sm"
-															className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs"
-														>
-															閱讀全文
-														</Button>
-													</Link>
+													<p className="line-clamp-3 wrap-break-word overflow-hidden text-base leading-6 text-gray-600">
+														{getArticleSummary(art.content)}
+													</p>
+													<div className="mt-auto flex items-center justify-between gap-3">
+														<div className="flex min-w-0 items-center gap-1 text-xs text-gray-500 sm:text-sm">
+															<FontAwesomeIcon
+																icon={faBookmark}
+																className="shrink-0"
+															/>
+															<span>被收藏 {savedCounts[art.id] || 0} 次</span>
+														</div>
+														<Link href={`/article/${art.id}`} className="shrink-0">
+															<Button
+																variant="outline"
+																size="sm"
+																className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100"
+															>
+																閱讀全文
+															</Button>
+														</Link>
+													</div>
 												</div>
 											</div>
 										))

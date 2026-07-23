@@ -32,6 +32,8 @@ import {
 	ImageToolbar,
 	ImageResize,
 	ImageUpload,
+	ImageInsert,
+	AutoImage,
 	Table,
 	TableToolbar,
 } from "ckeditor5";
@@ -112,7 +114,7 @@ export default function CustomEditor({
 						"code",
 						"codeBlock",
 						"insertTable",
-						"uploadImage",
+						"insertImage",
 						"undo",
 						"redo",
 					],
@@ -148,6 +150,8 @@ export default function CustomEditor({
 					ImageStyle,
 					ImageToolbar,
 					ImageUpload,
+					ImageInsert,
+					AutoImage,
 					ImageResize,
 				],
 			}}
