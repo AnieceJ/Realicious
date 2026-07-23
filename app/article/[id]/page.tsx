@@ -226,21 +226,18 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		<>
 			{toastComponent}
 			<div className="max-w-7xl mx-auto w-full p-3">
-				<div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-3 bg-white border border-black">
-					<div className="flex items-center gap-2">
+				<div className="flex flex-row items-center justify-between gap-4 p-3 bg-black border border-black text-white">
+					<div className="flex items-center gap-2 shrink-0">
 						<button
 							type="button"
 							onClick={() => router.back()}
 							aria-label="返回上一頁"
 						>
-							<ChevronLeft
-								size={30}
-								className="bg-slate-100 h-10 border border-black p-1"
-							/>
+							<ChevronLeft size={30} className="h-10 p-1 hover:bg-gray-400" />
 						</button>
 					</div>
-					<div className="flex items-center gap-2 w-full md:w-auto justify-end">
-						2026 夏季刊//台北美食地圖
+					<div className="flex items-center justify-end min-w-0 text-right">
+						<span className="truncate">2026 夏季刊//台北美食地圖</span>
 					</div>
 				</div>
 				<div className="flex p-4">
@@ -258,8 +255,16 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 				</div>
 
 				<article>
-					<div className=" bg-white p-6 border border-black">
+					<div className="relative bg-white p-6 border border-black">
 						<div className="flex justify-between items-center">
+							<div
+								className="absolute inset-0 opacity-[0.5] pointer-events-none"
+								style={{
+									backgroundImage: "url('/article/noise.png')",
+									backgroundRepeat: "repeat",
+									backgroundSize: "90px",
+								}}
+							/>
 							<h1 className="text-3xl mb-3 font-bold">{page.title}</h1>
 						</div>
 						<div className="justify-start">

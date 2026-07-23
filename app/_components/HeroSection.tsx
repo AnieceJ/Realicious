@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Hero() {
 	return (
-		<section className="relative overflow-hidden bg-page-red pt-15">
+		<section className="relative overflow-hidden bg-black">
 			{/* Hero 容器：满版宽度，flex 布局 */}
 			<div className="relative w-full h-190 flex items-center">
 				{/* 内层容器：限制文字内容在 1280px，左侧对齐 */}
