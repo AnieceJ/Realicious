@@ -1,64 +1,93 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Socket, io } from "socket.io-client";
 
 import Container from "../_components/container";
 import Left from "./_components/left";
 
 interface Message {
-  sender: string;
+  senderId: string;
   content: string;
 }
 
-// 連線後端
-const socket: Socket = io('http://localhost:3001/');
-
 export default function Chatroom() {
-
-const [roomId, setRoomId] = useState('room-101'); // 預設測試房間名
-  const [userName, setUserName] = useState('');
+  const [roomId, setRoomId] = useState("1"); // 預設測試房間名
+  const [userName, setUserName] = useState("");
   const [joined, setJoined] = useState(false);
-
-  const [messageInput, setMessageInput] = useState('');
+  const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
 
+  const socketRef = useRef<Socket | null>(null);
   useEffect(() => {
+    // 1. 初始化 Socket，但設定 autoConnect: false（先不要自動連線！）
+    socketRef.current = io("http://localhost:3001", {
+      autoConnect: false, //
+    });
+    const socket = socketRef.current;
+
     // 監聽後端廣播過來的「receive_message」事件
-    socket.on('receive_message', (newMessage: Message) => {
+    socket.on("receive_message", (newMessage: Message) => {
       // 將新訊息追加到現有的訊息陣列中
       setMessages((prev) => [...prev, newMessage]);
     });
-
+    socket.on('load_history', (historyMessages) => {
+      setMessages(historyMessages);
+    });
     // 清理函數：當元件卸載時，取消監聽，防止記憶體洩漏
     return () => {
-      socket.off('receive_message');
+      socket.off("receive_message");
+      socket.off('load_history');
+      socket.disconnect();
     };
   }, []);
-
-  // 1. 按下「加入房間」
+// 點擊「進入房間」按鈕時才真正發起 Socket 連線
   const handleJoinRoom = () => {
-    if (userName.trim() && roomId.trim()) {
-      socket.emit('join_room', roomId);
-      console.log("前端準備發送 join_room:", roomId); // 👈 加這行確認有沒有執行
-      setJoined(true);
-    }
+    if (!roomId.trim() || !socketRef.current) return;
+
+    // A. 手動建立連線
+    socketRef.current.connect();
+
+    // B. 發送加入房間事件
+    socketRef.current.emit('join_room', roomId);
+    setJoined(true);
   };
 
-  // 2. 按下「發送訊息」
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageInput.trim()) return;
+    if (!messageInput.trim() || !socketRef.current) return;
 
-    const messageData = {
-      roomId,
-      sender: userName,
+    socketRef.current.emit('send_message', {
+      roomId: Number(roomId),
+      senderId: userName, // 測試用的 User ID
       content: messageInput,
-    };
+    });
+
+    setMessageInput('');
+  };
+  // 1. 按下「加入房間」
+  // const handleJoinRoom = () => {
+  //   if (userName.trim() && roomId.trim()) {
+  //     socket.emit("join_room", roomId, userName);
+  //     console.log("前端準備發送 join_room:", roomId, userName); // 👈 加這行確認有沒有執行
+  //     setJoined(true);
+  //   }
+  // };
+
+  // 2. 按下「發送訊息」
+  // const handleSendMessage = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!messageInput.trim()) return;
+
+  //   const messageData = {
+  //     roomId: roomId,
+  //     senderId: userName,
+  //     content: messageInput,
+  //   };
 
     // 透過 Socket 傳送到後端
-    socket.emit('send_message', messageData);
-    setMessageInput(''); // 清空輸入框
-  };
+  //   socket.emit("send_message", messageData);
+  //   setMessageInput(""); // 清空輸入框
+  // };
 
   // return (
   //   <Container className="bg-white flex-col sm:flex-row overflow-hidden">
@@ -89,21 +118,21 @@ const [roomId, setRoomId] = useState('room-101'); // 預設測試房間名
   // );
   if (!joined) {
     return (
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: "20px" }}>
         <h2>Step 1: 輸入名字與房間號碼</h2>
         <input
           type="text"
           placeholder="你的名字"
           value={userName}
           onChange={(e) => setUserName(e.target.value)}
-          style={{ marginRight: '10px' }}
+          style={{ marginRight: "10px" }}
         />
         <input
           type="text"
           placeholder="房間 ID"
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
-          style={{ marginRight: '10px' }}
+          style={{ marginRight: "10px" }}
         />
         <button onClick={handleJoinRoom}>進入房間</button>
       </div>
@@ -111,22 +140,24 @@ const [roomId, setRoomId] = useState('room-101'); // 預設測試房間名
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '500px' }}>
-      <h2>房間：{roomId}（使用者：{userName}）</h2>
-      
+    <div style={{ padding: "20px", maxWidth: "500px" }}>
+      <h2>
+        房間：{roomId}（使用者：{userName}）
+      </h2>
+
       {/* 訊息展示區 */}
       <div
         style={{
-          border: '1px solid #ccc',
-          height: '300px',
-          overflowY: 'scroll',
-          padding: '10px',
-          marginBottom: '10px',
+          border: "1px solid #ccc",
+          height: "300px",
+          overflowY: "scroll",
+          padding: "10px",
+          marginBottom: "10px",
         }}
       >
         {messages.map((msg, index) => (
-          <div key={index} style={{ marginBottom: '8px' }}>
-            <strong>{msg.sender}: </strong>
+          <div key={index} style={{ marginBottom: "8px" }}>
+            <strong>{msg.senderId}: </strong>
             <span>{msg.content}</span>
           </div>
         ))}
@@ -139,13 +170,15 @@ const [roomId, setRoomId] = useState('room-101'); // 預設測試房間名
           placeholder="輸入訊息..."
           value={messageInput}
           onChange={(e) => setMessageInput(e.target.value)}
-          style={{ width: '70%', padding: '5px' }}
+          style={{ width: "70%", padding: "5px" }}
         />
-        <button type="submit" style={{ width: '25%', padding: '5px', marginLeft: '5px' }}>
+        <button
+          type="submit"
+          style={{ width: "25%", padding: "5px", marginLeft: "5px" }}
+        >
           發送
         </button>
       </form>
     </div>
   );
 }
-
