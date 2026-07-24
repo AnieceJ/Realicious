@@ -137,16 +137,16 @@ export default function Register() {
               <label className="text-[20px] mb-2.5" htmlFor="email">
                 電子郵件
               </label>
-              <div className="w-90 flex justify-between">
+              <div className="relative w-90 flex justify-between">
                 <input
                   {...register("account")}
-                  className={` w-72.5 h-12.5 text-[16px] px-2 ${user_input} ${isVerify ? "bg-yellow-100" : ""}`}
+                  className={` w-full h-12.5 text-[16px] px-2 pr-15 ${user_input} ${isVerify ? "bg-yellow-100" : ""}`}
                   type="text"
                   id="email"
                   placeholder="請輸入電子郵件 點擊驗證"
                   disabled={isVerify}
                 />
-                <VerifyButton onClick={handleSendCode} child={`驗證`} />
+                <VerifyButton className="absolute top-0 right-0" onClick={handleSendCode} child={`驗證`} />
               </div>
               <div className="w-auto h-4">
                 {errors.account && (
@@ -183,7 +183,7 @@ export default function Register() {
               <div className="relative w-full">
                 <input
                   {...register("password")}
-                  className={`border w-90 h-12.5 text-[16px] px-2 ${user_input}`}
+                  className={`border w-90 h-12.5 text-[16px] px-2 pr-10 ${user_input}`}
                   type={showPassword ? "text" : "password"}
                   id="password"
                   placeholder="密碼６位元以上 需包含英文與數字"
@@ -208,7 +208,7 @@ export default function Register() {
               <div className="relative w-full">
                 <input
                   {...register("check")}
-                  className={`border w-90 h-12.5 text-[16px] px-2 ${user_input}`}
+                  className={`border w-90 h-12.5 text-[16px] px-2 pr-10 ${user_input}`}
                   type={showPasswordCheck ? "text" : "password"}
                   id="passwordcheck"
                   placeholder="請再次輸入密碼"
@@ -229,7 +229,7 @@ export default function Register() {
             <button
               type="submit"
               disabled={submit}
-              className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
+              className={`-translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
             >
               {submit ? `loading` : `確認送出`}
             </button>

@@ -14,6 +14,7 @@ import Cookies from "js-cookie";
 import PageHeader from "@/app/_components/PageHeader";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 
+
 interface AccountInfo {
   email: string;
   isGoogleLinked: boolean;
@@ -202,7 +203,7 @@ export default function Password() {
                 {accountInfo.email}
               </p>
             </div>
-            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+            <span className="w-25 h-10 flex justify-center items-center text-xs bg-gray-100 border border-gray-600 text-gray-600 px-2 py-1">
               不可修改
             </span>
           </div>
@@ -217,7 +218,7 @@ export default function Password() {
             </div>
             <button
               onClick={() => setIsPasswordModalOpen(true)}
-              className={`${button_revise}`}
+              className={`${button_revise} -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0`}
               // className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
             >
               {accountInfo.hasPassword ? "修改密碼" : "設定密碼"}
@@ -243,12 +244,7 @@ export default function Password() {
             </div>
             <button
               onClick={handleToggleGoogleLink}
-              // className={`px-4 py-2 text-sm rounded-md transition ${
-              //   accountInfo.isGoogleLinked
-              //     ? "border border-red-500 text-red-500 hover:bg-red-50"
-              //     : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-              // }`}
-              className={`${
+              className={`-translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 ${
                 accountInfo.isGoogleLinked ? button_cancel : button_submit
               }`}
             >
@@ -260,7 +256,7 @@ export default function Password() {
         {/* 密碼 Modal 彈窗 */}
         {isPasswordModalOpen && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg">
+            <div className="bg-white p-6 w-full max-w-md shadow-[4px_4px_0_0_rgb(0,0,0,1)] border-2">
               <h3 className="text-lg font-bold mb-4">
                 {accountInfo.hasPassword ? "修改密碼" : "設定初始密碼"}
               </h3>
@@ -299,7 +295,7 @@ export default function Password() {
                         newPassword: e.target.value,
                       })
                     }
-                    className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
@@ -316,20 +312,22 @@ export default function Password() {
                         confirmPassword: e.target.value,
                       })
                     }
-                    className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setIsPasswordModalOpen(false)}
-                    className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                    // className=" px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md" 
+                    className={`${button_cancel}`}
                   >
                     取消
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    // className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    className={`${button_submit}`}
                   >
                     確認儲存
                   </button>
