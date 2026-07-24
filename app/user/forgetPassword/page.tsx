@@ -4,16 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAlert } from "../context/alert";
 
 import Container from "../_components/container";
 import ReturnLogin from "../_components/returnLogin";
 import VerifyButton from "../_components/verifyButton";
-import { user_input} from "@/app/user/_components/button"
+import { user_input } from "@/app/user/_components/button";
 import {
   forgetPasswordSchema,
   forgetPasswordInput,
 } from "@/validations/validate";
-import { useAlert } from "../context/alert";
+
+import { FaUnlockKeyhole } from "react-icons/fa6";
 
 export default function ForgetPassword() {
   const API_URL =
@@ -123,8 +125,10 @@ export default function ForgetPassword() {
   return (
     <Container>
       <div className="w-110 h-180 bg-[#FCF9F6] sm:border-2 flex flex-col items-center sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <h1 className="text-[24px] my-10">忘記密碼</h1>
-
+        <h1 className="flex items-center justify-center text-[24px] my-10">
+          <FaUnlockKeyhole className="mr-2" />
+          忘記密碼
+        </h1>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-col items-center mb-5"
@@ -133,16 +137,20 @@ export default function ForgetPassword() {
             <label className="text-[20px] mb-2.5" htmlFor="verification">
               電子郵件
             </label>
-            <div className="flex justify-between">
+            <div className="flex relative justify-between">
               <input
                 {...register("email")}
-                className={`${user_input} w-72.5 h-12.5 text-[16px] px-2 ${isVerify ? "bg-yellow-100" : ""}`}
+                className={`${user_input} w-full h-12.5 text-[16px] px-2 ${isVerify ? "bg-yellow-100" : ""}`}
                 type="text"
                 id="email"
                 placeholder="請輸入電子郵件 點擊驗證"
                 disabled={isVerify}
               />
-              <VerifyButton onClick={handleSendCode} child={`驗證`} />
+              <VerifyButton
+                className="absolute top-0 right-0"
+                onClick={handleSendCode}
+                child={`驗證`}
+              />
             </div>
           </div>
           <div className="w-auto h-4 mb-4">
@@ -176,7 +184,10 @@ export default function ForgetPassword() {
           <button
             type="submit"
             disabled={submit}
-            className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
+            className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 
+                      ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`} 
+                      text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] 
+                      -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0`}
           >
             {submit ? `登入中...` : `確認送出`}
           </button>

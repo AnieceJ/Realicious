@@ -166,7 +166,7 @@ export default function Login() {
               <div className="relative w-full">
                 <input
                   {...register("password")}
-                  className={`${errors.password ? "border-red-500" : ""} ${shakePassword ? "animate-shake" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
+                  className={`pr-10 ${errors.password ? "border-red-500" : ""} ${shakePassword ? "animate-shake" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
                   type={showPassword ? "text" : "password"}
                   id="password"
                   placeholder="請輸入密碼"
@@ -186,11 +186,6 @@ export default function Login() {
             </div>
             <div className="w-full h-10 flex justify-between">
               <div className="">
-                {/* {loginError && (
-                  <span className={`text-red-500 text-sm `}>
-                    帳號或密碼錯誤
-                  </span>
-                )} */}
               </div>
               <Link
                 className=" text-[16px] text-center h-6 align-middle w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
@@ -204,7 +199,7 @@ export default function Login() {
               onClick={() => {}}
               type="submit"
               disabled={submit}
-              className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
+              className={`-translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
             >
               {submit ? `登入中...` : `確認送出`}
             </button>
@@ -214,7 +209,7 @@ export default function Login() {
           <div className="flex justify-center items-center">
             <Link
               href={"http://localhost:3001/user/api/auth/google"}
-              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center `}
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0`}
             >
               <Image
                 className=" object-contain object-bottom w-10 mr-2"
@@ -228,10 +223,10 @@ export default function Login() {
             </Link>
 
             <Link
-              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center `}
+              className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0`}
               href={`/user/register`}
             >
-              <RiLoginBoxLine className="text-4xl mr-2" />
+              <RiLoginBoxLine className="text-4xl mr-2 " />
               按此註冊
             </Link>
           </div>

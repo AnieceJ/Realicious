@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useUser } from "@/app/context/user";
-import { useRouter } from "next/navigation"; // 引入 useRouter 用於跳轉頁面
+import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { cities, districts } from "use-tw-zipcode";
 
 import Container from "../_components/container";
 import AvatarUploader from "../account/_components/avatarUploader";
 import { useAlert } from "../context/alert";
+import { button_revise, button_submit ,user_input} from "../_components/button";
 
 interface FullProfile {
   avatar: string;
@@ -63,7 +65,7 @@ export default function OnboardingForm() {
         if (res.ok && result.success) {
           setFormData(result.data);
         } else {
-          showAlert("loading", "連線異常", result.message);
+          showAlert("error", "連線異常", result.message);
           setTimeout(() => {
             router.refresh();
             router.replace("/");
@@ -72,7 +74,7 @@ export default function OnboardingForm() {
         }
       } catch (error) {
         console.error("抓取詳細資料失敗:", error);
-        showAlert("loading", "連線異常", "系統發生錯誤，請稍後再試。");
+        showAlert("error", "連線異常", "系統發生錯誤，請稍後再試。");
         setTimeout(() => {
           router.refresh();
           router.replace("/");
@@ -84,7 +86,7 @@ export default function OnboardingForm() {
     };
 
     fetchFullProfile();
-  }, []);
+  }, [router, showAlert]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -93,6 +95,30 @@ export default function OnboardingForm() {
       [name]: value,
     }));
   };
+  // 專門處理「縣市」變更
+  const onCitySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    const newCity = selectedValue === "" ? "" : selectedValue;
+    setFormData((prev) => ({
+      ...prev,
+      city: newCity,
+      district: "", // 切換或重置縣市時，鄉鎮區強制設為""，null後端會有問題
+    }));
+  };
+
+  // 專門處理「鄉鎮區」變更
+  const onDistrictSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    const newDistrict = selectedValue === "" ? "" : selectedValue;
+    setFormData((prev) => ({
+      ...prev,
+      district: newDistrict,
+    }));
+  };
+  // 取得當前縣市對應的鄉鎮區清單 (沒有選擇縣市或選回預設值時為空陣列)
+  const availableDistricts = formData.city
+    ? districts[formData.city] || []
+    : [];
 
   // 🌟 統一處理後端 API 送出的邏輯
   const saveProfileData = async () => {
@@ -174,15 +200,15 @@ export default function OnboardingForm() {
       <div className="w-full max-w-lg p-6 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#FCF9F6]">
         {/* 步驟進度條提示 */}
         <div className="flex justify-between items-center mb-6 text-xs text-gray-400">
-          <span className={`${step === 1 ? "text-blue-600 font-bold" : ""}`}>
+          <span className={`${step === 1 ? " text-[#BB0015] font-bold" : ""}`}>
             1. 基本資料
           </span>
-          <div className="flex-1 h-[2px] bg-gray-200 mx-4">
+          <div className="flex-1 h-0.5 bg-gray-200 mx-4">
             <div
-              className={`h-full bg-blue-600 transition-all duration-300 ${step === 2 ? "w-full" : "w-0"}`}
+              className={`h-full bg-[#BB0015] transition-all duration-300 ${step === 2 ? "w-full" : "w-0"}`}
             ></div>
           </div>
-          <span className={`${step === 2 ? "text-blue-600 font-bold" : ""}`}>
+          <span className={`${step === 2 ? "text-[#BB0015] font-bold" : ""}`}>
             2. 詳細資訊
           </span>
         </div>
@@ -224,7 +250,7 @@ export default function OnboardingForm() {
                     value={formData.last_name}
                     onChange={handleInputChange}
                     placeholder="例如：陳"
-                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                    className={`placeholder-gray-400 mt-1 block w-full border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white`}
                   />
                 </div>
                 <div>
@@ -237,7 +263,7 @@ export default function OnboardingForm() {
                     value={formData.first_name}
                     onChange={handleInputChange}
                     placeholder="例如：小明"
-                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                    className="placeholder-gray-400 mt-1 block w-full  border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                   />
                 </div>
               </div>
@@ -252,7 +278,7 @@ export default function OnboardingForm() {
                   value={formData.nick_name}
                   onChange={handleInputChange}
                   placeholder="想被怎麼稱呼呢？"
-                  className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className="placeholder-gray-400 mt-1 block w-full  border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -265,12 +291,7 @@ export default function OnboardingForm() {
                 >
                   跳過，填下一步
                 </button>
-                <button
-                  type="submit"
-                  // className={`${button_revise}`}
-                  // className="px-6 py-2 bg-blue-600 text-white  font-medium hover:bg-blue-700 transition"
-                  className="bg-[#FFD45C] hover:bg-[#fbc632] w-25 h-10 border-2 border-black shadow-[0px_3px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:shadow-[0px_2px_0px_0px_rgba(0,0,0,1)]"
-                >
+                <button type="submit" className={`${button_revise}`}>
                   下一步
                 </button>
               </div>
@@ -294,27 +315,38 @@ export default function OnboardingForm() {
                   <label className="block text-sm font-medium text-gray-700">
                     縣市
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    placeholder="台北市"
-                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
-                  />
+                    value={formData.city || ""}
+                    onChange={onCitySelectChange}
+                    className="cursor-pointer placeholder-gray-400 mt-1 block w-full border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  >
+                    <option value="">請選擇縣市</option>
+                    {cities.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
                     鄉鎮
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="district"
-                    value={formData.district}
-                    onChange={handleInputChange}
-                    placeholder="信義區"
-                    className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
-                  />
+                    value={formData.district || ""}
+                    onChange={onDistrictSelectChange}
+                    disabled={!formData.city}
+                    className="cursor-pointer placeholder-gray-400 mt-1 block w-full border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  >
+                    <option value="">請選擇鄉鎮區</option>
+                    {availableDistricts.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -328,7 +360,7 @@ export default function OnboardingForm() {
                   value={formData.address}
                   onChange={handleInputChange}
                   placeholder="信義路五段 X 號"
-                  className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className="placeholder-gray-400 mt-1 block w-full border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -342,7 +374,7 @@ export default function OnboardingForm() {
                   value={formData.phone || ""}
                   onChange={handleInputChange}
                   placeholder="0912345678"
-                  className="placeholder-gray-400 mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className="placeholder-gray-400 mt-1 block w-full border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -355,7 +387,7 @@ export default function OnboardingForm() {
                   name="birthday"
                   value={formData.birthday}
                   onChange={handleInputChange}
-                  className=" mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
+                  className=" mt-1 block w-full border-gray-300 shadow-sm p-2 bg-gray-50 focus:bg-white"
                 />
               </div>
 
@@ -376,11 +408,7 @@ export default function OnboardingForm() {
                   >
                     跳過，進入首頁
                   </button>
-                  <button
-                    type="submit"
-                    className="w-25 h-10 border-2 border-black shadow-[0px_4px_0px_0px_rgba(0,0,0,1)] text-white  bg-[#F02A2D] hover:bg-[#e50004] cursor-pointer hover:shadow-[0px_2px_0px_0px_rgba(0,0,0,1)]"
-                    // className="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition shadow-sm"
-                  >
+                  <button type="submit" className={`${button_submit}`}>
                     完成填寫
                   </button>
                 </div>
