@@ -213,8 +213,8 @@ export default function SavedArticlesPage() {
 						/>
 
 						<div className="relative z-10">
-							<div className="flex w-full items-center justify-between gap-4 bg-black p-3 md:flex-row md:items-center">
-								<div className="flex min-w-0 items-center">
+							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
+								<div className="flex w-full min-w-0 flex-1 items-center">
 									<Link
 										href="/article"
 										className="flex h-10 w-10 shrink-0 items-center justify-center bg-black text-white hover:bg-gray-800"
@@ -222,57 +222,58 @@ export default function SavedArticlesPage() {
 									>
 										<House size={22} />
 									</Link>
+									<div className="w-full min-w-0">
+										<Menubar className="flex h-auto min-w-0 flex-wrap border-0 bg-black p-0 text-slate-100 md:h-10 md:flex-nowrap">
+											<MenubarMenu>
+												<MenubarTrigger
+													onClick={() => {
+														setSelectedSubCategory("");
+														resetToFirstPage();
+													}}
+												>
+													全部
+												</MenubarTrigger>
+											</MenubarMenu>
+											<div className="mx-1 h-5 w-px self-center bg-gray-500" />
 
-									<Menubar className="h-10 shrink-0 justify-start border-0 bg-black text-slate-100">
-										<MenubarMenu>
-											<MenubarTrigger
-												onClick={() => {
-													setSelectedSubCategory("");
-													resetToFirstPage();
-												}}
-											>
-												全部
-											</MenubarTrigger>
-										</MenubarMenu>
-										<div className="mx-1 h-5 w-px self-center bg-gray-500" />
-
-										{loading ? (
-											<div className="self-center px-3 text-sm text-gray-400">
-												載入中...
-											</div>
-										) : (
-											categories.map((category, index) => (
-												<React.Fragment key={category.category_name}>
-													<MenubarMenu>
-														<MenubarTrigger>
-															{category.category_name}
-														</MenubarTrigger>
-														<MenubarContent>
-															<MenubarRadioGroup
-																value={selectedSubCategory}
-																onValueChange={(value) => {
-																	setSelectedSubCategory(value);
-																	resetToFirstPage();
-																}}
-															>
-																{category.sub_category.map((subCategory) => (
-																	<MenubarRadioItem
-																		key={subCategory.id}
-																		value={String(subCategory.id)}
-																	>
-																		{subCategory.sub_category_name}
-																	</MenubarRadioItem>
-																))}
-															</MenubarRadioGroup>
-														</MenubarContent>
-													</MenubarMenu>
-													{index < categories.length - 1 && (
-														<div className="mx-1 h-5 w-px self-center bg-gray-500" />
-													)}
-												</React.Fragment>
-											))
-										)}
-									</Menubar>
+											{loading ? (
+												<div className="self-center px-3 text-sm text-gray-400">
+													載入中...
+												</div>
+											) : (
+												categories.map((category, index) => (
+													<React.Fragment key={category.category_name}>
+														<MenubarMenu>
+															<MenubarTrigger>
+																{category.category_name}
+															</MenubarTrigger>
+															<MenubarContent>
+																<MenubarRadioGroup
+																	value={selectedSubCategory}
+																	onValueChange={(value) => {
+																		setSelectedSubCategory(value);
+																		resetToFirstPage();
+																	}}
+																>
+																	{category.sub_category.map((subCategory) => (
+																		<MenubarRadioItem
+																			key={subCategory.id}
+																			value={String(subCategory.id)}
+																		>
+																			{subCategory.sub_category_name}
+																		</MenubarRadioItem>
+																	))}
+																</MenubarRadioGroup>
+															</MenubarContent>
+														</MenubarMenu>
+														{index < categories.length - 1 && (
+															<div className="mx-1 h-5 w-px self-center bg-gray-500" />
+														)}
+													</React.Fragment>
+												))
+											)}
+										</Menubar>
+									</div>
 								</div>
 
 								<div className="w-full max-w-md border border-white lg:w-auto">
@@ -371,7 +372,10 @@ export default function SavedArticlesPage() {
 
 													<div className="flex min-w-0 flex-1 flex-col gap-2">
 														<div className="flex min-w-0 items-start justify-between gap-3">
-															<Link href={detailHref} className="min-w-0 flex-1">
+															<Link
+																href={detailHref}
+																className="min-w-0 flex-1"
+															>
 																<h2 className="line-clamp-2 font-bold text-lg leading-6 text-slate-900 hover:underline">
 																	{article.title}
 																</h2>

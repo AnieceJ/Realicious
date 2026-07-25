@@ -80,11 +80,7 @@ export default function ArticleManagePage() {
 	const updatePageInUrl = (page: number) => {
 		const params = new URLSearchParams(window.location.search);
 		params.set("page", String(page));
-		window.history.replaceState(
-			null,
-			"",
-			`${pathname}?${params.toString()}`,
-		);
+		window.history.replaceState(null, "", `${pathname}?${params.toString()}`);
 	};
 	const getArticleDetailHref = (articleId: string) => {
 		const params = new URLSearchParams({
@@ -212,15 +208,15 @@ export default function ArticleManagePage() {
 							}}
 						/>
 						<div className="relative z-10">
-							<div className="flex items-center w-full justify-between lg:flex-row md:flex-row md:items-center gap-4 p-3 bg-black">
-								<div className="flex items-center">
+							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
+								<div className="flex w-full min-w-0 flex-1 items-center">
 									<Link
 										href="/article"
-										className="flex h-10 w-10 items-center justify-center bg-black text-white hover:bg-gray-800"
+										className="flex h-10 w-10 shrink-0 items-center justify-center bg-black text-white hover:bg-gray-800"
 									>
 										<House size={22} />
 									</Link>
-									<Menubar className="h-10 bg-black text-slate-100 border-0 justify-start shrink-0">
+									<Menubar className="flex h-auto min-w-0 flex-wrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
 										<MenubarMenu>
 											<MenubarTrigger
 												onClick={async () => {
@@ -273,8 +269,8 @@ export default function ArticleManagePage() {
 										)}
 									</Menubar>
 								</div>
-								<div className="flex items-center w-full lg:w-auto max-w-md gap-2">
-									<div className="border-white border">
+								<div className="flex items-center gap-2 w-full md:w-auto md:max-w-md">
+									<div className="border-white border flex-1 min-w-0">
 										<SearchBar
 											onSearch={(keyword) => {
 												fetchUserArticles(
@@ -290,7 +286,7 @@ export default function ArticleManagePage() {
 									</div>
 									<Link
 										href="/article/edit"
-										className="flex w-10 h-10 bg-black items-center justify-center border-white border"
+										className="flex w-10 h-10 bg-black items-center justify-center border-white border shrink-0"
 									>
 										<SquarePen color="#FFFFFF" />
 									</Link>

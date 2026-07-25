@@ -152,67 +152,72 @@ export default function ArticlePage() {
 							}}
 						/>
 						<div className="relative z-10">
-							<div className="flex items-center w-full justify-between lg:flex-row md:flex-row md:items-center gap-4 p-3 bg-black">
-								<div className="flex items-center">
+							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
+								<div className="flex w-full min-w-0 flex-1 items-center">
 									<Link
 										href="/"
-										className="flex h-10 w-10 items-center justify-center bg-black text-white hover:bg-gray-800"
+										className="flex h-10 w-10 shrink-0 items-center justify-center bg-black text-white hover:bg-gray-800"
 									>
 										<House size={22} />
 									</Link>
-									<Menubar className="h-10 bg-black text-slate-100 border-0 justify-start shrink-0">
-										<MenubarMenu>
-											<MenubarTrigger
-												onClick={() => {
-													setSelectedSubCategory("");
-													setCurrentPage(1);
-													updatePageInUrl(1);
-													fetchArticles();
-												}}
-											>
-												全部
-											</MenubarTrigger>
-										</MenubarMenu>
-										<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
-										{loading ? (
-											<div className="px-3 text-sm text-gray-400 self-center">
-												載入中...
-											</div>
-										) : (
-											categories.map((cat, index) => (
-												<React.Fragment key={cat.category_name}>
-													<MenubarMenu key={cat.category_name}>
-														<MenubarTrigger>{cat.category_name}</MenubarTrigger>
-														<MenubarContent>
-															<MenubarRadioGroup
-																value={selectedSubCategory}
-																onValueChange={(value) => {
-																	setSelectedSubCategory(value);
-																	setCurrentPage(1);
-																	updatePageInUrl(1);
-																	fetchArticles(Number(value));
-																}}
-															>
-																{cat.sub_category.map((sub) => (
-																	<MenubarRadioItem
-																		key={sub.id}
-																		value={String(sub.id)}
-																	>
-																		{sub.sub_category_name}
-																	</MenubarRadioItem>
-																))}
-															</MenubarRadioGroup>
-														</MenubarContent>
-													</MenubarMenu>
-													{index < categories.length - 1 && (
-														<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
-													)}
-												</React.Fragment>
-											))
-										)}
-									</Menubar>
+									<div className="w-full min-w-0">
+										<Menubar className="flex h-auto min-w-0 flex-wrap border-0 bg-black p-0 text-slate-100 md:h-10 md:flex-nowrap">
+											<MenubarMenu>
+												<MenubarTrigger
+													onClick={() => {
+														setSelectedSubCategory("");
+														setCurrentPage(1);
+														updatePageInUrl(1);
+														fetchArticles();
+													}}
+												>
+													全部
+												</MenubarTrigger>
+											</MenubarMenu>
+											<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
+											{loading ? (
+												<div className="px-3 text-sm text-gray-400 self-center">
+													載入中...
+												</div>
+											) : (
+												categories.map((cat, index) => (
+													<React.Fragment key={cat.category_name}>
+														<MenubarMenu key={cat.category_name}>
+															<MenubarTrigger>
+																{cat.category_name}
+															</MenubarTrigger>
+															<MenubarContent>
+																<MenubarRadioGroup
+																	value={selectedSubCategory}
+																	onValueChange={(value) => {
+																		setSelectedSubCategory(value);
+																		setCurrentPage(1);
+																		updatePageInUrl(1);
+																		fetchArticles(Number(value));
+																	}}
+																>
+																	{cat.sub_category.map((sub) => (
+																		<MenubarRadioItem
+																			key={sub.id}
+																			value={String(sub.id)}
+																		>
+																			{sub.sub_category_name}
+																		</MenubarRadioItem>
+																	))}
+																</MenubarRadioGroup>
+															</MenubarContent>
+														</MenubarMenu>
+														{index < categories.length - 1 && (
+															<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
+														)}
+													</React.Fragment>
+												))
+											)}
+										</Menubar>
+									</div>
 								</div>
-								<div className="flex items-center w-full lg:w-auto max-w-md gap-2 border-white border">
+								<div className="w-full md:w-auto md:max-w-md shrink-0 border border-white">
+									{" "}
 									<SearchBar
 										onSearch={(keyword) => {
 											fetchArticles(
@@ -295,7 +300,10 @@ export default function ArticlePage() {
 															/>
 															<span>被收藏 {savedCounts[art.id] || 0} 次</span>
 														</div>
-														<Link href={`/article/${art.id}`} className="shrink-0">
+														<Link
+															href={`/article/${art.id}`}
+															className="shrink-0"
+														>
 															<Button
 																variant="outline"
 																size="sm"

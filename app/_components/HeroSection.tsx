@@ -5,14 +5,14 @@ import Link from "next/link";
 
 export default function Hero() {
 	return (
-		<section className="relative overflow-hidden bg-black">
+		<section className="relative overflow-hidden bg-page-red">
 			{/* Hero 容器：满版宽度，flex 布局 */}
 			<div className="relative w-full h-190 flex items-center">
 				{/* 内层容器：限制文字内容在 1280px，左侧对齐 */}
 				<div className="mx-auto max-w-7xl w-full px-5 h-full flex items-center z-20">
 					{/* 左側文字內容區域 - 占據約 40-50% 寬度 */}
 					<div className="w-full md:w-1/2 lg:w-5/12 shrink-0">
-						<p className="mb-5 tracking-[0.45em] font-bold text-yellow-300 text-sm md:text-base">
+						<p className="mb-5 tracking-0.45em font-bold text-yellow-300 text-sm md:text-base">
 							REALICIOUS
 						</p>
 
@@ -53,7 +53,7 @@ export default function Hero() {
 							<div className="plate plate-1">
 								<div className="plate-content">
 									<Image
-										src="/article/沙拉.jpg"
+										src="/article/salad.jpg"
 										alt=""
 										fill
 										priority
@@ -66,7 +66,7 @@ export default function Hero() {
 							<div className="plate plate-2">
 								<div className="plate-content">
 									<Image
-										src="/article/滷肉飯.png"
+										src="/article/PorkRice.png"
 										alt=""
 										fill
 										priority
@@ -79,7 +79,7 @@ export default function Hero() {
 							<div className="plate plate-3">
 								<div className="plate-content">
 									<Image
-										src="/article/火鍋.png"
+										src="/article/pizza.jpg"
 										alt=""
 										fill
 										priority
