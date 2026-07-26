@@ -73,19 +73,24 @@ export default function Chatroom() {
       );
     });
 
-    // 🌟 新增：密碼驗證相關 Socket 事件監聽
-    socket.on("join_success", ({ roomId }: { roomId: number }) => {
-      setPasswordModalRoom(null); // 驗證成功，關閉彈窗
-      setInputPassword("");
-    });
+    // 🌟 後端確認可以進入房間（公開房、建立者、或已是成員）
+  socket.on("join_success", ({ room }: { room: Room }) => {
+    setCurrentRoom(room);
+    setPasswordModalRoom(null); // 關閉密碼彈窗
+    setInputPassword("");
+  });
 
-    socket.on("error_message", (data: { message: string }) => {
-      alert(data.message); // 顯示密碼錯誤或無法加入訊息
-    });
+   // 🌟 後端要求輸入密碼（未加入過的私密房）
+  socket.on("password_required", ({ roomId }: { roomId: number }) => {
+    const target = rooms.find((r) => r.id === roomId);
+    if (target) {
+      setPasswordModalRoom(target);
+    }
+  });
 
-    socket.on("password_required", () => {
-      alert("此房間為私密房，請輸入密碼！");
-    });
+  socket.on("error_message", (data: { message: string }) => {
+    alert(data.message);
+  });
 
     return () => {
       socket.off("receive_message");
@@ -97,7 +102,7 @@ export default function Chatroom() {
       socket.off("password_required");
       socket.disconnect();
     };
-  }, []);
+  }, [rooms]);
 
   // 2. 進入頁面時向 API 撈取房間清單
   const fetchRooms = async () => {
@@ -114,7 +119,10 @@ export default function Chatroom() {
   };
 
   useEffect(() => {
-    fetchRooms();
+    const loadInitialData = async () => {
+      await fetchRooms();
+    };
+    loadInitialData();
   }, []);
 
   // 3. 處理「建立房間」
@@ -155,42 +163,29 @@ export default function Chatroom() {
     }
   };
 
-  // 4. 點擊「進入房間」邏輯
-  const handleJoinRoom = (room: Room) => {
-    if (!socketRef.current) return;
+  // 2. 點擊「進入房間」簡化為直接發送 Socket 讓後端驗證
+const handleJoinRoom = (room: Room) => {
+  if (!socketRef.current) return;
 
-    if (!socketRef.current.connected) {
-      socketRef.current.connect();
-    }
+  if (!socketRef.current.connected) {
+    socketRef.current.connect();
+  }
 
-    // 判斷是否為私密房
-    if (room.type === "PRIVATE_GROUP") {
-      // 這裡如果要在前端就判斷「是否為自己建的房」，可以比對目前登入者的 ID
-      // 若無法即時知道自己 ID，直接跳彈窗讓使用者輸入也是常見做法
-      setPasswordModalRoom(room);
-      return;
-    }
+  setMessages([]); // 先清空舊訊息
+  // 讓後端去判斷：是公開房？是建立者？還是舊成員？
+  socketRef.current.emit("join_room", { roomId: room.id });
+};
 
-    // 公開房：直接發送 join_room
-    setCurrentRoom(room);
-    setMessages([]);
-    socketRef.current.emit("join_room", { roomId: room.id });
-  };
+ // 3. 彈窗提交密碼（帶著密碼再次嘗試 join_room）
+const handleSubmitPassword = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!passwordModalRoom || !socketRef.current || !inputPassword.trim()) return;
 
-  // 5. 提交私密房密碼
-  const handleSubmitPassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!passwordModalRoom || !socketRef.current || !inputPassword.trim()) return;
-
-    setCurrentRoom(passwordModalRoom);
-    setMessages([]);
-
-    // 帶上密碼發送 join_room
-    socketRef.current.emit("join_room", {
-      roomId: passwordModalRoom.id,
-      password: inputPassword,
-    });
-  };
+  socketRef.current.emit("join_room", {
+    roomId: passwordModalRoom.id,
+    password: inputPassword,
+  });
+};
 
   // 6. 發送訊息
   const handleSendMessage = (e: React.FormEvent) => {
