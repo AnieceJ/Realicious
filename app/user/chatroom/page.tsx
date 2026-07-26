@@ -6,7 +6,7 @@ import Cookies from "js-cookie";
 interface Room {
   id: number;
   name: string;
-  type: string;
+  type: string; // "PUBLIC_GROUP" | "PRIVATE_GROUP"
   createdBy: number;
   _count?: { members: number };
 }
@@ -21,7 +21,16 @@ interface Message {
 export default function Chatroom() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
+
+  // 1. 建立房間表單 State
   const [newRoomName, setNewRoomName] = useState("");
+  const [newRoomType, setNewRoomType] = useState<"PUBLIC_GROUP" | "PRIVATE_GROUP">("PUBLIC_GROUP");
+  const [newRoomPassword, setNewRoomPassword] = useState("");
+
+  // 2. 私密房密碼彈窗 State
+  const [passwordModalRoom, setPasswordModalRoom] = useState<Room | null>(null);
+  const [inputPassword, setInputPassword] = useState("");
+
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -45,29 +54,47 @@ export default function Chatroom() {
     socket.on("load_history", (historyMessages: Message[]) => {
       setMessages(historyMessages);
     });
-    // 監聽新房間廣播，收到時才非同步更新 State
+
     socket.on("room_created", (newRoom: Room) => {
       setRooms((prev) => [newRoom, ...prev]);
     });
+
     socket.on("room_member_updated", ({ roomId, memberCount }: { roomId: number; memberCount: number }) => {
-    setRooms((prevRooms) =>
-      prevRooms.map((room) => {
-        if (room.id === roomId) {
-          return {
-            ...room,
-            _count: { members: memberCount },
-          };
-        }
-        return room;
-      })
-    );
-  });
+      setRooms((prevRooms) =>
+        prevRooms.map((room) => {
+          if (room.id === roomId) {
+            return {
+              ...room,
+              _count: { members: memberCount },
+            };
+          }
+          return room;
+        })
+      );
+    });
+
+    // 🌟 新增：密碼驗證相關 Socket 事件監聽
+    socket.on("join_success", ({ roomId }: { roomId: number }) => {
+      setPasswordModalRoom(null); // 驗證成功，關閉彈窗
+      setInputPassword("");
+    });
+
+    socket.on("error_message", (data: { message: string }) => {
+      alert(data.message); // 顯示密碼錯誤或無法加入訊息
+    });
+
+    socket.on("password_required", () => {
+      alert("此房間為私密房，請輸入密碼！");
+    });
 
     return () => {
       socket.off("receive_message");
       socket.off("load_history");
       socket.off("room_created");
       socket.off("room_member_updated");
+      socket.off("join_success");
+      socket.off("error_message");
+      socket.off("password_required");
       socket.disconnect();
     };
   }, []);
@@ -85,17 +112,20 @@ export default function Chatroom() {
       console.error("獲取房間清單失敗:", err);
     }
   };
+
   useEffect(() => {
-    const loadInitialData = async () => {
-      await fetchRooms();
-    };
-    loadInitialData();
+    fetchRooms();
   }, []);
 
   // 3. 處理「建立房間」
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRoomName.trim()) return;
+
+    if (newRoomType === "PRIVATE_GROUP" && !newRoomPassword.trim()) {
+      alert("建立私密房間時請設定密碼！");
+      return;
+    }
 
     const token = Cookies.get("token");
     try {
@@ -105,33 +135,64 @@ export default function Chatroom() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ name: newRoomName }),
+        body: JSON.stringify({
+          name: newRoomName,
+          type: newRoomType,
+          password: newRoomPassword,
+        }),
       });
       const result = await res.json();
       if (result.success) {
         setNewRoomName("");
-        fetchRooms(); // 重新撈取房間列表
+        setNewRoomPassword("");
+        setNewRoomType("PUBLIC_GROUP");
+        // 如果後端已有發送 room_created 廣播，這裡也可以不需要重複 fetchRooms()
+      } else {
+        alert(result.message || "建立房間失敗");
       }
     } catch (err) {
       console.error("建立房間失敗:", err);
     }
   };
 
-  // 4. 點擊「進入房間」
+  // 4. 點擊「進入房間」邏輯
   const handleJoinRoom = (room: Room) => {
     if (!socketRef.current) return;
 
-    // 若原本就在別的房間，可以先連線
     if (!socketRef.current.connected) {
       socketRef.current.connect();
     }
 
+    // 判斷是否為私密房
+    if (room.type === "PRIVATE_GROUP") {
+      // 這裡如果要在前端就判斷「是否為自己建的房」，可以比對目前登入者的 ID
+      // 若無法即時知道自己 ID，直接跳彈窗讓使用者輸入也是常見做法
+      setPasswordModalRoom(room);
+      return;
+    }
+
+    // 公開房：直接發送 join_room
     setCurrentRoom(room);
-    setMessages([]); // 先清空前一個房間的訊息
-    socketRef.current.emit("join_room", room.id);
+    setMessages([]);
+    socketRef.current.emit("join_room", { roomId: room.id });
   };
 
-  // 5. 發送訊息
+  // 5. 提交私密房密碼
+  const handleSubmitPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordModalRoom || !socketRef.current || !inputPassword.trim()) return;
+
+    setCurrentRoom(passwordModalRoom);
+    setMessages([]);
+
+    // 帶上密碼發送 join_room
+    socketRef.current.emit("join_room", {
+      roomId: passwordModalRoom.id,
+      password: inputPassword,
+    });
+  };
+
+  // 6. 發送訊息
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || !socketRef.current || !currentRoom) return;
@@ -155,16 +216,48 @@ export default function Chatroom() {
         }}
       >
         <h3>建立新房間</h3>
-        <form onSubmit={handleCreateRoom} style={{ marginBottom: "20px" }}>
+        <form onSubmit={handleCreateRoom} style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
           <input
             type="text"
             placeholder="房間名稱..."
             value={newRoomName}
             onChange={(e) => setNewRoomName(e.target.value)}
-            style={{ width: "70%", padding: "5px" }}
+            style={{ padding: "5px" }}
           />
-          <button type="submit" style={{ padding: "5px 10px" }}>
-            新增
+
+          <div style={{ display: "flex", gap: "10px" }}>
+            <label>
+              <input
+                type="radio"
+                value="PUBLIC_GROUP"
+                checked={newRoomType === "PUBLIC_GROUP"}
+                onChange={() => setNewRoomType("PUBLIC_GROUP")}
+              />
+              公開
+            </label>
+            <label>
+              <input
+                type="radio"
+                value="PRIVATE_GROUP"
+                checked={newRoomType === "PRIVATE_GROUP"}
+                onChange={() => setNewRoomType("PRIVATE_GROUP")}
+              />
+              私密 🔒
+            </label>
+          </div>
+
+          {newRoomType === "PRIVATE_GROUP" && (
+            <input
+              type="password"
+              placeholder="設定密碼..."
+              value={newRoomPassword}
+              onChange={(e) => setNewRoomPassword(e.target.value)}
+              style={{ padding: "5px" }}
+            />
+          )}
+
+          <button type="submit" style={{ padding: "5px 10px", marginTop: "5px" }}>
+            建立房間
           </button>
         </form>
 
@@ -181,10 +274,14 @@ export default function Chatroom() {
                 borderRadius: "4px",
                 display: "flex",
                 justifyContent: "space-between",
+                alignItems: "center",
               }}
               onClick={() => handleJoinRoom(room)}
             >
-              <span>{room.name}</span>
+              <span>
+                {room.type === "PRIVATE_GROUP" ? "🔒 " : "💬 "}
+                {room.name}
+              </span>
               <small>({room._count?.members || 0}人)</small>
             </li>
           ))}
@@ -195,7 +292,10 @@ export default function Chatroom() {
       <div style={{ width: "70%" }}>
         {currentRoom ? (
           <div>
-            <h2>房間：{currentRoom.name}</h2>
+            <h2>
+              房間：{currentRoom.name}{" "}
+              {currentRoom.type === "PRIVATE_GROUP" && "🔒"}
+            </h2>
             <div
               style={{
                 border: "1px solid #ccc",
@@ -234,6 +334,61 @@ export default function Chatroom() {
           </div>
         )}
       </div>
+
+      {/* 🌟 私密房密碼輸入 Modal 彈窗 */}
+      {passwordModalRoom && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+              width: "320px",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            }}
+          >
+            <h4 style={{ marginTop: 0 }}>輸入密碼以進入【{passwordModalRoom.name}】</h4>
+            <form onSubmit={handleSubmitPassword}>
+              <input
+                type="password"
+                placeholder="請輸入房間密碼"
+                value={inputPassword}
+                onChange={(e) => setInputPassword(e.target.value)}
+                style={{ width: "100%", padding: "8px", marginBottom: "15px", boxSizing: "border-box" }}
+                autoFocus
+              />
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPasswordModalRoom(null);
+                    setInputPassword("");
+                  }}
+                  style={{ padding: "6px 12px" }}
+                >
+                  取消
+                </button>
+                <button type="submit" style={{ padding: "6px 12px" }}>
+                  進入
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
