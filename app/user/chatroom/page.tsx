@@ -52,7 +52,7 @@ export default function Chatroom() {
     socketRef.current = io("http://localhost:3001", {
       auth: { token },
     });
-    
+
     const socket = socketRef.current;
 
     socket.on("receive_message", (newMessage: Message) => {
@@ -180,7 +180,6 @@ export default function Chatroom() {
         setNewRoomName("");
         setNewRoomPassword("");
         setNewRoomType("PUBLIC_GROUP");
-        
       } else {
         alert(result.message || "建立房間失敗");
       }
@@ -251,16 +250,16 @@ export default function Chatroom() {
   };
 
   // 處理「離開房間」
-const handleLeaveRoom = () => {
-  if (!currentRoom || !socketRef.current) return;
+  const handleLeaveRoom = () => {
+    if (!currentRoom || !socketRef.current) return;
 
-  // 發送 Socket 事件通知後端
-  socketRef.current.emit("leave_room", { roomId: currentRoom.id });
+    // 發送 Socket 事件通知後端
+    socketRef.current.emit("leave_room", { roomId: currentRoom.id });
 
-  // 重置前端當前房間狀態
-  setCurrentRoom(null);
-  setMessages([]);
-};
+    // 重置前端當前房間狀態
+    setCurrentRoom(null);
+    setMessages([]);
+  };
 
   // 🌟 修復 3：先判斷 loading，再判斷 !user！
   if (loading) {
@@ -390,19 +389,19 @@ const handleLeaveRoom = () => {
               {currentRoom.type === "PRIVATE_GROUP" && "🔒"}
             </h2>
             {/* 🌟 離開房間按鈕 */}
-        <button
-          onClick={handleLeaveRoom}
-          style={{
-            padding: "6px 12px",
-            background: "#8c8c8c",
-            color: "#fff",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          離開房間 🚪
-        </button>
+            <button
+              onClick={handleLeaveRoom}
+              style={{
+                padding: "6px 12px",
+                background: "#8c8c8c",
+                color: "#fff",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              離開房間 🚪
+            </button>
             <div
               style={{
                 border: "1px solid #ccc",
