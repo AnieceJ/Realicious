@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
+import { useUser } from "@/app/context/user";
 import { Socket, io } from "socket.io-client";
 import Cookies from "js-cookie";
 
@@ -19,12 +20,16 @@ interface Message {
 }
 
 export default function Chatroom() {
+  const { user, loading } = useUser();
+
   const [rooms, setRooms] = useState<Room[]>([]);
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
 
   // 1. 建立房間表單 State
   const [newRoomName, setNewRoomName] = useState("");
-  const [newRoomType, setNewRoomType] = useState<"PUBLIC_GROUP" | "PRIVATE_GROUP">("PUBLIC_GROUP");
+  const [newRoomType, setNewRoomType] = useState<
+    "PUBLIC_GROUP" | "PRIVATE_GROUP"
+  >("PUBLIC_GROUP");
   const [newRoomPassword, setNewRoomPassword] = useState("");
 
   // 2. 私密房密碼彈窗 State
@@ -34,9 +39,12 @@ export default function Chatroom() {
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
 
+  // 🌟 修復 1：直接從 user 導出 currentUserId，不要用 useState 避免同步延遲與 NaN
+  const currentUserId = user?.id ? Number(user.id) : null;
+
   const socketRef = useRef<Socket | null>(null);
 
-  // 1. 初始化 Socket 連線
+  // 1. 初始化 Socket 連線（🌟 修復 2：依賴陣列設為 []，建立穩定連線，不因 rooms 改變而一直重連）
   useEffect(() => {
     const token = Cookies.get("token");
     if (!token) return;
@@ -59,38 +67,58 @@ export default function Chatroom() {
       setRooms((prev) => [newRoom, ...prev]);
     });
 
-    socket.on("room_member_updated", ({ roomId, memberCount }: { roomId: number; memberCount: number }) => {
-      setRooms((prevRooms) =>
-        prevRooms.map((room) => {
-          if (room.id === roomId) {
-            return {
-              ...room,
-              _count: { members: memberCount },
-            };
-          }
-          return room;
-        })
-      );
+    socket.on(
+      "room_member_updated",
+      ({ roomId, memberCount }: { roomId: number; memberCount: number }) => {
+        setRooms((prevRooms) =>
+          prevRooms.map((room) => {
+            if (room.id === roomId) {
+              return {
+                ...room,
+                _count: { members: memberCount },
+              };
+            }
+            return room;
+          }),
+        );
+      },
+    );
+
+    // 後端確認可以進入房間
+    socket.on("join_success", ({ room }: { room: Room }) => {
+      setCurrentRoom(room);
+      setPasswordModalRoom(null); // 關閉密碼彈窗
+      setInputPassword("");
     });
 
-    // 🌟 後端確認可以進入房間（公開房、建立者、或已是成員）
-  socket.on("join_success", ({ room }: { room: Room }) => {
-    setCurrentRoom(room);
-    setPasswordModalRoom(null); // 關閉密碼彈窗
-    setInputPassword("");
-  });
+    // 後端要求輸入密碼
+    socket.on("password_required", ({ roomId }: { roomId: number }) => {
+      // 🌟 使用 setRooms 的 callback 或搜尋即時狀態，避免抓不到最新的 rooms
+      setRooms((latestRooms) => {
+        const target = latestRooms.find((r) => r.id === roomId);
+        if (target) {
+          setPasswordModalRoom(target);
+        }
+        return latestRooms;
+      });
+    });
 
-   // 🌟 後端要求輸入密碼（未加入過的私密房）
-  socket.on("password_required", ({ roomId }: { roomId: number }) => {
-    const target = rooms.find((r) => r.id === roomId);
-    if (target) {
-      setPasswordModalRoom(target);
-    }
-  });
+    socket.on("error_message", (data: { message: string }) => {
+      alert(data.message);
+    });
 
-  socket.on("error_message", (data: { message: string }) => {
-    alert(data.message);
-  });
+    // 監聽「房間刪除」廣播
+    socket.on("room_deleted", ({ roomId }: { roomId: number }) => {
+      setRooms((prevRooms) => prevRooms.filter((room) => room.id !== roomId));
+
+      setCurrentRoom((prevCurrent) => {
+        if (prevCurrent && prevCurrent.id === roomId) {
+          alert("該房間已被建立者刪除！");
+          return null;
+        }
+        return prevCurrent;
+      });
+    });
 
     return () => {
       socket.off("receive_message");
@@ -100,9 +128,10 @@ export default function Chatroom() {
       socket.off("join_success");
       socket.off("error_message");
       socket.off("password_required");
+      socket.off("room_deleted");
       socket.disconnect();
     };
-  }, [rooms]);
+  }, []); // 🌟 保持空陣列，確保 Socket 只有在 Mount 時連線一次
 
   // 2. 進入頁面時向 API 撈取房間清單
   const fetchRooms = async () => {
@@ -119,10 +148,7 @@ export default function Chatroom() {
   };
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      await fetchRooms();
-    };
-    loadInitialData();
+    fetchRooms();
   }, []);
 
   // 3. 處理「建立房間」
@@ -154,7 +180,6 @@ export default function Chatroom() {
         setNewRoomName("");
         setNewRoomPassword("");
         setNewRoomType("PUBLIC_GROUP");
-        // 如果後端已有發送 room_created 廣播，這裡也可以不需要重複 fetchRooms()
       } else {
         alert(result.message || "建立房間失敗");
       }
@@ -163,31 +188,31 @@ export default function Chatroom() {
     }
   };
 
-  // 2. 點擊「進入房間」簡化為直接發送 Socket 讓後端驗證
-const handleJoinRoom = (room: Room) => {
-  if (!socketRef.current) return;
+  // 點擊「進入房間」
+  const handleJoinRoom = (room: Room) => {
+    if (!socketRef.current) return;
 
-  if (!socketRef.current.connected) {
-    socketRef.current.connect();
-  }
+    if (!socketRef.current.connected) {
+      socketRef.current.connect();
+    }
 
-  setMessages([]); // 先清空舊訊息
-  // 讓後端去判斷：是公開房？是建立者？還是舊成員？
-  socketRef.current.emit("join_room", { roomId: room.id });
-};
+    setMessages([]); // 先清空舊訊息
+    socketRef.current.emit("join_room", { roomId: room.id });
+  };
 
- // 3. 彈窗提交密碼（帶著密碼再次嘗試 join_room）
-const handleSubmitPassword = (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!passwordModalRoom || !socketRef.current || !inputPassword.trim()) return;
+  // 彈窗提交密碼
+  const handleSubmitPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordModalRoom || !socketRef.current || !inputPassword.trim())
+      return;
 
-  socketRef.current.emit("join_room", {
-    roomId: passwordModalRoom.id,
-    password: inputPassword,
-  });
-};
+    socketRef.current.emit("join_room", {
+      roomId: passwordModalRoom.id,
+      password: inputPassword,
+    });
+  };
 
-  // 6. 發送訊息
+  // 發送訊息
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageInput.trim() || !socketRef.current || !currentRoom) return;
@@ -200,6 +225,39 @@ const handleSubmitPassword = (e: React.FormEvent) => {
     setMessageInput("");
   };
 
+  // 處理「刪除房間」點擊事件
+  const handleDeleteRoom = async (roomId: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止觸發 handleJoinRoom
+
+    if (!confirm("確定要刪除這個房間嗎？此動作無法復原！")) return;
+
+    const token = Cookies.get("token");
+    try {
+      const res = await fetch(
+        `http://localhost:3001/user/api/chatrooms/${roomId}`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const result = await res.json();
+      if (!result.success) {
+        alert(result.message);
+      }
+    } catch (err) {
+      console.error("刪除房間失敗:", err);
+    }
+  };
+
+  // 🌟 修復 3：先判斷 loading，再判斷 !user！
+  if (loading) {
+    return <div style={{ padding: "20px" }}>載入使用者資料中...</div>;
+  }
+
+  if (!user) {
+    return <div style={{ padding: "20px" }}>請先登入以使用聊天室</div>;
+  }
+
   return (
     <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
       {/* 左邊：房間大廳列表 */}
@@ -211,7 +269,15 @@ const handleSubmitPassword = (e: React.FormEvent) => {
         }}
       >
         <h3>建立新房間</h3>
-        <form onSubmit={handleCreateRoom} style={{ marginBottom: "20px", display: "flex", flexDirection: "column", gap: "8px" }}>
+        <form
+          onSubmit={handleCreateRoom}
+          style={{
+            marginBottom: "20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+          }}
+        >
           <input
             type="text"
             placeholder="房間名稱..."
@@ -251,7 +317,10 @@ const handleSubmitPassword = (e: React.FormEvent) => {
             />
           )}
 
-          <button type="submit" style={{ padding: "5px 10px", marginTop: "5px" }}>
+          <button
+            type="submit"
+            style={{ padding: "5px 10px", marginTop: "5px" }}
+          >
             建立房間
           </button>
         </form>
@@ -278,6 +347,22 @@ const handleSubmitPassword = (e: React.FormEvent) => {
                 {room.name}
               </span>
               <small>({room._count?.members || 0}人)</small>
+              {/* 🌟 房主比對：精準比對建立者 ID */}
+              {currentUserId === room.createdBy && (
+                <button
+                  onClick={(e) => handleDeleteRoom(room.id, e)}
+                  style={{
+                    background: "#ff4d4f",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "4px",
+                    padding: "2px 8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  刪除
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -330,7 +415,7 @@ const handleSubmitPassword = (e: React.FormEvent) => {
         )}
       </div>
 
-      {/* 🌟 私密房密碼輸入 Modal 彈窗 */}
+      {/* 私密房密碼輸入 Modal 彈窗 */}
       {passwordModalRoom && (
         <div
           style={{
@@ -355,17 +440,30 @@ const handleSubmitPassword = (e: React.FormEvent) => {
               boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
             }}
           >
-            <h4 style={{ marginTop: 0 }}>輸入密碼以進入【{passwordModalRoom.name}】</h4>
+            <h4 style={{ marginTop: 0 }}>
+              輸入密碼以進入【{passwordModalRoom.name}】
+            </h4>
             <form onSubmit={handleSubmitPassword}>
               <input
                 type="password"
                 placeholder="請輸入房間密碼"
                 value={inputPassword}
                 onChange={(e) => setInputPassword(e.target.value)}
-                style={{ width: "100%", padding: "8px", marginBottom: "15px", boxSizing: "border-box" }}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "15px",
+                  boxSizing: "border-box",
+                }}
                 autoFocus
               />
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: "10px",
+                }}
+              >
                 <button
                   type="button"
                   onClick={() => {
