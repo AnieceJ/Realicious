@@ -75,22 +75,23 @@ export function useChatroom() {
       setRooms((prev) =>
         prev.map((r) => (r.id === roomId ? { ...r, _count: { members: memberCount } } : r))
       );
-  //     setCurrentRoom((prevCurrent) => {
-  //   if (prevCurrent && prevCurrent.id === roomId) {
-  //     return {
-  //       ...prevCurrent,
-  //       _count: {
-  //         ...prevCurrent._count,
-  //         members: memberCount,
-  //       },
-  //     };
-  //   }
-  //   return prevCurrent;
-  // });
+      const targetRoomId = Number(roomId);
+     setCurrentRoom((prevRoom) => {
+    if (prevRoom && Number(prevRoom.id) === targetRoomId) {
+      return {
+        ...prevRoom,
+        _count: {
+          ...prevRoom?._count, // 保留原本 _count 裡的其他屬性（如果有）
+          members: memberCount,
+        },
+      };
+    }
+    return prevRoom;
+  });
     });
 
     socket.on("join_success", ({ room }: { room: Room }) => {
-      setCurrentRoom(room);
+      setCurrentRoom({...room});
       setPasswordModalRoom(null);
     });
 

@@ -82,7 +82,8 @@ export default function ChatWindow({
 
   // 切換房間時重置狀態
   useEffect(() => {
-    setUnreadCount(0);
+    const reset = async()=>{await setUnreadCount(0);}
+    reset()
     isNearBottomRef.current = true;
     prevMessagesLengthRef.current = messages.length;
   }, [currentRoom?.id]);
@@ -95,7 +96,7 @@ export default function ChatWindow({
       </div>
     );
   }
-
+console.log(currentRoom)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -112,7 +113,7 @@ export default function ChatWindow({
             {currentRoom.name}
           </h3>
           <p className="text-[11px] text-slate-400">
-            線上：{currentRoom._count?.members || 0} 人
+            線上：{currentRoom._count?.members ?? 0} 人
           </p>
         </div>
         <button
