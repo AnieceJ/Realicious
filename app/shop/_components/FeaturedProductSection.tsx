@@ -66,7 +66,7 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
   return (
     <>
       {toastComponent}
-      <div className="flex flex-row w-full h-72 bg-[#FFF9E6] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] select-none overflow-hidden"
+      <div className="flex flex-row w-full h-72 bg-[#FFD45C] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] select-none overflow-hidden"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
