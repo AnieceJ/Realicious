@@ -11,8 +11,7 @@ import PageHeader from "@/app/_components/PageHeader";
 const FILTERS = [
   { key: "all", label: "全部訂單" },
   { key: "1", label: "待付款" },
-  { key: "2", label: "已付款" },
-  { key: "3", label: "已完成" },
+  { key: "2", label: "付款完成" },
 ] as const;
 
 export default function AccountOrders() {
