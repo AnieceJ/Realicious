@@ -147,7 +147,7 @@ export default function ShopPage() {
         </div>
 
         {/* 商品網格 */}
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 xl:gap-8">
           {sortedProducts.map((p) => (
             <ProductCard key={p.id} product={p} favoritedProductIds={favoriteProductIds} />
           ))}

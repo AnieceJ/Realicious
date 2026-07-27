@@ -50,10 +50,10 @@ export default function ProductCard({ product, favoritedProductIds = [] }: { pro
 
       {/* 飄浮字卡 */}
       <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left pointer-events-none">
-        <p className="text-[#3D2419] font-black text-base truncate tracking-wide">
+        <p className="flex-1 min-w-0 text-[#3D2419] font-black text-base leading-snug line-clamp-2 tracking-wide">
           {product.name}
         </p>
-        <p className="text-[#8C5230] font-black text-lg tracking-wider">
+        <p className="shrink-0 text-[#8C5230] font-black text-lg tracking-wider">
           ${product.price}
         </p>
       </div>
