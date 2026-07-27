@@ -5,7 +5,7 @@ import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutSummary from "./_components/CheckoutSummary";
 import { getCartItems, type CartItem } from "@/lib/shop/cart";
-import { createOrder } from "@/lib/shop/orders";
+import { createOrder, type OrderContact } from "@/lib/shop/orders";
 import { useUser } from "@/app/context/user";
 import PaymentMethodDialog from "../_components/PaymentMethodDialog";
 
@@ -38,10 +38,15 @@ export default function CheckoutPage() {
   const { user } = useUser();
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
-  const [address, setAddress] = useState("");
+  const [contact, setContact] = useState<OrderContact>({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
   const createPendingOrder = async (): Promise<number | null> => {
     console.log("當前 user:", user);
-    const order = await createOrder(items, address, Number(user?.id) || undefined);
+    const order = await createOrder(items, contact, Number(user?.id) || undefined);
     if (!order.success) { alert("訂單建立失敗"); return null; }
 
     return order.orderId;
@@ -62,7 +67,10 @@ export default function CheckoutPage() {
         <div className="flex flex-row gap-8">
           <div className="w-[60%]">
             <div className="mb-6">
-              <CheckoutContactInfo onAddressChange={setAddress} />
+              <CheckoutContactInfo
+                defaultEmail={user?.account}
+                onContactChange={setContact}
+              />
             </div>
             <div className="mb-6">
               <CheckoutOrderList items={items} />
