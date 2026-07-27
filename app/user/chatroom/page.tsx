@@ -12,16 +12,19 @@ import PasswordModal from "./_components/PasswordModal";
 export default function Chatroom() {
   const { user, loading } = useUser();
   const {
-    rooms,
     currentRoom,
     messages,
     passwordModalRoom,
+    filteredRooms,
+    activeTab,
+    setActiveTab,
     setPasswordModalRoom,
     createRoom,
     joinRoom,
     sendMessage,
     leaveRoom,
     deleteRoom,
+    toggleFavorite,
   } = useChatroom();
 
   if (loading) return <div className="flex h-screen items-center justify-center">載入中...</div>;
@@ -34,11 +37,14 @@ export default function Chatroom() {
       <div className="flex flex-row h-[600px] md:h-[750px] gap-2 md:gap-6 min-w-[640px]">
         {/* 左側：大廳 */}
         <RoomList
-          rooms={rooms}
+          rooms={filteredRooms}               /* 👈 傳入過濾後的資料庫清單 */
+          activeTab={activeTab}               /* 👈 頁籤狀態 */
+          onTabChange={setActiveTab}          /* 👈 頁籤切換事件 */
           currentRoomId={currentRoom?.id}
           currentUserId={currentUserId}
           onJoinRoom={(room) => joinRoom(room.id)}
           onDeleteRoom={deleteRoom}
+          onToggleFavorite={toggleFavorite}   /* 👈 傳入追蹤函式 */
         />
 
         {/* 右側：控制台 & 聊天室 */}
