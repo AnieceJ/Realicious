@@ -34,7 +34,7 @@ export default function FeaturedProductSection({
   }, [paused, featuredList.length]);
 
   if (featuredList.length === 0) {
-    return <div className="h-72 w-full bg-[#FFF9E6] border-[3px] border-[#3D2419] animate-pulse" />;
+    return <div className="h-72 w-full bg-[#FFF9E6] border-[.1875rem] border-[#3D2419] animate-pulse" />;
   }
 
   const currentProduct = featuredList[currentIndex];
@@ -66,7 +66,7 @@ export default function FeaturedProductSection({
   return (
     <>
       {toastComponent}
-      <div className="flex flex-row w-full h-72 bg-[#FFD45C] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] select-none overflow-hidden"
+      <div className="flex flex-row w-full h-72 bg-[#FFD45C] border-[.1875rem] border-[#3D2419] shadow-[.25rem_.25rem_0rem_0rem_#3D2419] select-none overflow-hidden"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -92,12 +92,12 @@ export default function FeaturedProductSection({
           {/* 左右箭頭 */}
           <div className="absolute left-0 top-0 bottom-0 w-16 z-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-              className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl border-[.125rem] border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] hover:bg-[#ffbe94] active:translate-x-[.125rem] active:translate-y-[.125rem] active:shadow-none transition-all cursor-pointer"
             >◀</button>
           </div>
           <div className="absolute right-0 top-0 bottom-0 w-16 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <button onClick={(e) => { e.stopPropagation(); handleNext(); }}
-              className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-[#ffbe94] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl border-[.125rem] border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] hover:bg-[#ffbe94] active:translate-x-[.125rem] active:translate-y-[.125rem] active:shadow-none transition-all cursor-pointer"
             >▶</button>
           </div>
 
@@ -123,18 +123,18 @@ export default function FeaturedProductSection({
             限時特惠主打商品！【{currentProduct.name}】現正熱賣中。
           </p>
           <div className="flex items-center gap-2 mt-auto">
-            <span className="inline-flex items-center h-9 px-3 text-base font-black text-amber-700 bg-amber-100/80 border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419]">
+            <span className="inline-flex items-center h-9 px-3 text-base font-black text-amber-700 bg-amber-100/80 border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419]">
               ${currentProduct.price}
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
-              className="inline-flex items-center h-9 px-4 bg-purple-400 hover:bg-purple-500 active:translate-x-[1px] active:translate-y-[1px] text-[#3D2419] font-bold text-sm border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center h-9 px-4 bg-purple-400 hover:bg-purple-500 active:translate-x-[.0625rem] active:translate-y-[.0625rem] text-[#3D2419] font-bold text-sm border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] cursor-pointer whitespace-nowrap"
             >
               加入購物車
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); toggleFavorite(); }}
-              className="flex items-center justify-center h-9 w-9 bg-white border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
+              className="flex items-center justify-center h-9 w-9 bg-white border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
             >
               <svg className="w-4 h-4 transition-all" viewBox="0 0 24 24"
                 fill={favorited ? "#ef4444" : "none"}
