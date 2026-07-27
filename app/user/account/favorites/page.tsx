@@ -7,10 +7,14 @@ import Left from "../_components/left";
 import { getFavorites, removeFavorite, type Favorite } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
+import { useToast } from "@/app/shop/_components/Toast";
+import ConfirmRemoveFavoriteDialog from "@/app/shop/_components/ConfirmRemoveFavoriteDialog";
 
 export default function AccountFavorites() {
   const { user } = useUser();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [pendingRemoval, setPendingRemoval] = useState<Favorite | null>(null);
+  const { toastComponent, showToast } = useToast();
 
   const fetchFavorites = () => {
     if (!user?.id) return;
@@ -25,12 +29,24 @@ export default function AccountFavorites() {
 
   const handleRemove = async (productId: number) => {
     if (!user?.id) return;
-    await removeFavorite(Number(user.id), productId);
-    fetchFavorites();
+    const result = await removeFavorite(Number(user.id), productId);
+    if (result.success) {
+      showToast("已從收藏移除商品");
+      setPendingRemoval(null);
+      fetchFavorites();
+    }
   };
 
   return (
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
+      {toastComponent}
+      {pendingRemoval && (
+        <ConfirmRemoveFavoriteDialog
+          productName={pendingRemoval.product_name}
+          onCancel={() => setPendingRemoval(null)}
+          onConfirm={() => handleRemove(pendingRemoval.product_id)}
+        />
+      )}
       <Left />
       <div className="w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
         <PageHeader icon={<Heart className="h-5 w-5" />} title="我的收藏" />
@@ -55,7 +71,7 @@ export default function AccountFavorites() {
                   <div className="flex items-center justify-between mt-2">
                     <span className="font-black text-[#8C5230]">${fav.product_price}</span>
                     <button
-                      onClick={() => handleRemove(fav.product_id)}
+                      onClick={() => setPendingRemoval(fav)}
                       className="text-xs text-red-500 hover:text-red-700 cursor-pointer"
                     >
                       移除

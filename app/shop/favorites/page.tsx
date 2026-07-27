@@ -5,10 +5,14 @@ import Link from "next/link";
 import { getFavorites, removeFavorite, type Favorite } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
+import { useToast } from "@/app/shop/_components/Toast";
+import ConfirmRemoveFavoriteDialog from "@/app/shop/_components/ConfirmRemoveFavoriteDialog";
 
 export default function ShopFavorites() {
   const { user } = useUser();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [pendingRemoval, setPendingRemoval] = useState<Favorite | null>(null);
+  const { toastComponent, showToast } = useToast();
 
   const fetchFavorites = () => {
     if (!user?.id) return;
@@ -23,12 +27,24 @@ export default function ShopFavorites() {
 
   const handleRemove = async (productId: number) => {
     if (!user?.id) return;
-    await removeFavorite(Number(user.id), productId);
-    fetchFavorites();
+    const result = await removeFavorite(Number(user.id), productId);
+    if (result.success) {
+      showToast("已從收藏移除商品");
+      setPendingRemoval(null);
+      fetchFavorites();
+    }
   };
 
   return (
     <div className="relative min-h-screen p-4">
+      {toastComponent}
+      {pendingRemoval && (
+        <ConfirmRemoveFavoriteDialog
+          productName={pendingRemoval.product_name}
+          onCancel={() => setPendingRemoval(null)}
+          onConfirm={() => handleRemove(pendingRemoval.product_id)}
+        />
+      )}
       <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto">
         <PageHeader icon={<Heart className="h-5 w-5" />} title="我的收藏" />
@@ -53,7 +69,7 @@ export default function ShopFavorites() {
                   <div className="flex items-center justify-between mt-2">
                     <span className="font-black text-[#8C5230]">${fav.product_price}</span>
                     <button
-                      onClick={() => handleRemove(fav.product_id)}
+                      onClick={() => setPendingRemoval(fav)}
                       className="text-xs text-red-500 hover:text-red-700 cursor-pointer"
                     >
                       移除
