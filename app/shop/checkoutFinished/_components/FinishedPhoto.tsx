@@ -1,10 +1,12 @@
 import React from "react";
+import PetSprite from "@/app/accounting/pixel/PixelSpriteSheet";
+import "@/app/accounting/pixel/fx.css";
 
 export default function FinishedPhoto() {
   return (
     <div className="flex flex-col items-center justify-center">
-      <div className="bg-purple-300 w-100 h-30 mb-4">
-        {/* <img src="" alt="" /> */}
+      <div className="flex items-end justify-center w-full h-36 mb-4 overflow-hidden">
+        <PetSprite mood="happy" size={128} />
       </div>
     </div>
   );
