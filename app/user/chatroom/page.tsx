@@ -4,6 +4,8 @@ import { useUser } from "@/app/context/user";
 import { Socket, io } from "socket.io-client";
 import Cookies from "js-cookie";
 
+import Container from "@/app/user/_components/container"
+
 interface Room {
   id: number;
   name: string;
@@ -148,7 +150,10 @@ export default function Chatroom() {
   };
 
   useEffect(() => {
-    fetchRooms();
+    const loadInitialData = async () => {
+      await fetchRooms();
+    };
+    loadInitialData();
   }, []);
 
   // 3. 處理「建立房間」
@@ -261,44 +266,27 @@ export default function Chatroom() {
     setMessages([]);
   };
 
-  // 🌟 修復 3：先判斷 loading，再判斷 !user！
   if (loading) {
-    return <div style={{ padding: "20px" }}>載入使用者資料中...</div>;
+    return <div>載入使用者資料中...</div>;
   }
-
   if (!user) {
-    return <div style={{ padding: "20px" }}>請先登入以使用聊天室</div>;
+    return <div>請先登入以使用聊天室</div>;
   }
 
   return (
-    <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-      {/* 左邊：房間大廳列表 */}
-      <div
-        style={{
-          width: "30%",
-          borderRight: "1px solid #ccc",
-          paddingRight: "15px",
-        }}
-      >
-        <h3>建立新房間</h3>
+    <Container className="flex flex-col">
+       <div className="border w-full h-20">
         <form
           onSubmit={handleCreateRoom}
-          style={{
-            marginBottom: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-          }}
         >
           <input
             type="text"
             placeholder="房間名稱..."
             value={newRoomName}
             onChange={(e) => setNewRoomName(e.target.value)}
-            style={{ padding: "5px" }}
           />
 
-          <div style={{ display: "flex", gap: "10px" }}>
+          <div>
             <label>
               <input
                 type="radio"
@@ -325,20 +313,21 @@ export default function Chatroom() {
               placeholder="設定密碼..."
               value={newRoomPassword}
               onChange={(e) => setNewRoomPassword(e.target.value)}
-              style={{ padding: "5px" }}
             />
           )}
 
           <button
             type="submit"
-            style={{ padding: "5px 10px", marginTop: "5px" }}
           >
             建立房間
           </button>
         </form>
+       </div>
+       <div className="flex w-full">
+ {/* 左邊：房間大廳列表 */}
+      <div className="w-[30%] border">
 
-        <h3>聊天室列表</h3>
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <ul>
           {rooms.map((room) => (
             <li
               key={room.id}
@@ -381,7 +370,7 @@ export default function Chatroom() {
       </div>
 
       {/* 右邊：當前聊天室內容 */}
-      <div style={{ width: "70%" }}>
+      <div className={`w-[70%] border`}>
         {currentRoom ? (
           <div>
             <h2>
@@ -440,6 +429,9 @@ export default function Chatroom() {
           </div>
         )}
       </div>
+
+       </div>
+     
 
       {/* 私密房密碼輸入 Modal 彈窗 */}
       {passwordModalRoom && (
@@ -508,6 +500,8 @@ export default function Chatroom() {
           </div>
         </div>
       )}
-    </div>
+  
+    </Container>
+   
   );
 }
