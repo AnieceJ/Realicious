@@ -1,4 +1,5 @@
 import { Room } from "../hooks/useChatroom";
+import Image from "next/image";
 
 interface RoomListProps {
   rooms: Room[];
@@ -10,6 +11,9 @@ interface RoomListProps {
   onDeleteRoom: (roomId: number, e: React.MouseEvent) => void;
   onToggleFavorite: (roomId: number, e: React.MouseEvent) => void; // 🌟 補上介面定義
 }
+
+  /* 預設圖庫備用網址 */
+const DEFAULT_COVER = "/user/chatroom/apple.png";
 
 export default function RoomList({
   rooms,
@@ -88,16 +92,13 @@ export default function RoomList({
                 >
                   {/* 房間圖片區 */}
                   <div className="relative aspect-video w-full bg-slate-100 overflow-hidden">
-                    <img
-                      src={
-                        room.imageUrl ||
-                        "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60"
-                      }
+                    <Image
+                      src={room.imageUrl || DEFAULT_COVER}
                       alt={room.name}
+                      width={200}
+                      height={170}
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
-
-                    {/* 🌟 追蹤愛心按鈕 */}
                     <button
                       type="button"
                       onClick={(e) => onToggleFavorite(room.id, e)}
@@ -128,7 +129,9 @@ export default function RoomList({
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (confirm("確定要刪除這個房間嗎？此動作無法復原！")) {
+                          if (
+                            confirm("確定要刪除這個房間嗎？此動作無法復原！")
+                          ) {
                             onDeleteRoom(room.id, e);
                           }
                         }}

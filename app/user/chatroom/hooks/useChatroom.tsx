@@ -100,15 +100,23 @@ export function useChatroom() {
     loadInitialData();
   }, []);
 
-  const createRoom = async (name: string, type: "PUBLIC_GROUP" | "PRIVATE_GROUP", password?: string) => {
-    const token = Cookies.get("token");
-    const res = await fetch("http://localhost:3001/user/api/chatrooms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ name, type, password }),
-    });
-    return res.json();
-  };
+  const createRoom = async (
+  name: string,
+  type: "PUBLIC_GROUP" | "PRIVATE_GROUP",
+  imageUrl?: string, 
+  password?: string
+) => {
+  const token = Cookies.get("token");
+  const res = await fetch("http://localhost:3001/user/api/chatrooms", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, type, imageUrl, password }), // 
+  });
+  return res.json();
+};
 
   const joinRoom = (roomId: number, password?: string) => {
     if (!socketRef.current) return;
