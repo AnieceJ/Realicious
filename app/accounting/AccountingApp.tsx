@@ -214,6 +214,13 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
     })();
   }, []);
 
+// 台詞泡泡:出現後自動消失。每戳一次 getChickTalk 都回傳新物件 →
+// talk 參考變了 → 這個 effect 重跑 → 計時器重置,連戳不會提早消失。
+useEffect(() => {
+  if (!talk) return;
+  const id = setTimeout(() => setTalk(null), 3500);
+  return () => clearTimeout(id);
+}, [talk]);
 
   // 換頭飾（擇一，再點同一個 = 脫下）
   const toggleHead = async (item: "bow" | "cap" | "crown") => {
@@ -295,7 +302,7 @@ const saveName = async () => {
         streak: pet.streak,
         alive: pet.alive,
         loggedToday: pet.loggedToday,
-        isOver: over,
+        isOver: junkMode,
         justFed,
         pokeCount: next,
       })
@@ -840,6 +847,8 @@ const addTx = async () => {
         spriteSize={SPRITE}
         groundHeight={GROUND_H}
         x={12}
+        onPoke={handlePoke}   // ← 戳一下 → 播台詞
+        talk={talk}           // ← 把氣泡內容交給 ChickGround 定位渲染
       />
 
       {/* ============ 衣櫃 Modal ============
