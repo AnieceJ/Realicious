@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { useToast } from "../_components/article_toast";
 import Cookies from "js-cookie";
+import { getSavedArticles } from "@/lib/article-saved";
 
 interface ArticlePage {
 	id: string;
@@ -25,7 +26,6 @@ interface ArticlePage {
 	date: string;
 	author: string;
 	category: string;
-	isSaved: boolean;
 }
 
 interface ArticleDetailPageProps {
@@ -127,19 +127,14 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 
 		const checkIfSaved = async () => {
 			const token = Cookies.get("token");
-			if (!token) return;
+			if (!token) {
+				setIsSaved(false);
+				return;
+			}
 
 			try {
-				const response = await fetch("/api/article/articles", {
-					headers: { Authorization: `Bearer ${token}` },
-				});
-				if (response.ok) {
-					const data = await response.json();
-					const article = data.article.find((a: ArticlePage) => a.id === id);
-					if (article) {
-						setIsSaved(article.isSaved || false);
-					}
-				}
+				const savedArticles = await getSavedArticles(token);
+				setIsSaved(savedArticles.some((article) => article.id === id));
 			} catch (error) {
 				console.error("Error checking saved status:", error);
 			}

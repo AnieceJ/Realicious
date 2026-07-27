@@ -8,6 +8,7 @@ import ArticleThumbnail from "@/components/article-thumbnail";
 import { Button } from "@/components/ui/button";
 import { getArticleSummary } from "@/lib/article-preview";
 import SearchBar from "./_components/search_bar";
+import { useToast } from "./_components/article_toast";
 import Link from "next/link";
 import {
 	Menubar,
@@ -53,6 +54,7 @@ interface ArticlesResponse {
 }
 
 export default function ArticlePage() {
+	const { toastComponent } = useToast();
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [articles, setArticles] = React.useState<Article[]>([]);
 	const [loading, setLoading] = React.useState(true);
@@ -140,6 +142,7 @@ export default function ArticlePage() {
 
 	return (
 		<>
+			{toastComponent}
 			<div className="min-h-screen">
 				<div className="max-w-7xl mx-auto w-full py-4">
 					<div className="relative border-2 border-black">
@@ -160,8 +163,7 @@ export default function ArticlePage() {
 									>
 										<House size={22} />
 									</Link>
-									<div className="w-full min-w-0">
-										<Menubar className="flex h-auto min-w-0 flex-wrap border-0 bg-black p-0 text-slate-100 md:h-10 md:flex-nowrap">
+									<Menubar className="flex h-auto min-w-0 flex-wrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
 											<MenubarMenu>
 												<MenubarTrigger
 													onClick={() => {
@@ -213,23 +215,23 @@ export default function ArticlePage() {
 													</React.Fragment>
 												))
 											)}
-										</Menubar>
-									</div>
+									</Menubar>
 								</div>
-								<div className="w-full md:w-auto md:max-w-md shrink-0 border border-white">
-									{" "}
-									<SearchBar
-										onSearch={(keyword) => {
-											fetchArticles(
-												selectedSubCategory
-													? Number(selectedSubCategory)
-													: undefined,
-												keyword,
-											);
-											setCurrentPage(1);
-											updatePageInUrl(1);
-										}}
-									/>
+								<div className="flex w-full items-center gap-2 md:w-auto md:max-w-md">
+									<div className="min-w-0 flex-1 border border-white">
+										<SearchBar
+											onSearch={(keyword) => {
+												fetchArticles(
+													selectedSubCategory
+														? Number(selectedSubCategory)
+														: undefined,
+													keyword,
+												);
+												setCurrentPage(1);
+												updatePageInUrl(1);
+											}}
+										/>
+									</div>
 								</div>
 							</div>
 
