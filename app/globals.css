@@ -200,6 +200,66 @@
 	max-width: 100%;
 }
 
+.article-content figure.image {
+	clear: both;
+	margin: 1rem auto;
+	max-width: 100%;
+}
+
+.article-content figure.image img {
+	display: block;
+	margin-inline: auto;
+}
+
+.article-content span.image-inline {
+	display: inline-flex;
+	max-width: 100%;
+	vertical-align: middle;
+}
+
+.article-content .image-style-side,
+.article-content .image-style-align-right {
+	float: right;
+	margin-left: 1.5rem;
+	max-width: 50%;
+}
+
+.article-content .image-style-align-left {
+	float: left;
+	margin-right: 1.5rem;
+	max-width: 50%;
+}
+
+.article-content .image-style-align-center,
+.article-content .image-style-block-align-left,
+.article-content .image-style-block-align-right {
+	max-width: 100%;
+}
+
+.article-content .image-style-block-align-left {
+	margin-left: 0;
+}
+
+.article-content .image-style-block-align-right {
+	margin-right: 0;
+}
+
+.article-content::after {
+	clear: both;
+	content: "";
+	display: block;
+}
+
+@media (max-width: 639px) {
+	.article-content .image-style-side,
+	.article-content .image-style-align-left,
+	.article-content .image-style-align-right {
+		float: none;
+		margin-inline: auto;
+		max-width: 100%;
+	}
+}
+
 .article-content figure.table {
 	max-width: 100%;
 	overflow-x: auto;

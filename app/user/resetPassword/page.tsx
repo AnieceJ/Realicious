@@ -3,7 +3,6 @@
 import Container from "../_components/container";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-// 1. 引入 useSearchParams
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -13,14 +12,12 @@ import {
 import { useAlert } from "../context/alert";
 import { user_input } from "@/app/user/_components/button";
 import PasswordToggleIcon from "../_components/PasswordToggleIcon";
+import { RiLockPasswordFill } from "react-icons/ri";
 
 export default function ForgetPassword() {
   const { showAlert, closeAlert } = useAlert();
   const router = useRouter();
-  // 2. 初始化 searchParams 語法
   const searchParams = useSearchParams();
-
-  // 3. 從網址取出 token 和 email (對應前一頁傳過來的參數名)
   const token = searchParams.get("token");
   const email = searchParams.get("email");
 
@@ -56,7 +53,6 @@ export default function ForgetPassword() {
     }
     setSubmit(true);
     try {
-      // 4. 將路由改為我們寫好的後端驗證節點
       const res = await fetch(`${API_URL}/resetpassword`, {
         method: "POST",
         headers: {
@@ -91,7 +87,10 @@ export default function ForgetPassword() {
     <Container>
       <div className="flex justify-center items-center sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         <div className="w-108 h-180 bg-[#FCF9F6] border-2 flex flex-col items-center">
-          <h1 className="text-[24px] my-10">重置密碼</h1>
+          <h1 className="flex justify-center items-center text-[24px] my-10">
+            <RiLockPasswordFill className="mr-2"/>
+            重置密碼
+          </h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col items-center mb-5"
@@ -103,7 +102,7 @@ export default function ForgetPassword() {
               <div className="relative w-full">
                 <input
                   {...register("password", { required: "這是必填欄位" })}
-                  className={`${errors.password ? "border-red-500" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
+                  className={`${errors.password ? "border-red-500" : ""} ${user_input} w-90 h-12 text-[16px] px-2 pr-10`}
                   type={showPassword ? "text" : "password"}
                   id="password"
                   placeholder="密碼６位元以上 需包含英文與數字"
@@ -121,7 +120,7 @@ export default function ForgetPassword() {
               <div className="relative w-full">
                 <input
                   {...register("check", { required: "這是必填欄位" })}
-                  className={`${errors.check ? "border-red-500" : ""} ${user_input} w-90 h-12 text-[16px] px-2 `}
+                  className={`${errors.check ? "border-red-500" : ""} ${user_input} w-90 h-12 text-[16px] px-2 pr-10`}
                   type={showPasswordCheck ? "text" : "password"}
                   id="check"
                   placeholder="請再次輸入密碼"
@@ -142,7 +141,7 @@ export default function ForgetPassword() {
             <button
               type="submit"
               disabled={submit}
-              className={` border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
+              className={`-translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] w-55 h-15 ${submit ? `bg-gray-400 hover:bg-gray-400` : `bg-[#F02A2D] hover:bg-[#e50004]`}  text-white text-[26px] cursor-pointer  hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}
             >
               {submit ? `loading` : `確認送出`}
             </button>
