@@ -1,5 +1,6 @@
 "use client";
-import React, { useSyncExternalStore, useState } from "react";
+import React, { useEffect, useSyncExternalStore, useState } from "react";
+import { useRouter } from "next/navigation";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
@@ -35,7 +36,8 @@ function getServerSnapshot() {
 }
 
 export default function CheckoutPage() {
-  const { user } = useUser();
+  const router = useRouter();
+  const { user, loading } = useUser();
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
   const [contact, setContact] = useState<OrderContact>({
@@ -44,6 +46,13 @@ export default function CheckoutPage() {
     phone: "",
     address: "",
   });
+
+  useEffect(() => {
+    if (!loading && !user?.id) {
+      router.replace("/user/login?next=/shop/checkout");
+    }
+  }, [loading, router, user?.id]);
+
   const createPendingOrder = async (): Promise<number | null> => {
     console.log("當前 user:", user);
     const order = await createOrder(items, contact, Number(user?.id) || undefined);
@@ -51,6 +60,10 @@ export default function CheckoutPage() {
 
     return order.orderId;
   };
+
+  if (loading || !user?.id) {
+    return <div className="min-h-screen bg-white" />;
+  }
 
   return (
     <div className="relative min-h-screen scroll-smooth">
