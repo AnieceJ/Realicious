@@ -47,6 +47,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     Cookies.remove("token");
     Cookies.remove("user");
     localStorage.removeItem("realicious-cart"); // 跟商城相關
+    // 登出時立刻切回訪客購物車，避免全站 Header 暫時顯示上一位會員的數量。
+    localStorage.removeItem("realicious-cart-active-user");
+    window.dispatchEvent(new Event("cart-updated"));
     setUser(null);
   };
 
