@@ -260,11 +260,11 @@ const saveName = async () => {
     try {
       await savePet({ petName: n });
     } catch (e) {
-      console.error("[lia] 改名失敗", e);
-      setPetName(petName);  // 失敗就回復
-      setNameInput(petName);
-    }
-  };
+        console.error("[lia] 改名失敗", e);
+        setPetName(petName);
+        setNameInput(petName);
+        setTalk({ text: e instanceof Error ? e.message : "改名失敗了" });
+      }
 
   const pet = useMemo(() => calcPet(txs), [txs]);
 
