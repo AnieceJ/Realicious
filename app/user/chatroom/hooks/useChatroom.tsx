@@ -75,6 +75,18 @@ export function useChatroom() {
       setRooms((prev) =>
         prev.map((r) => (r.id === roomId ? { ...r, _count: { members: memberCount } } : r))
       );
+  //     setCurrentRoom((prevCurrent) => {
+  //   if (prevCurrent && prevCurrent.id === roomId) {
+  //     return {
+  //       ...prevCurrent,
+  //       _count: {
+  //         ...prevCurrent._count,
+  //         members: memberCount,
+  //       },
+  //     };
+  //   }
+  //   return prevCurrent;
+  // });
     });
 
     socket.on("join_success", ({ room }: { room: Room }) => {

@@ -17,7 +17,7 @@ export default function ChatWindow({
   onLeaveRoom,
 }: ChatWindowProps) {
   const [input, setInput] = useState("");
-  
+
   // 新增：未讀訊息數量狀態
   const [unreadCount, setUnreadCount] = useState(0);
 
@@ -34,7 +34,7 @@ export default function ChatWindow({
       top: container.scrollHeight,
       behavior: "smooth",
     });
-    
+
     // 滾到底部後清空未讀數
     setUnreadCount(0);
     isNearBottomRef.current = true;
@@ -47,7 +47,7 @@ export default function ChatWindow({
 
     const distanceFromBottom =
       container.scrollHeight - container.scrollTop - container.clientHeight;
-    
+
     const isAtBottom = distanceFromBottom < 80;
     isNearBottomRef.current = isAtBottom;
 
@@ -108,28 +108,71 @@ export default function ChatWindow({
       {/* Header */}
       <div className="flex items-center justify-between border-b px-4 py-3 bg-slate-50/50 flex-shrink-0">
         <div>
-          <h3 className="font-bold text-sm text-slate-800">{currentRoom.name}</h3>
-          <p className="text-[11px] text-slate-400">線上：{currentRoom._count?.members || 0} 人</p>
+          <h3 className="font-bold text-sm text-slate-800">
+            {currentRoom.name}
+          </h3>
+          <p className="text-[11px] text-slate-400">
+            線上：{currentRoom._count?.members || 0} 人
+          </p>
         </div>
-        <button onClick={onLeaveRoom} className="px-2 py-0.5 text-xs border rounded hover:bg-slate-100">
+        <button
+          onClick={onLeaveRoom}
+          className="px-2 py-0.5 text-xs border rounded hover:bg-slate-100"
+        >
           離開 🚪
         </button>
       </div>
 
       {/* Messages 容器：設定 relative 讓提示按鈕定位 */}
       <div className="flex-1 relative overflow-hidden flex flex-col">
-        <div 
+        <div
           ref={chatContainerRef}
           onScroll={handleScroll}
           className="flex-1 overflow-y-auto p-4 space-y-2.5"
         >
           {messages.map((msg, idx) => {
             const isMe = msg.senderId === currentUserId;
+
+            // 🌟 1. 讀取 user_profile 裡面的資料
+            const profile = msg.sender?.user_profile;
+            const avatarUrl =
+              profile?.avatar ||
+              `https://api.dicebear.com/7.x/bottts/svg?seed=${msg.sender?.account || idx}`;
+            const displayName =
+              profile?.nick_name ||
+              msg.sender?.account ||
+              `User #${msg.senderId}`;
+
             return (
-              <div key={msg.id || idx} className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}>
-                {!isMe && <span className="text-[10px] text-slate-400">{msg.sender?.account}</span>}
-                <div className={`px-3 py-1.5 text-xs rounded-xl max-w-[80%] break-words ${isMe ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-800"}`}>
-                  {msg.content}
+              <div
+                key={msg.id || idx}
+                className={`flex gap-2.5 ${isMe ? "flex-row-reverse" : "flex-row"}`}
+              >
+                {/* 大頭貼 */}
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="w-8 h-8 rounded-full object-cover border border-slate-200 flex-shrink-0"
+                />
+
+                <div
+                  className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
+                >
+                  {/* 顯示暱稱/帳號 */}
+                  <span className="text-[10px] text-slate-400 mb-1 px-0.5">
+                    {displayName}
+                  </span>
+
+                  {/* 對話氣泡 */}
+                  <div
+                    className={`px-3 py-1.5 text-xs rounded-2xl max-w-[260px] sm:max-w-[360px] break-words shadow-sm ${
+                      isMe
+                        ? "bg-indigo-600 text-white rounded-tr-none"
+                        : "bg-slate-100 text-slate-800 rounded-tl-none"
+                    }`}
+                  >
+                    {msg.content}
+                  </div>
                 </div>
               </div>
             );
@@ -148,7 +191,10 @@ export default function ChatWindow({
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="border-t p-2 flex gap-2 flex-shrink-0 bg-white">
+      <form
+        onSubmit={handleSubmit}
+        className="border-t p-2 flex gap-2 flex-shrink-0 bg-white"
+      >
         <input
           type="text"
           value={input}
@@ -156,7 +202,10 @@ export default function ChatWindow({
           placeholder="輸入訊息..."
           className="flex-1 border rounded px-2 py-1 text-xs focus:outline-none"
         />
-        <button type="submit" className="bg-indigo-600 text-white text-xs px-3 py-1 rounded">
+        <button
+          type="submit"
+          className="bg-indigo-600 text-white text-xs px-3 py-1 rounded"
+        >
           發送
         </button>
       </form>
