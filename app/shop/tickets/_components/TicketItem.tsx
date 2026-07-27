@@ -10,6 +10,11 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 const API_BASE = "http://localhost:3001";
+const FALLBACK_IMAGE = `${API_BASE}/images/optimized/吃到飽.webp`;
+
+function getImageUrl(imagePath: string) {
+  return imagePath.startsWith("http") ? imagePath : `${API_BASE}${imagePath}`;
+}
 
 export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRefresh?: () => void }) {
   const [showQR, setShowQR] = useState(false);
@@ -37,13 +42,15 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
           <div className="flex flex-row items-center justify-between w-full">
             <div className="flex flex-col items-start gap-1.5 shrink-0 w-48 text-left">
               <div className="flex items-center gap-2">
-                {ticket.product_img && (
-                  <img
-                    src={ticket.product_img}
-                    alt=""
-                    className="w-10 h-10 object-cover border-2 border-[#3D2419]"
-                  />
-                )}
+                <img
+                  src={ticket.product_img ? getImageUrl(ticket.product_img) : FALLBACK_IMAGE}
+                  alt={ticket.product_name || ticket.name}
+                  className="w-10 h-10 object-cover border-2 border-[#3D2419]"
+                  onError={(event) => {
+                    event.currentTarget.onerror = null;
+                    event.currentTarget.src = FALLBACK_IMAGE;
+                  }}
+                />
                 <div>
                   <div className="text-sm font-black tracking-wide">
                     TICKET ID: <span className="text-[#8C5230]">#{ticket.id}</span>

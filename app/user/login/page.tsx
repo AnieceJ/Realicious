@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, type FieldErrors } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useUser } from "@/app/context/user";
 import { useAlert } from "../context/alert";
@@ -24,6 +24,10 @@ export default function Login() {
   const { showAlert, closeAlert } = useAlert();
   const searchParams = useSearchParams();
   const error = searchParams.get("error");
+  const requestedNext = searchParams.get("next");
+  const nextPath = requestedNext?.startsWith("/") && !requestedNext.startsWith("//")
+    ? requestedNext
+    : "/";
   
   useEffect(() => {
     if (error === "server_error") {
@@ -50,7 +54,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   
   // RHF有錯誤訊息時觸發晃動
-  const onError = (errors: any) => {
+  const onError = (errors: FieldErrors<LoginInput>) => {
     if (errors.account) {
       setShakeAccount(true);
       setTimeout(() => setShakeAccount(false), 400); // 0.4秒動畫跑完後，關掉開關
@@ -102,7 +106,7 @@ export default function Login() {
         setTimeout(() => {
           closeAlert();
           router.refresh();
-          router.replace("/");
+          router.replace(nextPath);
         }, 2000);
       } else {
         showAlert("error", "登入失敗", "帳號或密碼輸入錯誤");
@@ -189,7 +193,7 @@ export default function Login() {
               </div>
               <Link
                 className=" text-[16px] text-center h-6 align-middle w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
-                href={`/user/forgetPassword`}
+              href={`/user/forgetPassword`}
               >
                 忘記密碼
               </Link>
@@ -208,7 +212,7 @@ export default function Login() {
           <h2 className="text-[20px] mb-4">--OR--</h2>
           <div className="flex justify-center items-center">
             <Link
-              href={"http://localhost:3001/user/api/auth/google"}
+              href={`http://localhost:3001/user/api/auth/google?next=${encodeURIComponent(nextPath)}`}
               className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0`}
             >
               <Image

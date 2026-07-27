@@ -1,10 +1,28 @@
 const API_BASE = "http://localhost:3001";
 
-export async function createOrder(items: { id: number; name: string; price: number; qty: number }[], address = "", userId?: number) {
+export type OrderContact = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+};
+
+export async function createOrder(
+  items: { id: number; name: string; price: number; qty: number }[],
+  contact: OrderContact,
+  userId?: number,
+) {
   const res = await fetch(`${API_BASE}/orders`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ items, address, user_id: userId }),
+    body: JSON.stringify({
+      items,
+      user_id: userId,
+      address: contact.address,
+      recipient_name: contact.name,
+      recipient_email: contact.email,
+      recipient_phone: contact.phone,
+    }),
   });
   return res.json();
 }

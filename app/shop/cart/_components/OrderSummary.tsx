@@ -2,13 +2,24 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import type { CartItem } from "@/lib/shop/cart";
 import { useConfirm } from "../../_components/ConfirmModal";
+import { useUser } from "@/app/context/user";
 
 export default function OrderSummary({ items }: { items: CartItem[] }) {
   const router = useRouter();
+  const { user } = useUser();
   const { confirmComponent, showConfirm } = useConfirm();
   const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
   const handleCheckout = async () => {
+    if (!user?.id) {
+      const confirmed = await showConfirm(
+        "電子票券、訂單紀錄與待付款續付都會綁定會員帳號。\n\n請先登入會員後再結帳。",
+        { confirmLabel: "前往登入" },
+      );
+      if (confirmed) router.push("/user/login?next=/shop/checkout");
+      return;
+    }
+
     const count = items.reduce((sum, item) => sum + item.qty, 0);
     const confirmed = await showConfirm(
       `確認結帳？\n\n共 ${count} 件商品\n總計 $${subtotal.toLocaleString()}\n\n確定前往結帳頁面？`
