@@ -9,13 +9,23 @@ export interface Room {
   createdBy: number;
   imageUrl?: string;
   _count?: { members: number };
+  isFavorited?: boolean; 
 }
 
+export interface UserProfile {
+  nick_name?: string | null;
+  avatar?: string | null;
+}
+export interface Sender {
+  id: number;
+  account: string;
+  user_profile?: UserProfile | null; 
+}
 export interface Message {
   id?: number;
   senderId: number;
   content: string;
-  sender?: { id: number; account: string };
+  sender?: Sender
 }
 
 export function useChatroom() {
@@ -23,9 +33,12 @@ export function useChatroom() {
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [passwordModalRoom, setPasswordModalRoom] = useState<Room | null>(null);
+  
+  // 🌟 1. 新增：頁籤狀態 (all | favorites)
+  const [activeTab, setActiveTab] = useState<"all" | "favorites">("all");
+
   const socketRef = useRef<Socket | null>(null);
 
-  // 1. Fetch Rooms API
   const fetchRooms = async () => {
     const token = Cookies.get("token");
     try {
@@ -39,9 +52,7 @@ export function useChatroom() {
     }
   };
 
-  // 2. Socket 初始化與事件監聽
   useEffect(() => {
-
     const token = Cookies.get("token");
     if (!token) return;
 
@@ -64,10 +75,23 @@ export function useChatroom() {
       setRooms((prev) =>
         prev.map((r) => (r.id === roomId ? { ...r, _count: { members: memberCount } } : r))
       );
+      const targetRoomId = Number(roomId);
+     setCurrentRoom((prevRoom) => {
+    if (prevRoom && Number(prevRoom.id) === targetRoomId) {
+      return {
+        ...prevRoom,
+        _count: {
+          ...prevRoom?._count, // 保留原本 _count 裡的其他屬性（如果有）
+          members: memberCount,
+        },
+      };
+    }
+    return prevRoom;
+  });
     });
 
     socket.on("join_success", ({ room }: { room: Room }) => {
-      setCurrentRoom(room);
+      setCurrentRoom({...room});
       setPasswordModalRoom(null);
     });
 
@@ -90,6 +114,7 @@ export function useChatroom() {
       socket.disconnect();
     };
   }, []);
+
   useEffect(() => {
     const loadInitialData = async () => {
       await fetchRooms();
@@ -97,16 +122,23 @@ export function useChatroom() {
     loadInitialData();
   }, []);
 
-  // 3. 封裝給 UI 呼叫的 Actions
-  const createRoom = async (name: string, type: "PUBLIC_GROUP" | "PRIVATE_GROUP", password?: string) => {
-    const token = Cookies.get("token");
-    const res = await fetch("http://localhost:3001/user/api/chatrooms", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ name, type, password }),
-    });
-    return res.json();
-  };
+  const createRoom = async (
+  name: string,
+  type: "PUBLIC_GROUP" | "PRIVATE_GROUP",
+  imageUrl?: string, 
+  password?: string
+) => {
+  const token = Cookies.get("token");
+  const res = await fetch("http://localhost:3001/user/api/chatrooms", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, type, imageUrl, password }), // 
+  });
+  return res.json();
+};
 
   const joinRoom = (roomId: number, password?: string) => {
     if (!socketRef.current) return;
@@ -136,8 +168,44 @@ export function useChatroom() {
     return res.json();
   };
 
+  const toggleFavorite = async (roomId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    // 畫面先行更新 (Optimistic UI)
+    setRooms((prevRooms) =>
+      prevRooms.map((room) =>
+        room.id === roomId ? { ...room, isFavorited: !room.isFavorited } : room
+      )
+    );
+
+    const token = Cookies.get("token");
+    try {
+      const res = await fetch(
+        `http://localhost:3001/user/api/chatrooms/${roomId}/favorite`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const result = await res.json();
+      if (!result.success) fetchRooms();
+    } catch (err) {
+      console.error("切換追蹤狀態失敗:", err);
+      fetchRooms();
+    }
+  };
+
+  // 🌟 2. 依據 activeTab 計算出過濾後的房間清單
+  const filteredRooms = rooms.filter((room) => {
+    if (activeTab === "favorites") return room.isFavorited;
+    return true;
+  });
+
   return {
     rooms,
+    filteredRooms, // 👈 匯出過濾後的資料
+    activeTab,     // 👈 匯出頁籤狀態
+    setActiveTab,  // 👈 匯出切換頁籤函式
     currentRoom,
     messages,
     passwordModalRoom,
@@ -147,5 +215,6 @@ export function useChatroom() {
     sendMessage,
     leaveRoom,
     deleteRoom,
+    toggleFavorite,
   };
 }
