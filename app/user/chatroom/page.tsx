@@ -11,7 +11,7 @@ interface Room {
   name: string;
   type: string; // "PUBLIC_GROUP" | "PRIVATE_GROUP"
   createdBy: number;
-  imageUrl?: string; // 預留房間圖片欄位
+  imageUrl?: string;
   _count?: { members: number };
 }
 
@@ -28,17 +28,17 @@ export default function Chatroom() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
 
-  // 頁籤過濾：所有房間 vs 喜愛房間
+  // 頁籤過濾
   const [activeTab, setActiveTab] = useState<"all" | "favorites">("all");
 
-  // 1. 建立房間表單 State
+  // 表單 State
   const [newRoomName, setNewRoomName] = useState("");
   const [newRoomType, setNewRoomType] = useState<
     "PUBLIC_GROUP" | "PRIVATE_GROUP"
   >("PUBLIC_GROUP");
   const [newRoomPassword, setNewRoomPassword] = useState("");
 
-  // 2. 私密房密碼彈窗 State
+  // 私密房彈窗 State
   const [passwordModalRoom, setPasswordModalRoom] = useState<Room | null>(null);
   const [inputPassword, setInputPassword] = useState("");
 
@@ -48,7 +48,7 @@ export default function Chatroom() {
   const currentUserId = user?.id ? Number(user.id) : null;
   const socketRef = useRef<Socket | null>(null);
 
-  // 自動置底 Ref
+  // 置底 Ref
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
@@ -59,7 +59,7 @@ export default function Chatroom() {
     scrollToBottom();
   }, [messages]);
 
-  // Socket 初始化邏輯
+  // Socket 初始化
   useEffect(() => {
     const token = Cookies.get("token");
     if (!token) return;
@@ -276,25 +276,29 @@ export default function Chatroom() {
   }
 
   return (
-    <div className="py-6">
-      {/* 🌟 左右雙欄主要架構 */}
-      <div className="flex h-[750px] gap-6">
+    <Container className="py-4 md:py-6">
+      {/* 
+        🌟 響應式核心：
+        - 桌機 (md 以上): 水平雙欄 (flex-row)，高度固定 750px
+        - 手機 (md 以下): 垂直直立 (flex-col)，高度自動延伸，確保閱讀體驗不擠壓
+      */}
+      <div className="flex flex-col md:flex-row h-auto md:h-[750px] gap-4 md:gap-6">
         
-        {/* 👈 左側：聊天大廳 (佔 60% 寬度) */}
-        <div className="flex flex-[1.4] flex-col rounded-2xl border border-slate-200 bg-slate-50/50 p-5 shadow-sm">
-          {/* 大廳 Header & 頁籤 */}
-          <div className="mb-4 flex items-center justify-between">
+        {/* 👈 左側：聊天大廳 */}
+        <div className="flex flex-[1.4] flex-col rounded-2xl border border-slate-200 bg-slate-50/50 p-4 md:p-5 shadow-sm h-[500px] md:h-full">
+          {/* 大廳 Header */}
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h2 className="text-xl font-bold text-slate-800">聊天大廳</h2>
-              <p className="text-xs text-slate-500">探索感興趣的房間，即時加入對話</p>
+              <h2 className="text-lg md:text-xl font-bold text-slate-800">聊天大廳</h2>
+              <p className="text-xs text-slate-500 hidden sm:block">探索感興趣的房間，即時加入對話</p>
             </div>
 
-            {/* 頁籤按鈕 */}
-            <div className="flex rounded-lg bg-slate-200/70 p-1 text-xs">
+            {/* 頁籤 */}
+            <div className="flex rounded-lg bg-slate-200/70 p-1 text-xs w-fit">
               <button
                 type="button"
                 onClick={() => setActiveTab("all")}
-                className={`rounded-md px-3 py-1.5 font-medium transition-all ${
+                className={`rounded-md px-3 py-1 font-medium transition-all ${
                   activeTab === "all"
                     ? "bg-white text-slate-800 shadow-sm"
                     : "text-slate-500 hover:text-slate-700"
@@ -305,20 +309,24 @@ export default function Chatroom() {
               <button
                 type="button"
                 onClick={() => setActiveTab("favorites")}
-                className={`rounded-md px-3 py-1.5 font-medium transition-all ${
+                className={`rounded-md px-3 py-1 font-medium transition-all ${
                   activeTab === "favorites"
                     ? "bg-white text-slate-800 shadow-sm"
                     : "text-slate-500 hover:text-slate-700"
                 }`}
               >
-                喜愛清單 ❤️
+                喜愛 ❤️
               </button>
             </div>
           </div>
 
-          {/* 🌟 卡片式房間網格 (一排 2~3 個，超出一頁自動滾動) */}
+          {/* 🌟 卡片網格 RWD：
+              - 手機版 (default): grid-cols-1 (一排 1 個)
+              - 平板版 (sm): grid-cols-2 (一排 2 個)
+              - 桌機版 (lg): grid-cols-3 (一排 3 個)
+          */}
           <div className="flex-1 overflow-y-auto pr-1">
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {rooms.map((room) => {
                 const isSelected = currentRoom?.id === room.id;
                 const isOwner = currentUserId === room.createdBy;
@@ -327,13 +335,13 @@ export default function Chatroom() {
                   <div
                     key={room.id}
                     onClick={() => handleJoinRoom(room)}
-                    className={`group relative flex flex-col overflow-hidden rounded-xl border bg-white cursor-pointer transition-all hover:-translate-y-0.5 hover:shadow-md ${
+                    className={`group relative flex flex-col overflow-hidden rounded-xl border bg-white cursor-pointer transition-all hover:shadow-md ${
                       isSelected
                         ? "border-indigo-500 ring-2 ring-indigo-500/20 shadow-md"
                         : "border-slate-200 hover:border-indigo-300"
                     }`}
                   >
-                    {/* 房間卡片頂部圖片區塊 */}
+                    {/* 房間圖片區 */}
                     <div className="relative aspect-video w-full bg-slate-100 overflow-hidden">
                       <img
                         src={
@@ -343,36 +351,34 @@ export default function Chatroom() {
                         alt={room.name}
                         className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
-                      {/* 私密房標籤 */}
                       {room.type === "PRIVATE_GROUP" && (
-                        <span className="absolute top-2 left-2 rounded-md bg-black/60 backdrop-blur-md px-2 py-0.5 text-xs font-medium text-white">
+                        <span className="absolute top-2 left-2 rounded-md bg-black/60 backdrop-blur-md px-1.5 py-0.5 text-[10px] font-medium text-white">
                           🔒 私密
                         </span>
                       )}
-                      {/* 線上人數 Badge */}
-                      <span className="absolute bottom-2 right-2 rounded-md bg-white/90 backdrop-blur-md px-2 py-0.5 text-[11px] font-semibold text-slate-700 shadow-sm">
-                        🟢 {room._count?.members || 0} 人線上
+                      <span className="absolute bottom-2 right-2 rounded-md bg-white/90 backdrop-blur-md px-2 py-0.5 text-[10px] font-semibold text-slate-700 shadow-sm">
+                        🟢 {room._count?.members || 0} 人
                       </span>
                     </div>
 
-                    {/* 房間卡片內容區塊 */}
-                    <div className="flex flex-1 flex-col justify-between p-3.5">
-                      <div>
-                        <h3 className="font-bold text-sm text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition-colors">
-                          {room.name}
-                        </h3>
-                      </div>
+                    {/* 房間卡片文字區 (精簡手機顯示) */}
+                    <div className="flex flex-1 flex-col justify-between p-3">
+                      <h3 className="font-bold text-xs md:text-sm text-slate-800 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+                        {room.name}
+                      </h3>
 
-                      <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-2.5">
-                        <span className="text-[11px] text-slate-400">
-                          {isOwner ? "👑 你是建立者" : "點擊進入"}
+                      {/* 🌟 資訊精簡：隱藏「點擊進入」提示，手機版只保留必要的刪除按鈕 */}
+                      <div className="mt-2 flex items-center justify-between border-t border-slate-100 pt-2 text-[11px]">
+                        {/* 「點擊進入」只有在平版/電腦版 (sm:) 才顯示 */}
+                        <span className="hidden sm:inline text-slate-400">
+                          {isOwner ? "👑 建立者" : "點擊進入"}
                         </span>
 
                         {isOwner && (
                           <button
                             type="button"
                             onClick={(e) => handleDeleteRoom(room.id, e)}
-                            className="rounded px-2 py-0.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors"
+                            className="rounded px-1.5 py-0.5 text-xs font-medium text-red-500 hover:bg-red-50 transition-colors ml-auto"
                           >
                             刪除
                           </button>
@@ -386,15 +392,16 @@ export default function Chatroom() {
           </div>
         </div>
 
-        {/* 👉 右側：控制面板 & 聊天視窗 (佔 40% 寬度) */}
-        <div className="flex flex-1 flex-col gap-4">
+        {/* 👉 右側：控制面板 & 聊天視窗 */}
+        {/* 🌟 給予最小寬度（md:min-w-[340px]），確保縮小視窗時聊天室不會被壓得太窄 */}
+        <div className="flex flex-1 flex-col gap-4 md:min-w-[340px] h-[550px] md:h-full">
           
-          {/* 右上方：建立新房間卡片 */}
-          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          {/* 右上方：建立新房間 */}
+          <div className="rounded-2xl border border-slate-200 bg-white p-3.5 md:p-4 shadow-sm shrink-0">
             <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
               ➕ 建立新房間
             </h3>
-            <form onSubmit={handleCreateRoom} className="space-y-3">
+            <form onSubmit={handleCreateRoom} className="space-y-2.5">
               <input
                 type="text"
                 placeholder="房間名稱..."
@@ -429,7 +436,7 @@ export default function Chatroom() {
 
                 <button
                   type="submit"
-                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
+                  className="rounded-lg bg-indigo-600 px-3 py-1 text-xs font-medium text-white hover:bg-indigo-700 transition-colors"
                 >
                   建立
                 </button>
@@ -448,13 +455,13 @@ export default function Chatroom() {
           </div>
 
           {/* 右下方：聊天視窗 */}
-          <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+          <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm min-h-0">
             {currentRoom ? (
               <>
                 {/* 聊天室頂欄 */}
                 <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 bg-slate-50/50">
                   <div className="truncate pr-2">
-                    <h3 className="font-bold text-sm text-slate-800 truncate flex items-center gap-1">
+                    <h3 className="font-bold text-xs md:text-sm text-slate-800 truncate flex items-center gap-1">
                       {currentRoom.name}
                       {currentRoom.type === "PRIVATE_GROUP" && "🔒"}
                     </h3>
@@ -471,8 +478,8 @@ export default function Chatroom() {
                   </button>
                 </div>
 
-                {/* 🌟 訊息顯示區 (最佳化文字換行與對齊) */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/30">
+                {/* 訊息顯示區 */}
+                <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 bg-slate-50/30">
                   {messages.map((msg, index) => {
                     const isMe = msg.senderId === currentUserId;
 
@@ -489,7 +496,6 @@ export default function Chatroom() {
                           </span>
                         )}
 
-                        {/* 🌟 關鍵修正：max-w-[85%] 限制最大寬度、w-fit 字少時自動縮小、break-words 避免字多破頁 */}
                         <div
                           className={`w-fit max-w-[85%] rounded-2xl px-3.5 py-2 text-xs leading-relaxed shadow-sm break-words ${
                             isMe
@@ -505,8 +511,8 @@ export default function Chatroom() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* 訊息輸入區 */}
-                <div className="border-t border-slate-100 p-3 bg-white">
+                {/* 輸入框 */}
+                <div className="border-t border-slate-100 p-2.5 md:p-3 bg-white">
                   <form
                     onSubmit={handleSendMessage}
                     className="flex items-center gap-2"
@@ -520,7 +526,7 @@ export default function Chatroom() {
                     />
                     <button
                       type="submit"
-                      className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white hover:bg-indigo-700 transition-colors shrink-0"
+                      className="rounded-lg bg-indigo-600 px-3.5 py-2 text-xs font-medium text-white hover:bg-indigo-700 transition-colors shrink-0"
                     >
                       發送
                     </button>
@@ -530,14 +536,14 @@ export default function Chatroom() {
             ) : (
               <div className="flex flex-1 flex-col items-center justify-center text-slate-300 p-6 text-center">
                 <span className="text-3xl mb-2">💬</span>
-                <p className="text-xs">請點擊左側房間卡片進入聊天</p>
+                <p className="text-xs">請點擊大廳房間卡片進入聊天</p>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* 私密房密碼彈窗 Modal */}
+      {/* 私密房密碼彈窗 */}
       {passwordModalRoom && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-xl">
@@ -579,6 +585,6 @@ export default function Chatroom() {
           </div>
         </div>
       )}
-    </div>
+    </Container>
   );
 }
