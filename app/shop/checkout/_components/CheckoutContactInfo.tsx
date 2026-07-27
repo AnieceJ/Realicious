@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Cookies from "js-cookie";
+import { Check, Pencil } from "lucide-react";
 import type { OrderContact } from "@/lib/shop/orders";
 
 const API_URL =
@@ -32,6 +33,7 @@ export default function CheckoutContactInfo({
     phone: "",
     address: "",
   });
+  const [isEditing, setIsEditing] = useState(false);
   const isEdited = useRef(false);
 
   useEffect(() => {
@@ -80,7 +82,20 @@ export default function CheckoutContactInfo({
   return (
     <div className="w-full">
       <div className="flex flex-col w-full px-4 py-2.5 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
-        <h2 className="text-xl mb-4">聯絡資訊</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl">聯絡資訊</h2>
+          <button
+            type="button"
+            onClick={() => setIsEditing((value) => !value)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-[#FBDF58] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all cursor-pointer"
+            aria-label={isEditing ? "完成修改聯絡資訊" : "修改聯絡資訊"}
+          >
+            {isEditing ? <Check className="w-4 h-4" /> : <Pencil className="w-4 h-4" />}
+            <span>{isEditing ? "完成" : "修改"}</span>
+          </button>
+        </div>
+
+        {isEditing ? (
         <div className="flex flex-col gap-3">
           <label>
             <span className="text-sm">姓名</span>
@@ -99,6 +114,26 @@ export default function CheckoutContactInfo({
             <input type="text" placeholder="請輸入地址" value={contact.address} onChange={(e) => handleChange("address", e.target.value)} className="w-full px-3 py-2 border-2 border-[#3D2419] bg-white text-sm font-normal placeholder-gray-400" />
           </label>
         </div>
+        ) : (
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            <div>
+              <dt className="text-[#3D2419]/60 mb-1">姓名</dt>
+              <dd className="min-h-5 break-words">{contact.name || "尚未填寫"}</dd>
+            </div>
+            <div>
+              <dt className="text-[#3D2419]/60 mb-1">電子郵件</dt>
+              <dd className="min-h-5 break-all">{contact.email || "尚未填寫"}</dd>
+            </div>
+            <div>
+              <dt className="text-[#3D2419]/60 mb-1">手機號碼</dt>
+              <dd className="min-h-5 break-words">{contact.phone || "尚未填寫"}</dd>
+            </div>
+            <div>
+              <dt className="text-[#3D2419]/60 mb-1">地址</dt>
+              <dd className="min-h-5 break-words">{contact.address || "尚未填寫"}</dd>
+            </div>
+          </dl>
+        )}
       </div>
     </div>
   );
