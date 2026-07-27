@@ -10,6 +10,7 @@ import Favorite from "../../_components/Favorite";
 import PurchaseButton from "./_components/PurchaseButton";
 import ProductDescription from "./_components/ProductDescription";
 import TicketInfo from "./_components/TicketInfo";
+import RelatedProducts from "./_components/RelatedProducts";
 import { getProductById, type Product } from "@/lib/shop/product";
 import { getFavorites } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
@@ -126,6 +127,8 @@ export default function ProductsPage() {
         <div className="mt-16 border-t-[3px] border-[#3D2419] pt-12">
           <ProductDescription description={product.description} />
         </div>
+
+        <RelatedProducts product={product} />
       </div>
     </div>
   );
