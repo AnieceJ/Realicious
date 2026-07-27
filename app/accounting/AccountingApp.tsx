@@ -1,5 +1,6 @@
 "use client";
 
+import { getChickTalk } from "./chickTalk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBurger, faMugHot, faTrainSubway, faBook, faGamepad, faShirt,
@@ -183,6 +184,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [showBudget, setShowBudget] = useState(false);
   const [junkMode, setJunkMode] = useState(false);
   const [junkDismissed, setJunkDismissed] = useState(false);
+  const [pokeCount, setPokeCount] = useState(0);
+  const [talk, setTalk] = useState<{ text: string; sub?: string } | null>(null);
 
   // 表單
   const [fType, setFType] = useState<"expense" | "income">("expense");
@@ -280,6 +283,26 @@ const saveName = async () => {
   const balance = monthIncome - monthExpense;
   const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
   const over = spent > budget;
+  const pokeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handlePoke = () => {
+    const next = pokeCount + 1;
+    setPokeCount(next);
+  setTalk(
+      getChickTalk({
+        name: petName,
+        hp: pet.hp,
+        streak: pet.streak,
+        alive: pet.alive,
+        loggedToday: pet.loggedToday,
+        isOver: over,
+        justFed,
+        pokeCount: next,
+      })
+    );
+    if (pokeTimer.current) clearTimeout(pokeTimer.current);
+    pokeTimer.current = setTimeout(() => setPokeCount(0), 3000);
+  };
   const spentAnim = useCountUp(spent); // 金額用「數」的，不要用「跳」的
 
   const spendDays = useMemo(
@@ -960,3 +983,4 @@ function Bar({
     </div>
   );
 }
+
