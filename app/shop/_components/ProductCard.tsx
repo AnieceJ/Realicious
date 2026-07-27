@@ -9,22 +9,33 @@ import { useToast } from "./Toast";
 const API_BASE = "http://localhost:3001";
 const FALLBACK_IMAGE = `${API_BASE}/images/optimized/吃到飽.webp`;
 
-export default function ProductCard({ product, favoritedProductIds = [] }: { product: Product; favoritedProductIds?: number[] }) {
+export default function ProductCard({
+  product,
+  favoritedProductIds = [],
+  onFavoriteChange,
+}: {
+  product: Product;
+  favoritedProductIds?: number[];
+  onFavoriteChange: (productId: number, isFavorited: boolean) => void;
+}) {
   const { user } = useUser();
-  const [favorited, setFavorited] = useState(favoritedProductIds.includes(product.id));
   const [showCart, setShowCart] = useState(false);
   const { toastComponent, showToast } = useToast();
+  const favorited = favoritedProductIds.includes(product.id);
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!user?.id) return;
+    if (!user?.id) {
+      showToast("請先登入會員後再收藏商品");
+      return;
+    }
     const userId = Number(user.id);
     if (favorited) {
-      await removeFavorite(userId, product.id);
-      setFavorited(false);
+      const result = await removeFavorite(userId, product.id);
+      if (result.success) onFavoriteChange(product.id, false);
     } else {
-      await addFavorite(userId, product.id);
-      setFavorited(true);
+      const result = await addFavorite(userId, product.id);
+      if (result.success) onFavoriteChange(product.id, true);
     }
   };
 

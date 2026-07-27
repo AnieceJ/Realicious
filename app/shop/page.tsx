@@ -71,6 +71,15 @@ export default function ShopPage() {
     });
   }, [user?.id]);
 
+  const handleFavoriteChange = useCallback((productId: number, isFavorited: boolean) => {
+    setFavoriteProductIds((previousIds) => {
+      if (isFavorited) {
+        return previousIds.includes(productId) ? previousIds : [...previousIds, productId];
+      }
+      return previousIds.filter((id) => id !== productId);
+    });
+  }, []);
+
   useEffect(() => {
     getProducts({ keyword, page: 1 }).then((res) => {
       if (res.success) {
@@ -142,14 +151,23 @@ export default function ShopPage() {
         {/* 推薦商品區塊 */}
         <div className="w-full mb-4">
           {allProducts.length > 0 && (
-            <FeaturedProductSection products={allProducts} />
+            <FeaturedProductSection
+              products={allProducts}
+              favoritedProductIds={user?.id ? favoriteProductIds : []}
+              onFavoriteChange={handleFavoriteChange}
+            />
           )}
         </div>
 
         {/* 商品網格 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 xl:gap-8">
           {sortedProducts.map((p) => (
-            <ProductCard key={p.id} product={p} favoritedProductIds={favoriteProductIds} />
+            <ProductCard
+              key={p.id}
+              product={p}
+              favoritedProductIds={user?.id ? favoriteProductIds : []}
+              onFavoriteChange={handleFavoriteChange}
+            />
           ))}
         </div>
 

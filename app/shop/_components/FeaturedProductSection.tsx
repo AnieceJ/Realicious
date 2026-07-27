@@ -2,20 +2,26 @@ import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
 import { addToCart } from "@/lib/shop/cart";
-import { getFavorites, addFavorite, removeFavorite } from "@/lib/shop/favorites";
+import { addFavorite, removeFavorite } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
 interface FeaturedProductSectionProps {
   products: Product[];
+  favoritedProductIds: number[];
+  onFavoriteChange: (productId: number, isFavorited: boolean) => void;
 }
 
-export default function FeaturedProductSection({ products }: FeaturedProductSectionProps) {
+export default function FeaturedProductSection({
+  products,
+  favoritedProductIds,
+  onFavoriteChange,
+}: FeaturedProductSectionProps) {
   const { user } = useUser();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const [favorited, setFavorited] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const { toastComponent, showToast } = useToast();
 
   const featuredList = products.slice(0, 3);
 
@@ -27,29 +33,25 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
     return () => clearInterval(timerRef.current);
   }, [paused, featuredList.length]);
 
-  useEffect(() => {
-    setFavorited(false);
-    if (!user?.id || !featuredList[currentIndex]) return;
-    getFavorites(Number(user.id)).then((res) => {
-      if (res.success) setFavorited(res.data.some((f: { product_id: number }) => f.product_id === featuredList[currentIndex].id));
-    });
-  }, [user?.id, currentIndex]);
-
   if (featuredList.length === 0) {
     return <div className="h-72 w-full bg-[#FFF9E6] border-[3px] border-[#3D2419] animate-pulse" />;
   }
 
   const currentProduct = featuredList[currentIndex];
+  const favorited = favoritedProductIds.includes(currentProduct.id);
 
   const toggleFavorite = async () => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      showToast("請先登入會員後再收藏商品");
+      return;
+    }
     const userId = Number(user.id);
     if (favorited) {
-      await removeFavorite(userId, currentProduct.id);
-      setFavorited(false);
+      const result = await removeFavorite(userId, currentProduct.id);
+      if (result.success) onFavoriteChange(currentProduct.id, false);
     } else {
-      await addFavorite(userId, currentProduct.id);
-      setFavorited(true);
+      const result = await addFavorite(userId, currentProduct.id);
+      if (result.success) onFavoriteChange(currentProduct.id, true);
     }
   };
 
@@ -60,8 +62,6 @@ export default function FeaturedProductSection({ products }: FeaturedProductSect
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === featuredList.length - 1 ? 0 : prev + 1));
   };
-
-  const { toastComponent, showToast } = useToast();
 
   return (
     <>
