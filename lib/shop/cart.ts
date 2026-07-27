@@ -28,6 +28,10 @@ export function addToCart(product: { id: number; name: string; price: number; ma
 
   if (exist) {
     exist.qty += qty;
+    // 舊購物車資料可能建立於商品圖片資料補齊之前；再次加入時同步更新圖片。
+    if (product.main_img) {
+      exist.main_img = product.main_img;
+    }
   } else {
     cart.push({ id: product.id, name: product.name, price: product.price, main_img: product.main_img || "", qty });
   }

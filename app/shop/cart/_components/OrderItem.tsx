@@ -3,6 +3,13 @@ import QuantityPicker from "../../_components/QuantityPicker";
 import { removeFromCart, updateQty, type CartItem } from "@/lib/shop/cart";
 import { useConfirm } from "../../_components/ConfirmModal";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+const FALLBACK_IMAGE = "/images/optimized/food-placeholder.webp";
+
+function getImageUrl(imagePath: string) {
+  return imagePath.startsWith("http") ? imagePath : `${API_BASE}${imagePath}`;
+}
+
 export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate: () => void }) {
   const { confirmComponent, showConfirm } = useConfirm();
 
@@ -25,11 +32,15 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
       >
         <div>
           <div className="bg-pink-300 w-30 h-30 flex items-center justify-center">
-            {item.main_img ? (
-              <img src={`http://localhost:3001${item.main_img}`} alt={item.name} className="w-full h-full object-cover" />
-            ) : (
-              <span>商品照片</span>
-            )}
+            <img
+              src={item.main_img ? getImageUrl(item.main_img) : FALLBACK_IMAGE}
+              alt={item.name}
+              className="w-full h-full object-cover"
+              onError={(event) => {
+                event.currentTarget.onerror = null;
+                event.currentTarget.src = FALLBACK_IMAGE;
+              }}
+            />
           </div>
         </div>
         <div className="flex flex-col ml-3">
