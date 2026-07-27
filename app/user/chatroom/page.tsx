@@ -49,7 +49,7 @@ export default function Chatroom() {
           onTabChange={setActiveTab} /* 頁籤切換事件 */
           currentRoomId={currentRoom?.id}
           currentUserId={currentUserId}
-          onJoinRoom={(room) => joinRoom(room.id)} 
+          onJoinRoom={(room) => joinRoom(room.id)} //傳入房間id
           onDeleteRoom={deleteRoom}
           onToggleFavorite={toggleFavorite} /*  傳入追蹤函式 */
         />

@@ -12,11 +12,20 @@ export interface Room {
   isFavorited?: boolean; 
 }
 
+export interface UserProfile {
+  nick_name?: string | null;
+  avatar?: string | null;
+}
+export interface Sender {
+  id: number;
+  account: string;
+  user_profile?: UserProfile | null; 
+}
 export interface Message {
   id?: number;
   senderId: number;
   content: string;
-  sender?: { id: number; account: string };
+  sender?: Sender
 }
 
 export function useChatroom() {
