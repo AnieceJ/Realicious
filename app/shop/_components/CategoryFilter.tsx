@@ -133,41 +133,67 @@ export default function CategoryFilter({
 
         {isCustomPriceOpen && (
           <div className="w-full mt-1 pt-3 border-t-2 border-dashed border-[#3D2419]/20">
-          <div className="hidden lg:flex items-center gap-2 max-w-sm">
-            <span className="text-xs text-[#3D2419]/80 w-10 text-right">${slideMin}</span>
-            <div className="relative flex-1 h-6">
-          <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-[#3D2419]/20" />
-          <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-[#3D2419]"
-            style={{ left: `${(slideMin / priceMax) * 100}%`, width: `${((slideMax - slideMin) / priceMax) * 100}%` }} />
-          <input type="range" min={0} max={priceMax} step={1} value={slideMin}
-            onChange={(e) => handleSlider("min", Number(e.target.value))}
-            className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
-              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
-              [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
-          <input type="range" min={0} max={priceMax} step={1} value={slideMax}
-            onChange={(e) => handleSlider("max", Number(e.target.value))}
-            className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
-              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
-              [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
-        </div>
-            <span className="text-xs text-[#3D2419]/80 w-10">${slideMax}</span>
-          </div>
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <label className="flex items-center gap-1 text-xs text-[#3D2419]/80">
+                最低 $
+                <input
+                  type="number"
+                  min="0"
+                  max={priceMax}
+                  inputMode="numeric"
+                  value={minStr}
+                  onChange={(e) => setMinStr(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && applyInput()}
+                  className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
+                />
+              </label>
+              <span className="text-sm text-[#3D2419]/60">～</span>
+              <label className="flex items-center gap-1 text-xs text-[#3D2419]/80">
+                最高 $
+                <input
+                  type="number"
+                  min="0"
+                  max={priceMax}
+                  inputMode="numeric"
+                  value={maxStr}
+                  onChange={(e) => setMaxStr(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && applyInput()}
+                  className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={applyInput}
+                className="h-8 px-3 text-xs bg-[#FFD3B6] border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-[#ffbe94] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+              >
+                套用
+              </button>
+              <span className="text-xs text-[#3D2419]/50">可輸入 $0～${priceMax.toLocaleString()}</span>
+            </div>
 
-          <div className="flex lg:hidden items-center gap-1">
-        <input type="text" inputMode="numeric" placeholder="最低"
-          value={minStr} onChange={(e) => setMinStr(e.target.value)}
-          onBlur={applyInput} onKeyDown={(e) => e.key === "Enter" && applyInput()}
-          className="w-16 h-7 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none placeholder-[#3D2419]/40" />
-        <span className="text-xs text-[#3D2419]/60">—</span>
-        <input type="text" inputMode="numeric" placeholder="最高"
-          value={maxStr} onChange={(e) => setMaxStr(e.target.value)}
-          onBlur={applyInput} onKeyDown={(e) => e.key === "Enter" && applyInput()}
-          className="w-16 h-7 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none placeholder-[#3D2419]/40" />
-          </div>
+            <div className="flex items-center gap-2 w-full max-w-lg">
+              <span className="text-xs text-[#3D2419]/80 w-10 text-right">${slideMin}</span>
+              <div className="relative flex-1 h-6">
+                <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-[#3D2419]/20" />
+                <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-[#3D2419]"
+                  style={{ left: `${(slideMin / priceMax) * 100}%`, width: `${((slideMax - slideMin) / priceMax) * 100}%` }} />
+                <input type="range" min={0} max={priceMax} step={1} value={slideMin}
+                  onChange={(e) => handleSlider("min", Number(e.target.value))}
+                  className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
+                    [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
+                    [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
+                <input type="range" min={0} max={priceMax} step={1} value={slideMax}
+                  onChange={(e) => handleSlider("max", Number(e.target.value))}
+                  className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
+                    [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
+                    [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
+              </div>
+              <span className="text-xs text-[#3D2419]/80 w-10">${slideMax}</span>
+            </div>
           </div>
         )}
       </div>
