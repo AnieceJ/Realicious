@@ -1,19 +1,24 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { ShoppingBasket } from "lucide-react";
 import { getCartItems } from "@/lib/shop/cart";
 
-export default function CartBadge() {
-	const [count, setCount] = useState(0);
+function subscribe(callback: () => void) {
+	window.addEventListener("cart-updated", callback);
+	return () => window.removeEventListener("cart-updated", callback);
+}
 
-	useEffect(() => {
-		setCount(getCartItems().reduce((sum, item) => sum + item.qty, 0));
-		const refresh = () =>
-			setCount(getCartItems().reduce((sum, item) => sum + item.qty, 0));
-		window.addEventListener("cart-updated", refresh);
-		return () => window.removeEventListener("cart-updated", refresh);
-	}, []);
+function getSnapshot() {
+	return getCartItems().reduce((sum, item) => sum + item.qty, 0);
+}
+
+function getServerSnapshot() {
+	return 0;
+}
+
+export default function CartBadge() {
+	const count = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
 	return (
 		<Link href="/shop/cart" title="購物車" className="relative m-3">
