@@ -112,9 +112,10 @@ console.log(currentRoom)
           <h3 className="font-bold text-sm text-slate-800">
             {currentRoom.name}
           </h3>
-          <p className="text-[11px] text-slate-400">
+          {/* 待修 */}
+          {/* <p className="text-[11px] text-slate-400">
             線上：{currentRoom._count?.members ?? 0} 人
-          </p>
+          </p> */}
         </div>
         <button
           onClick={onLeaveRoom}
