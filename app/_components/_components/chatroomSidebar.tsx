@@ -53,6 +53,7 @@ export default function Chatroom() {
                 </button>
 
                 <h2 className="text-[24px] m-4 font-bold text-black">聊天室</h2>
+                <Link href={"/user/chatroom"} className="w-40 y-30 border bg-amber-300">測試用</Link>
 
                 <div className="overflow-y-auto grow px-4">
                   <Link

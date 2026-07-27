@@ -23,14 +23,6 @@ interface UserContextType {
   setUser: React.Dispatch<React.SetStateAction<User>>;
 }
 
-const FAKE_USER_INIT: User = {
-  id: "",
-  account: "",
-  role: "",
-  nick_name: "",
-  avatar: "",
-};
-
 const UserContext = createContext<UserContextType | null>(null);
 UserContext.displayName = "UserContext";
 
@@ -38,6 +30,7 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
+
   const router = useRouter();
   const [user, setUser] = useState<User | null>();
   const [loading, setLoading] = useState(true); // 🆕 預設為載入中
