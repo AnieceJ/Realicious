@@ -432,3 +432,22 @@
 @media (prefers-reduced-motion: reduce) {
   .talk-pop { animation: none; }
 }
+
+/* ---------- 教學聚光燈:環呼吸 + 外圈虛線瞄準 ---------- */
+.tut-pulse {
+  animation: tut-pulse 1.1s steps(2, end) infinite;
+}
+@keyframes tut-pulse {
+  0%, 49%  { transform: scale(1); }
+  50%,100% { transform: scale(1.06); }
+}
+.tut-spin {
+  animation: tut-spin 4s steps(8, end) infinite;
+}
+@keyframes tut-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tut-pulse, .tut-spin { animation: none; }
+}
