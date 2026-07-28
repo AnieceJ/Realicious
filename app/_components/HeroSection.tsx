@@ -12,11 +12,11 @@ export default function Hero() {
 				<div className="mx-auto max-w-7xl w-full px-5 h-full flex items-center z-20">
 					{/* 左側文字內容區域 - 占據約 40-50% 寬度 */}
 					<div className="w-full md:w-1/2 lg:w-5/12 shrink-0">
-						<p className="mb-5 tracking-0.45em font-bold text-yellow-300 text-sm md:text-base">
+						<p className="font-pixel mb-4 tracking-0.45em font-bold text-yellow-300 text-sm md:text-xl">
 							REALICIOUS
 						</p>
 
-						<h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-tight text-white">
+						<h1 className="font-pixel text-4xl md:text-3xl lg:text-6xl font-black leading-tight text-white">
 							Taste More.
 							<br />
 							Spend Less.

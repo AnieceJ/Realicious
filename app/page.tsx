@@ -22,26 +22,28 @@ export default function HomePage() {
 
 	return (
 		<>
-			<Hero />
+			<div className="font-pixel">
+				<Hero />
 
-			<section className="relative py-24 overflow-hidden">
-				<AmbientBackground />
-				<div className="relative z-10 max-w-7xl mx-auto px-5">
-					<ProductSection />
-				</div>
-			</section>
+				<section className="relative py-24 overflow-hidden">
+					<AmbientBackground />
+					<div className="relative z-10 max-w-7xl mx-auto px-5">
+						<ProductSection />
+					</div>
+				</section>
 
-			<AccountingSection />
+				<AccountingSection />
 
-			<section className="relative py-24 overflow-hidden">
-				<AmbientBackground />
-				<div className="relative z-10 max-w-7xl mx-auto px-5">
-					<ArticleSection />
-				</div>
-				<div className="max-w-7xl mx-auto px-5">
-					<PopularChatroomsSection />
-				</div>
-			</section>
+				<section className="relative py-24 overflow-hidden">
+					<AmbientBackground />
+					<div className="relative z-10 max-w-7xl mx-auto px-5">
+						<ArticleSection />
+					</div>
+					<div className="mx-auto mt-30 bg-gray-200">
+						<PopularChatroomsSection />
+					</div>
+				</section>
+			</div>
 		</>
 	);
 }

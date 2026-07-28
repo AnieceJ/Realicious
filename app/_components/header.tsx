@@ -22,7 +22,7 @@ export default function Header({ token, className = "" }: HeaderProps) {
 			<div className="max-w-7xl mx-auto h-full px-5 flex items-center justify-between">
 				<Link
 					href="/"
-					className="font-black text-xl hover:underline underline-offset-4"
+					className="font-black text-4xl hover:underline underline-offset-4 font-pixel"
 				>
 					Realicious
 				</Link>
