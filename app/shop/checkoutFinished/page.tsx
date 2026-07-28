@@ -71,7 +71,7 @@ export default function CheckoutFinishedPage() {
   }
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen pb-16 md:pb-24">
       <div className="max-w-7xl mx-auto">
         <FinishedPhoto />
       </div>
