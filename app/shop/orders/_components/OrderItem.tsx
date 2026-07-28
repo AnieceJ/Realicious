@@ -2,9 +2,11 @@
 import React, { useEffect, useState } from "react";
 import type { Order } from "@/lib/shop/orders";
 import { getOrderDetail } from "@/lib/shop/orders";
+import PaymentMethodDialog from "../../_components/PaymentMethodDialog";
 
 export default function OrderItem({ order }: { order: Order }) {
   const [expanded, setExpanded] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
   const [items, setItems] = useState<{ product_name: string; quantity: number; unit_price: number }[]>([]);
 
   useEffect(() => {
@@ -34,8 +36,8 @@ export default function OrderItem({ order }: { order: Order }) {
             }`}>
               <span>{
                 order.status === 1 ? "待付款" :
-                order.status === 2 ? "已付款" :
-                order.status === 3 ? "已完成" :
+                order.status === 2 ? "付款完成・票券已發送" :
+                order.status === 3 ? "交易完成" :
                 "已取消"
               }</span>
             </div>
@@ -51,13 +53,25 @@ export default function OrderItem({ order }: { order: Order }) {
               </div>
             </div>
 
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="px-4 py-2.5 bg-white border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-sm font-black flex items-center gap-2"
-            >
-              <span>{expanded ? "收合" : "檢視明細"}</span>
-              <span className={`text-xs transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}>▼</span>
-            </button>
+            <div className="flex items-center gap-3">
+              {order.status === 1 && (
+                <button
+                  type="button"
+                  onClick={() => setShowPayment(true)}
+                  className="px-4 py-2.5 bg-[#FBDF58] border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-[#f5cc22] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-sm font-black"
+                >
+                  繼續付款
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setExpanded(!expanded)}
+                className="px-4 py-2.5 bg-white border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-sm font-black flex items-center gap-2"
+              >
+                <span>{expanded ? "收合" : "檢視明細"}</span>
+                <span className={`text-xs transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}>▼</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -79,6 +93,7 @@ export default function OrderItem({ order }: { order: Order }) {
           </div>
         )}
       </div>
+      {showPayment && <PaymentMethodDialog orderId={order.id} onClose={() => setShowPayment(false)} />}
     </div>
   );
 }

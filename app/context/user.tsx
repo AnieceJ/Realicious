@@ -23,14 +23,6 @@ interface UserContextType {
   setUser: React.Dispatch<React.SetStateAction<User>>;
 }
 
-const FAKE_USER_INIT: User = {
-  id: "",
-  account: "",
-  role: "",
-  nick_name: "",
-  avatar: "",
-};
-
 const UserContext = createContext<UserContextType | null>(null);
 UserContext.displayName = "UserContext";
 
@@ -38,6 +30,7 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
+
   const router = useRouter();
   const [user, setUser] = useState<User | null>();
   const [loading, setLoading] = useState(true); // 🆕 預設為載入中
@@ -47,6 +40,9 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     Cookies.remove("token");
     Cookies.remove("user");
     localStorage.removeItem("realicious-cart"); // 跟商城相關
+    // 登出時立刻切回訪客購物車，避免全站 Header 暫時顯示上一位會員的數量。
+    localStorage.removeItem("realicious-cart-active-user");
+    window.dispatchEvent(new Event("cart-updated"));
     setUser(null);
   };
 

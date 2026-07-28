@@ -1,10 +1,13 @@
 "use client";
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { ChevronLeft, Eye, SquarePen, House } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { SquarePen, House } from "lucide-react";
 import Pagination from "@/components/articlePagination";
+import ArticleThumbnail from "@/components/article-thumbnail";
 import { Button } from "@/components/ui/button";
+import { getArticleSummary } from "@/lib/article-preview";
 import SearchBar from "../_components/search_bar";
+import { useToast } from "../_components/article_toast";
 import Link from "next/link";
 import {
 	Menubar,
@@ -32,7 +35,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsis, faBookmark } from "@fortawesome/free-solid-svg-icons";
+import Cookies from "js-cookie";
 
 interface SubCategory {
 	id: number;
@@ -61,6 +65,8 @@ interface UserArticlesResponse {
 
 export default function ArticleManagePage() {
 	const router = useRouter();
+	const pathname = usePathname();
+	const { toastComponent, showToast } = useToast();
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [userArticles, setUserArticles] = React.useState<UserArticle[]>([]);
 	const [loading, setLoading] = React.useState(true);
@@ -74,11 +80,15 @@ export default function ArticleManagePage() {
 	const updatePageInUrl = (page: number) => {
 		const params = new URLSearchParams(window.location.search);
 		params.set("page", String(page));
-		window.history.replaceState(
-			null,
-			"",
-			`/article/manage?${params.toString()}`,
-		);
+		window.history.replaceState(null, "", `${pathname}?${params.toString()}`);
+	};
+	const getArticleDetailHref = (articleId: string) => {
+		const params = new URLSearchParams({
+			from: "my-article",
+			returnTo: `${pathname}?page=${currentPage}`,
+		});
+
+		return `/article/${articleId}?${params.toString()}`;
 	};
 
 	const fetchUserArticles = async (
@@ -86,18 +96,23 @@ export default function ArticleManagePage() {
 		keyword?: string,
 	) => {
 		const params = new URLSearchParams();
-		params.append("user_id", "1");
+		// params.append("user_id", "1");
+		const token = Cookies.get("token");
 		if (subCategoryId) {
 			params.append("sub_cat_id", String(subCategoryId));
 		}
 		if (keyword?.trim()) {
 			params.append("keyword", keyword);
 		}
-		const res = await fetch(`/api/article/user-articles?${params.toString()}`);
+		const res = await fetch(`/api/article/user-articles?${params.toString()}`, {
+			method: "GET",
+			headers: { Authorization: `Bearer ${token}` },
+		});
 		if (!res.ok) throw new Error("Fetch failed");
 		const data: UserArticlesResponse = await res.json();
-		setUserArticles(data.articles);
-		return data.articles;
+		const nextArticles = Array.isArray(data.articles) ? data.articles : [];
+		setUserArticles(nextArticles);
+		return nextArticles;
 	};
 	const totalPages = Math.ceil(userArticles.length / itemsPerPage);
 	const startIndex = (currentPage - 1) * itemsPerPage;
@@ -122,22 +137,25 @@ export default function ArticleManagePage() {
 		const isConfirm = window.confirm("確定要刪除嗎？");
 		if (!isConfirm) return;
 		try {
+			const token = Cookies.get("token");
 			const response = await fetch(`/api/article/articles/${articleId}`, {
 				method: "DELETE",
+				headers: { Authorization: `Bearer ${token}` },
 			});
+			console.log(response);
 			if (!response.ok) {
 				throw new Error("後端刪除失敗");
 			}
 			const data = await response.json();
 			if (data.success) {
-				alert("文章已成功刪除！");
+				showToast("文章已成功刪除！");
 				setUserArticles((prevArticles) =>
 					prevArticles.filter((art) => art.id !== articleId),
 				);
 			}
 		} catch (error) {
 			console.error("刪除請求出錯:", error);
-			alert("刪除失敗，請檢查網路或稍後再試。");
+			showToast("刪除失敗，請檢查網路或稍後再試。");
 		}
 	};
 
@@ -177,6 +195,7 @@ export default function ArticleManagePage() {
 
 	return (
 		<>
+			{toastComponent}
 			<div className="min-h-screen">
 				<div className="max-w-7xl mx-auto w-full py-4">
 					<div className="relative border-2 border-black">
@@ -189,17 +208,22 @@ export default function ArticleManagePage() {
 							}}
 						/>
 						<div className="relative z-10">
-							<div className="flex items-center w-full justify-between lg:flex-row md:flex-row md:items-center gap-4 p-3 bg-black">
-								<div className="flex items-center">
+							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
+								<div className="flex w-full min-w-0 flex-1 items-center">
 									<Link
 										href="/article"
-										className="flex h-10 w-10 items-center justify-center bg-black text-white hover:bg-gray-800"
+										className="flex h-10 w-10 shrink-0 items-center justify-center bg-black text-white hover:bg-gray-800"
 									>
 										<House size={22} />
 									</Link>
-									<Menubar className="h-10 bg-black text-slate-100 border-0 justify-start shrink-0">
+									<Menubar className="flex h-auto min-w-0 flex-wrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
 										<MenubarMenu>
 											<MenubarTrigger
+												className={
+													selectedSubCategory === ""
+														? "bg-gray-600 hover:bg-gray-400"
+														: undefined
+												}
 												onClick={async () => {
 													setSelectedSubCategory("");
 													setCurrentPage(1);
@@ -220,7 +244,18 @@ export default function ArticleManagePage() {
 											categories.map((cat, index) => (
 												<React.Fragment key={cat.category_name}>
 													<MenubarMenu>
-														<MenubarTrigger>{cat.category_name}</MenubarTrigger>
+														<MenubarTrigger
+															className={
+																cat.sub_category.some(
+																	(sub) =>
+																		String(sub.id) === selectedSubCategory,
+																)
+																	? "bg-gray-600 hover:bg-gray-400"
+																	: undefined
+															}
+														>
+															{cat.category_name}
+														</MenubarTrigger>
 														<MenubarContent>
 															<MenubarRadioGroup
 																value={selectedSubCategory}
@@ -250,8 +285,8 @@ export default function ArticleManagePage() {
 										)}
 									</Menubar>
 								</div>
-								<div className="flex items-center w-full lg:w-auto max-w-md gap-2">
-									<div className="border-white border">
+								<div className="flex items-center gap-2 w-full md:w-auto md:max-w-md">
+									<div className="border-white border flex-1 min-w-0">
 										<SearchBar
 											onSearch={(keyword) => {
 												fetchUserArticles(
@@ -267,7 +302,7 @@ export default function ArticleManagePage() {
 									</div>
 									<Link
 										href="/article/edit"
-										className="flex w-10 h-10 bg-black items-center justify-center border-white border"
+										className="flex w-10 h-10 bg-black items-center justify-center border-white border shrink-0"
 									>
 										<SquarePen color="#FFFFFF" />
 									</Link>
@@ -308,65 +343,79 @@ export default function ArticleManagePage() {
 										paginatedArticles.map((art) => (
 											<div
 												key={art.id}
-												className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3"
+												className="flex gap-3 border-b border-black py-4 sm:gap-4"
 											>
-												{/* 1. 調整標題區塊為垂直居中齊平 */}
-												<div className="flex justify-between items-center gap-4">
-													<h3 className="font-bold text-lg text-slate-900 flex-1 truncate">
-														{art.title}
-													</h3>
-													{/* 將日期與按鈕包在一起，推到最右側 */}
-													<div className="flex items-center gap-4 shrink-0">
-														<p className="whitespace-nowrap text-xs text-gray-500">
-															{art.date}
-														</p>
-														<DropdownMenu>
-															<DropdownMenuTrigger className="flex h-8 w-8 items-center justify-center text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors focus:outline-none">
-																<FontAwesomeIcon icon={faEllipsis} />
-															</DropdownMenuTrigger>
-															{/* 3. 限制選單寬度 min-w-[5rem] 並讓文字居中 */}
-															<DropdownMenuContent
-																align="end"
-																className="min-w-20 text-center"
-															>
-																<DropdownMenuItem
-																	className="justify-center cursor-pointer"
-																	onClick={() =>
-																		router.push(`/article/edit?id=${art.id}`)
-																	}
-																>
-																	編輯
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	className="justify-center cursor-pointer text-red-600 focus:text-red-600"
-																	onClick={() => handleDeleteArticle(art.id)}
-																>
-																	刪除
-																</DropdownMenuItem>
-															</DropdownMenuContent>
-														</DropdownMenu>
-													</div>
+												<div className="relative min-h-36 w-32 shrink-0 self-stretch sm:w-40 md:w-44">
+													<ArticleThumbnail
+														content={art.content}
+														title={art.title}
+														width={176}
+														height={132}
+														className="absolute inset-0 h-full w-full border border-black bg-white object-cover"
+													/>
 												</div>
-												<div
-													className="article-content overflow-hidden wrap-break-word text-base line-clamp-3 text-gray-600"
-													dangerouslySetInnerHTML={{ __html: art.content }}
-												/>
-												<div className="flex justify-between items-end mt-1.5">
-													<div className="flex items-center text-gray-500">
-														<Eye size={16} />
-														<div className="ml-1 text-sm">
-															收藏次數({savedCounts[art.id] || 0})
+												<div className="flex min-w-0 flex-1 flex-col gap-2">
+													<div className="flex min-w-0 items-start justify-between gap-2">
+														<h3 className="min-w-0 flex-1 font-bold text-lg leading-6 text-slate-900">
+															{art.title}
+														</h3>
+														<div className="flex shrink-0 items-center gap-1 sm:gap-3">
+															<p className="whitespace-nowrap text-xs text-gray-500">
+																{art.date}
+															</p>
+															<DropdownMenu>
+																<DropdownMenuTrigger
+																	className="flex h-8 w-8 items-center justify-center text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:outline-none"
+																	aria-label={`管理文章：${art.title}`}
+																>
+																	<FontAwesomeIcon icon={faEllipsis} />
+																</DropdownMenuTrigger>
+																<DropdownMenuContent
+																	align="end"
+																	className="min-w-20 text-center"
+																>
+																	<DropdownMenuItem
+																		className="cursor-pointer justify-center"
+																		onClick={() =>
+																			router.push(`/article/edit?id=${art.id}`)
+																		}
+																	>
+																		編輯
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		className="cursor-pointer justify-center text-red-600 focus:text-red-600"
+																		onClick={() => handleDeleteArticle(art.id)}
+																	>
+																		刪除
+																	</DropdownMenuItem>
+																</DropdownMenuContent>
+															</DropdownMenu>
 														</div>
 													</div>
-													<Link href={`/article/${art.id}`}>
-														<Button
-															variant="outline"
-															size="sm"
-															className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs hover:bg-red-700 hover:text-white"
+													<p className="line-clamp-3 wrap-break-word overflow-hidden text-base leading-6 text-gray-600">
+														{getArticleSummary(art.content)}
+													</p>
+													<div className="mt-auto flex items-center justify-between gap-3">
+														<div className="flex min-w-0 items-center gap-1 text-xs text-gray-500 sm:text-sm">
+															<FontAwesomeIcon
+																icon={faBookmark}
+																className="shrink-0"
+															/>
+															<span>被收藏 {savedCounts[art.id] || 0} 次</span>
+														</div>
+														<Link
+															href={getArticleDetailHref(art.id)}
+															className="shrink-0"
 														>
-															閱讀全文
-														</Button>
-													</Link>
+															<Button
+																variant="outline"
+																size="sm"
+																className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100 hover:bg-red-700 hover:text-white"
+															>
+																閱讀全文
+															</Button>
+														</Link>
+													</div>
 												</div>
 											</div>
 										))

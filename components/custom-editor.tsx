@@ -32,6 +32,8 @@ import {
 	ImageToolbar,
 	ImageResize,
 	ImageUpload,
+	ImageInsert,
+	AutoImage,
 	Table,
 	TableToolbar,
 } from "ckeditor5";
@@ -90,6 +92,8 @@ export default function CustomEditor({
 					],
 				},
 				toolbar: {
+					// 窄螢幕時將按鈕換行，避免 CKEditor 的預設群組工具列撐出容器。
+					shouldNotGroupWhenFull: true,
 					items: [
 						"heading",
 						"|",
@@ -112,7 +116,7 @@ export default function CustomEditor({
 						"code",
 						"codeBlock",
 						"insertTable",
-						"uploadImage",
+						"insertImage",
 						"undo",
 						"redo",
 					],
@@ -148,6 +152,8 @@ export default function CustomEditor({
 					ImageStyle,
 					ImageToolbar,
 					ImageUpload,
+					ImageInsert,
+					AutoImage,
 					ImageResize,
 				],
 			}}

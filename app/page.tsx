@@ -1,26 +1,59 @@
+"use client";
 import Hero from "./_components/HeroSection";
 import ProductSection from "./_components/ProductSection";
 import AccountingSection from "./_components/AccountingSection";
 import ArticleSection from "./_components/ArticleSection";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useEffect } from "react";
+import PopularChatroomsSection from "./_components/PopularChatroomsSection";
+import AmbientBackground from "@/components/AmbientBackground";
 
 export default function HomePage() {
+	const searchParams = useSearchParams();
+	const router = useRouter();
+	const pathname = usePathname();
+	// 清除google登入後網址上的 query 參數
+	useEffect(() => {
+		const token = searchParams.get("token");
+		if (token) {
+			router.replace(pathname);
+		}
+	}, [searchParams, router, pathname]);
+
 	return (
 		<>
-			<Hero />
+			<div className="font-pixel">
+				<Hero />
 
-			<section className="py-24 bg-white">
-				<div className="max-w-7xl mx-auto px-5">
-					<ProductSection />
-				</div>
-			</section>
+				<section className="relative py-24 overflow-hidden">
+					<AmbientBackground />
+					<div className="relative z-10 max-w-7xl mx-auto px-5">
+						<ProductSection />
+					</div>
+				</section>
 
-			<AccountingSection />
+				<AccountingSection />
 
-			<section className="py-24  bg-white">
-				<div className="max-w-7xl mx-auto px-5">
-					<ArticleSection />
-				</div>
-			</section>
+				<section className="relative pt-15 overflow-hidden">
+					<AmbientBackground />
+					<div className="relative z-10 max-w-7xl mx-auto px-5">
+						<ArticleSection />
+					</div>
+					<div className="relative z-10 bg-gray-200">
+						<div
+							className="absolute inset-0 opacity-[0.5] pointer-events-none"
+							style={{
+								backgroundImage: "url('/article/noise.png')",
+								backgroundRepeat: "repeat",
+								backgroundSize: "90px",
+							}}
+						/>
+						<div className="relative z-10 mt-15">
+							<PopularChatroomsSection />
+						</div>
+					</div>
+				</section>
+			</div>
 		</>
 	);
 }

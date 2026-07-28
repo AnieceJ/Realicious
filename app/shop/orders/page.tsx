@@ -9,8 +9,7 @@ import PageHeader from "@/app/_components/PageHeader";
 const FILTERS = [
   { key: "all", label: "全部訂單" },
   { key: "1", label: "待付款" },
-  { key: "2", label: "已付款" },
-  { key: "3", label: "已完成" },
+  { key: "2", label: "付款完成" },
 ] as const;
 
 export default function OrderPage() {
@@ -32,7 +31,6 @@ export default function OrderPage() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
         <PageHeader icon={<ClipboardList className="h-5 w-5" />} title="我的訂單" />
 

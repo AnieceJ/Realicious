@@ -8,30 +8,38 @@ import CategoryFilter from "./_components/CategoryFilter";
 import FeaturedProductSection from "./_components/FeaturedProductSection";
 import ProductCard from "./_components/ProductCard";
 import { getProducts, type Product } from "@/lib/shop/product";
+import { getFavorites } from "@/lib/shop/favorites";
+import { useUser } from "@/app/context/user";
+
+const PRICE_MAX = 5000;
+
+const QUICK_FILTER_TERMS: Record<string, string[]> = {
+  hotpot: ["鍋"],
+  fried: ["炸雞", "炸豬", "雞排"],
+  burger: ["堡"],
+  pizza: ["比薩"],
+  dumplings: ["七方"],
+  buffet: ["饗食"],
+};
+
+function matchesQuickFilter(product: Product, filterKey: string) {
+  if (!filterKey) return true;
+  return (QUICK_FILTER_TERMS[filterKey] || []).some((term) => product.name.includes(term));
+}
 
 export default function ShopPage() {
+  const { user } = useUser();
   const searchParams = useSearchParams();
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [favoriteProductIds, setFavoriteProductIds] = useState<number[]>([]);
   const [categoryId, setCategoryId] = useState("")
   const [keyword, setKeyword] = useState(searchParams.get("keyword") || "")
   const [tagKeyword, setTagKeyword] = useState("")
   const [sortId, setSortId] = useState("")
   const [minPrice, setMinPrice] = useState(0)
-  const [maxPrice, setMaxPrice] = useState(5000)
-  const priceMax = useMemo(() => {
-    const matched = allProducts.filter((p) => {
-      if (categoryId && String(p.category_id) !== categoryId) return false;
-      if (tagKeyword && !p.name.includes(tagKeyword)) return false;
-      return true;
-    });
-    const max = Math.max(...matched.map((p) => p.price));
-    return max > 0 ? max : 5000;
-  }, [allProducts, categoryId, tagKeyword])
-
-  useEffect(() => {
-    setMaxPrice(priceMax);
-  }, [priceMax]);
+  const [maxPrice, setMaxPrice] = useState(PRICE_MAX)
+  const priceMax = PRICE_MAX;
   const [page, setPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -42,7 +50,7 @@ export default function ShopPage() {
       (p) => p.price >= minPrice && p.price <= maxPrice
     );
     if (categoryId) list = list.filter((p) => String(p.category_id) === categoryId);
-    if (tagKeyword) list = list.filter((p) => p.name.includes(tagKeyword));
+    if (tagKeyword) list = list.filter((p) => matchesQuickFilter(p, tagKeyword));
     if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
     if (sortId === "price_high") list.sort((a, b) => b.price - a.price);
     return list;
@@ -50,7 +58,25 @@ export default function ShopPage() {
 
   useEffect(() => {
     getProducts().then((res) => {
-      if (res.success) setAllProducts(res.data);
+      if (res.success) {
+        setAllProducts(res.data);
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    getFavorites(Number(user.id)).then((res) => {
+      if (res.success) setFavoriteProductIds(res.data.map((f: { product_id: number }) => f.product_id));
+    });
+  }, [user?.id]);
+
+  const handleFavoriteChange = useCallback((productId: number, isFavorited: boolean) => {
+    setFavoriteProductIds((previousIds) => {
+      if (isFavorited) {
+        return previousIds.includes(productId) ? previousIds : [...previousIds, productId];
+      }
+      return previousIds.filter((id) => id !== productId);
     });
   }, []);
 
@@ -92,7 +118,6 @@ export default function ShopPage() {
 
   return (
     <div className="relative min-h-screen p-4">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto">
         {/* 頂層：麵包屑 + 搜尋 + 排序 + 篩選 */}
         <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -112,21 +137,36 @@ export default function ShopPage() {
             priceMax={priceMax}
             onTagChange={(kw) => setTagKeyword(kw)}
             onPriceChange={(min, max) => { setMinPrice(min); setMaxPrice(max); }}
-            onReset={() => { setTagKeyword(""); setKeyword(""); setSortId(""); setMinPrice(0); setMaxPrice(priceMax); }}
+            onReset={() => {
+              setTagKeyword("");
+              setKeyword("");
+              setSortId("");
+              setMinPrice(0);
+              setMaxPrice(PRICE_MAX);
+            }}
           />
         </div>
 
         {/* 推薦商品區塊 */}
         <div className="w-full mb-4">
           {allProducts.length > 0 && (
-            <FeaturedProductSection products={allProducts} />
+            <FeaturedProductSection
+              products={allProducts}
+              favoritedProductIds={user?.id ? favoriteProductIds : []}
+              onFavoriteChange={handleFavoriteChange}
+            />
           )}
         </div>
 
         {/* 商品網格 */}
-        <div className="grid grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 xl:gap-8">
           {sortedProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard
+              key={p.id}
+              product={p}
+              favoritedProductIds={user?.id ? favoriteProductIds : []}
+              onFavoriteChange={handleFavoriteChange}
+            />
           ))}
         </div>
 

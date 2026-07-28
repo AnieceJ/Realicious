@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 interface VerifyButtonProps {
   onClick: () => Promise<boolean>;
   child: React.ReactNode;
+  className?:string;
 }
 
-export default function VerifyButton({ onClick, child }: VerifyButtonProps) {
+export default function VerifyButton({ onClick, child ,className="" }: VerifyButtonProps) {
   const [seconds, setSeconds] = useState<number>(0);
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function VerifyButton({ onClick, child }: VerifyButtonProps) {
 
   return (
     <button
-      className={`w-12.5 h-12.5 border-2  border-black   ${isCounting ? "bg-[#FCF9F6] cursor-not-allowed shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]" : "shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-white cursor-pointer hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FCF9F6]"}`}
+      className={`${className} w-12.5 h-12.5 border-2 border-black -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 ${isCounting ? "bg-[#FCF9F6] cursor-not-allowed shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] translate-x-0 translate-y-0" : "shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-white cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] hover:bg-[#FCF9F6]"}`}
       onClick={(e) => {
         e.preventDefault();
         handleSend();

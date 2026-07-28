@@ -2,29 +2,32 @@
 
 import "./account.css";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/app/context/user";
 import Cookies from "js-cookie";
+import { cities, districts } from "use-tw-zipcode";
 
+import { useAlert } from "../context/alert";
 import Container from "../_components/container";
 import Left from "./_components/left";
+import PageHeader from "@/app/_components/PageHeader";
 import AvatarUploader from "./_components/avatarUploader";
 import {
   button_revise,
   button_cancel,
   button_submit,
+  user_input,
 } from "../_components/button";
-import { useAlert } from "../context/alert";
-import { useRouter } from "next/navigation";
+
 import { FaUser } from "react-icons/fa";
-import PageHeader from "@/app/_components/PageHeader";
 
 interface FullProfile {
   avatar: string;
   first_name: string;
   last_name: string;
   nick_name: string;
-  city: string;
-  district: string;
+  city: string | null;
+  district: string | null;
   address: string;
   phone: string | undefined;
   birthday: string;
@@ -35,8 +38,8 @@ const defaultValues: FullProfile = {
   first_name: "",
   last_name: "",
   nick_name: "",
-  city: "",
-  district: "",
+  city: null,
+  district: null,
   address: "",
   phone: undefined,
   birthday: "",
@@ -49,6 +52,7 @@ export default function ProfileForm() {
   const { user, setUser } = useUser();
   const { showAlert, closeAlert } = useAlert();
   const router = useRouter();
+
   // 控制是否為編輯模式
   const [isEditing, setIsEditing] = useState(false);
   // 畫面上正在輸入的資料
@@ -72,9 +76,9 @@ export default function ProfileForm() {
         const result = await res.json();
 
         if (res.ok && result.success) {
-          // 同步寫入兩組狀態
-          setFormData(result.data);
-          setOriginalData(result.data);
+          const profileData = result.data;
+          setFormData(profileData);
+          setOriginalData(profileData);
         }
       } catch (error) {
         showAlert("error", "伺服器異常");
@@ -90,8 +94,10 @@ export default function ProfileForm() {
     fetchFullProfile();
   }, []);
 
-  // 3. 處理 Input 改變的共用函式
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 處理一般 Input 改變
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -99,20 +105,41 @@ export default function ProfileForm() {
     }));
   };
 
-  // 4. 取消鍵：抓回原本的資料，並關閉編輯模式
-  const handleCancel = () => {
-    setFormData(originalData); // 還原成備份的原始資料
-    setIsEditing(false); // 關閉編輯模式
+  // 專門處理「縣市」變更
+  const onCitySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    const newCity = selectedValue === "" ? "" : selectedValue;
+    setFormData((prev) => ({
+      ...prev,
+      city: newCity,
+      district: "", // 切換或重置縣市時，鄉鎮區強制設為""，null後端會有問題
+    }));
   };
 
-  // 5. 送出鍵：發送一個新的更新 API
+  // 專門處理「鄉鎮區」變更
+  const onDistrictSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = e.target.value;
+    const newDistrict = selectedValue === "" ? "" : selectedValue;
+    setFormData((prev) => ({
+      ...prev,
+      district: newDistrict,
+    }));
+  };
+
+  // 取消鍵：還原原始資料
+  const handleCancel = () => {
+    setFormData(originalData);
+    setIsEditing(false);
+  };
+
+  // 送出鍵：更新 API
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const token = Cookies.get("token");
 
     try {
       const res = await fetch(`${API_URL}/profile/full`, {
-        method: "PUT", // 或是 POST，看你後端定義
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -124,7 +151,6 @@ export default function ProfileForm() {
 
       if (res.ok && result.success) {
         showAlert("success", "資料更新成功！");
-        // 更新成功後，把當前資料變成「新的原始資料」
         setOriginalData(formData);
         setIsEditing(false);
         setTimeout(() => {
@@ -141,29 +167,35 @@ export default function ProfileForm() {
 
   if (loading) return <div className="p-6">詳細資料載入中...</div>;
 
+  // 取得當前縣市對應的鄉鎮區清單 (沒有選擇縣市或選回預設值時為空陣列)
+  const availableDistricts = formData.city
+    ? districts[formData.city] || []
+    : [];
+
   return (
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left></Left>
       <div className="w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
-        <div className="flex justify-between mb-4">
-           <PageHeader icon={<FaUser className="h-5 w-5" />} title="個人資料" />
-        {/* 放入大頭貼組件 */}
-        <AvatarUploader
-          currentAvatar={formData.avatar}
-          onUploadSuccess={(newUrl) => {
-            // 當大頭貼上傳成功，同步把新網址寫進整張表單的狀態裡
-            setFormData((prev) => ({ ...prev, avatar: newUrl }));
-            setOriginalData((prev) => ({ ...prev, avatar: newUrl }));
-            // 2. 🌟 關鍵：同步更新全域 Context！這樣一來，Header 就會立刻收到通知並換圖
-            setUser((prev) => ({ ...prev, avatar: newUrl }));
+        <div className="relative flex justify-between">
+          <div>
+            <PageHeader
+              icon={<FaUser className="h-5 w-5" />}
+              title="個人資料"
+            />
+          </div>
+          <AvatarUploader
+            currentAvatar={formData.avatar}
+            onUploadSuccess={(newUrl) => {
+              setFormData((prev) => ({ ...prev, avatar: newUrl }));
+              setOriginalData((prev) => ({ ...prev, avatar: newUrl }));
+              setUser((prev) => ({ ...prev, avatar: newUrl }));
 
-            // 3. 順便把新的 user 狀態更新進本地 Cookie，保證下次重新整理也是對的
-            const updatedUser = { ...user, avatar: newUrl };
-            Cookies.set("user", JSON.stringify(updatedUser), { expires: 1 });
-          }}
-        />
+              const updatedUser = { ...user, avatar: newUrl };
+              Cookies.set("user", JSON.stringify(updatedUser), { expires: 1 });
+            }}
+          />
         </div>
-       
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex justify-between items-center">
             {/* 姓氏欄位 */}
@@ -174,56 +206,63 @@ export default function ProfileForm() {
               <input
                 type="text"
                 name="last_name"
-                value={formData.last_name}
+                value={formData.last_name || ""}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className="mt-1 block w-full border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+                className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
               />
             </div>
             {/* 姓名欄位 */}
-            <div className="w-[49%] ">
+            <div className="w-[49%]">
               <label className="block text-sm font-medium text-gray-700">
                 姓名
               </label>
               <input
                 type="text"
                 name="first_name"
-                value={formData.first_name}
+                value={formData.first_name || ""}
                 onChange={handleInputChange}
                 disabled={!isEditing}
-                className="w-full mt-1 block rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+                className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
               />
             </div>
           </div>
 
           {/* 暱稱欄位 */}
-          <div className="">
+          <div>
             <label className="block text-sm font-medium text-gray-700">
               暱稱
             </label>
             <input
               type="text"
               name="nick_name"
-              value={formData.nick_name}
+              value={formData.nick_name || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
             />
           </div>
+
           <div className="flex justify-between items-center">
             {/* 縣市欄位 */}
             <div className="w-[49%]">
               <label className="block text-sm font-medium text-gray-700">
                 縣市
               </label>
-              <input
-                type="text"
+              <select
                 name="city"
-                value={formData.city}
-                onChange={handleInputChange}
+                value={formData.city || ""}
+                onChange={onCitySelectChange}
                 disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
-              />
+                className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
+              >
+                <option value="">請選擇縣市</option>
+                {cities.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* 鄉鎮欄位 */}
@@ -231,14 +270,21 @@ export default function ProfileForm() {
               <label className="block text-sm font-medium text-gray-700">
                 鄉鎮
               </label>
-              <input
-                type="text"
+              <select
                 name="district"
-                value={formData.district}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
-              />
+                value={formData.district || ""}
+                onChange={onDistrictSelectChange}
+                // 未開啟編輯模式，或是未選擇縣市時禁用
+                disabled={!isEditing || !formData.city}
+                className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
+              >
+                <option value="">請選擇鄉鎮區</option>
+                {availableDistricts.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -250,10 +296,10 @@ export default function ProfileForm() {
             <input
               type="text"
               name="address"
-              value={formData.address}
+              value={formData.address || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
             />
           </div>
 
@@ -268,7 +314,7 @@ export default function ProfileForm() {
               value={formData.phone || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
             />
           </div>
 
@@ -280,17 +326,16 @@ export default function ProfileForm() {
             <input
               type="date"
               name="birthday"
-              value={formData.birthday}
+              value={formData.birthday || ""}
               onChange={handleInputChange}
               disabled={!isEditing}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 disabled:bg-gray-100"
+              className={`${user_input} mt-1 block w-full shadow-sm p-2 disabled:bg-gray-100 disabled:border-0`}
             />
           </div>
 
-          {/* 下方的按鈕切換邏輯 */}
+          {/* 按鈕邏輯 */}
           <div className="flex justify-start space-x-2 pt-4">
             {!isEditing ? (
-              // 模式 A：唯讀狀態，只顯示「修改」按鈕
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
@@ -299,12 +344,11 @@ export default function ProfileForm() {
                 修改資料
               </button>
             ) : (
-              // 模式 B：編輯狀態，顯示「送出」與「取消」
               <>
                 <button
                   type="button"
                   onClick={handleCancel}
-                  className={`${button_cancel} mr-8 `}
+                  className={`${button_cancel} mr-8`}
                 >
                   取消
                 </button>

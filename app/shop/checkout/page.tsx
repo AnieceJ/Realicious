@@ -1,14 +1,15 @@
 "use client";
-import React, { useSyncExternalStore, useState } from "react";
+import React, { useEffect, useSyncExternalStore, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "../_components/Breadcrumbs";
 import CheckoutContactInfo from "./_components/CheckoutContactInfo";
 import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutSummary from "./_components/CheckoutSummary";
 import { getCartItems, type CartItem } from "@/lib/shop/cart";
-import { createOrder } from "@/lib/shop/orders";
-import { paymentMethods } from "@/lib/shop/payment";
+import { createOrder, type OrderContact } from "@/lib/shop/orders";
 import { useUser } from "@/app/context/user";
+import PaymentMethodDialog from "../_components/PaymentMethodDialog";
 
 const EMPTY: CartItem[] = [];
 let cached = EMPTY;
@@ -37,98 +38,72 @@ function getServerSnapshot() {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { user } = useUser();
+  const { user, loading } = useUser();
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
-  const [address, setAddress] = useState("");
+  const [contact, setContact] = useState<OrderContact>({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
 
-  const handlePayment = async (methodId: "ecpay" | "linepay" | "mock") => {
-    setShowPayment(false);
-    console.log("當前 user:", user);
-    const order = await createOrder(items, address, Number(user?.id) || undefined);
-    if (!order.success) { alert("訂單建立失敗"); return; }
-
-    localStorage.setItem("realicious-pending-order", String(order.orderId));
-
-    try {
-      await paymentMethods[methodId].checkout(order.orderId);
-      // mock 付款成功後留在頁面，手動導向完成頁
-      if (methodId === "mock") {
-        router.push(`/shop/checkoutFinished?RtnCode=1&orderId=${order.orderId}`);
-      }
-    } catch {
-      alert("付款導向失敗");
+  useEffect(() => {
+    if (!loading && !user?.id) {
+      router.replace("/user/login?next=/shop/checkout");
     }
+  }, [loading, router, user?.id]);
+
+  const createPendingOrder = async (): Promise<number | null> => {
+    console.log("當前 user:", user);
+    const order = await createOrder(items, contact, Number(user?.id) || undefined);
+    if (!order.success) { alert("訂單建立失敗"); return null; }
+
+    return order.orderId;
   };
 
+  if (loading || !user?.id) {
+    return <div className="min-h-screen" />;
+  }
+
   return (
-    <div className="relative min-h-screen scroll-smooth">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
+    <div className="relative min-h-screen pb-16 md:pb-24 scroll-smooth">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 pt-4">
-          <Breadcrumbs items={[
-            { label: "首頁", href: "/" },
-            { label: "商品列表", href: "/shop" },
-            { label: "購物車", href: "/shop/cart" },
-            { label: "結帳" }
-          ]} />
+          <Link
+            href="/shop/cart"
+            className="inline-flex items-center gap-2 border-2 border-[#3D2419] bg-[#FFD45C] px-3 py-2 text-sm font-bold text-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] sm:hidden"
+          >
+            ← 返回購物車
+          </Link>
+          <div className="hidden sm:block">
+            <Breadcrumbs items={[
+              { label: "首頁", href: "/" },
+              { label: "商品列表", href: "/shop" },
+              { label: "購物車", href: "/shop/cart" },
+              { label: "結帳" }
+            ]} />
+          </div>
         </div>
-        <div className="flex flex-row gap-8">
-          <div className="w-[60%]">
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+          <div className="w-full lg:w-[60%]">
             <div className="mb-6">
-              <CheckoutContactInfo onAddressChange={setAddress} />
+              <CheckoutContactInfo
+                defaultEmail={user?.account}
+                onContactChange={setContact}
+              />
             </div>
             <div className="mb-6">
               <CheckoutOrderList items={items} />
             </div>
           </div>
-          <div className="w-[30%] self-start sticky top-8 transition-all duration-300">
+          <div className="w-full self-start transition-all duration-300 lg:sticky lg:top-8 lg:w-[40%]">
             <CheckoutSummary items={items} onCheckout={() => setShowPayment(true)} />
           </div>
         </div>
       </div>
 
-      {/* 支付方式燈箱 */}
-      {showPayment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={() => setShowPayment(false)}>
-          <div className="bg-white border-[3px] border-[#3D2419] shadow-[6px_6px_0px_0px_#3D2419] px-8 py-6 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-2xl font-bold text-[#3D2419] text-center mb-6">選擇支付方式</h3>
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={() => handlePayment("ecpay")}
-                className="flex items-center justify-center gap-3 w-full py-5 bg-slate-200 text-slate-600 font-bold text-xl border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-slate-300 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
-              >
-                <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
-                  <path d="M2 5h20v14H2V5zm2 2v2h16V7H4zm0 4v6h16v-6H4zm2 2h4v2H6v-2z" />
-                </svg>
-                線上刷卡
-              </button>
-              <button
-                onClick={() => handlePayment("linepay")}
-                className="flex items-center justify-center gap-3 w-full py-5 bg-slate-200 text-slate-600 font-bold text-xl border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-slate-300 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
-              >
-                <svg className="w-7 h-7 shrink-0 fill-slate-600" viewBox="0 0 24 24">
-                  <path d="M6 2h12v20H6V2zm2 2v14h8V4H8zm3 15h2v2h-2v-2z" />
-                </svg>
-                行動支付
-              </button>
-              <hr className="border-t-2 border-[#3D2419]/20 my-3" />
-              <button
-                onClick={() => handlePayment("mock")}
-                className="flex items-center justify-center gap-3 w-full py-3 bg-gray-100 text-gray-500 font-bold text-base border-[2px] border-gray-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,0.15)] hover:bg-gray-200 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
-              >
-                模擬付款（測試用，跳過金流）
-              </button>
-            </div>
-            <button
-              onClick={() => setShowPayment(false)}
-              className="w-full mt-4 py-3 text-sm font-bold text-[#3D2419] bg-white border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-gray-100 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer"
-            >
-              取消
-            </button>
-          </div>
-        </div>
-      )}
+      {showPayment && <PaymentMethodDialog createOrder={createPendingOrder} onClose={() => setShowPayment(false)} />}
     </div>
   );
 }

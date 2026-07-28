@@ -1,10 +1,17 @@
 "use client";
 import * as React from "react";
-import { Eye, House } from "lucide-react";
+import { House } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 import Pagination from "@/components/articlePagination";
+import ArticleThumbnail from "@/components/article-thumbnail";
 import { Button } from "@/components/ui/button";
+import { getArticleSummary } from "@/lib/article-preview";
 import SearchBar from "./_components/search_bar";
+import { useToast } from "./_components/article_toast";
 import Link from "next/link";
+import AmbientBackground from "@/components/AmbientBackground";
+
 import {
 	Menubar,
 	MenubarContent,
@@ -48,24 +55,8 @@ interface ArticlesResponse {
 	article: Article[];
 }
 
-const stripHtml = (html: string) => {
-	if (typeof document === "undefined") {
-		// server-side fallback: remove tags and decode basic entities
-		return html
-			.replace(/<[^>]+>/g, "")
-			.replace(/&nbsp;/g, " ")
-			.replace(/&amp;/g, "&")
-			.replace(/&lt;/g, "<")
-			.replace(/&gt;/g, ">")
-			.replace(/&quot;/g, '"')
-			.replace(/&#39;/g, "'");
-	}
-	const div = document.createElement("div");
-	div.innerHTML = html;
-	return div.textContent || div.innerText || "";
-};
-
 export default function ArticlePage() {
+	const { toastComponent } = useToast();
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [articles, setArticles] = React.useState<Article[]>([]);
 	const [loading, setLoading] = React.useState(true);
@@ -96,9 +87,13 @@ export default function ArticlePage() {
 		const artResponse = await fetch(
 			query ? `/api/article/articles?${query}` : "/api/article/articles",
 		);
+		if (!artResponse.ok) {
+			throw new Error(`Fetch articles failed: ${artResponse.status}`);
+		}
 		const artData: ArticlesResponse = await artResponse.json();
-		setArticles(artData.article);
-		return artData.article;
+		const nextArticles = Array.isArray(artData.article) ? artData.article : [];
+		setArticles(nextArticles);
+		return nextArticles;
 	};
 	const totalPages = Math.ceil(articles.length / itemsPerPage);
 	const startIndex = (currentPage - 1) * itemsPerPage;
@@ -149,29 +144,36 @@ export default function ArticlePage() {
 
 	return (
 		<>
-			<div className="min-h-screen">
-				<div className="max-w-7xl mx-auto w-full py-4">
-					<div className="relative border-2 border-black">
-						<div
+			{toastComponent}
+			<div className="relative min-h-screen overflow-hidden">
+				<AmbientBackground />
+				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
+					<div className="relative border-2 border-black bg-[#FCF9F6]">
+						{/* <div
 							className="absolute inset-0 opacity-[0.5] pointer-events-none"
 							style={{
 								backgroundImage: "url('/article/noise.png')",
 								backgroundRepeat: "repeat",
 								backgroundSize: "90px",
 							}}
-						/>
+						/> */}
 						<div className="relative z-10">
-							<div className="flex items-center w-full justify-between lg:flex-row md:flex-row md:items-center gap-4 p-3 bg-black">
-								<div className="flex items-center">
+							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
+								<div className="flex w-full min-w-0 flex-1 items-center">
 									<Link
 										href="/"
-										className="flex h-10 w-10 items-center justify-center bg-black text-white hover:bg-gray-800"
+										className="flex h-10 w-10 shrink-0 items-center justify-center bg-black text-white hover:bg-gray-800"
 									>
 										<House size={22} />
 									</Link>
-									<Menubar className="h-10 bg-black text-slate-100 border-0 justify-start shrink-0">
+									<Menubar className="flex h-auto min-w-0 flex-wrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
 										<MenubarMenu>
 											<MenubarTrigger
+												className={
+													selectedSubCategory === ""
+														? "bg-gray-600 hover:bg-gray-500"
+														: undefined
+												}
 												onClick={() => {
 													setSelectedSubCategory("");
 													setCurrentPage(1);
@@ -184,14 +186,25 @@ export default function ArticlePage() {
 										</MenubarMenu>
 										<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
 										{loading ? (
-											<div className="px-3 text-sm text-gray-400 self-center">
+											<div className="px-3 text-sm text-gray-500 self-center">
 												載入中...
 											</div>
 										) : (
 											categories.map((cat, index) => (
 												<React.Fragment key={cat.category_name}>
 													<MenubarMenu key={cat.category_name}>
-														<MenubarTrigger>{cat.category_name}</MenubarTrigger>
+														<MenubarTrigger
+															className={
+																cat.sub_category.some(
+																	(sub) =>
+																		String(sub.id) === selectedSubCategory,
+																)
+																	? "bg-gray-600 hover:bg-gray-400"
+																	: undefined
+															}
+														>
+															{cat.category_name}
+														</MenubarTrigger>
 														<MenubarContent>
 															<MenubarRadioGroup
 																value={selectedSubCategory}
@@ -221,19 +234,21 @@ export default function ArticlePage() {
 										)}
 									</Menubar>
 								</div>
-								<div className="flex items-center w-full lg:w-auto max-w-md gap-2 border-white border">
-									<SearchBar
-										onSearch={(keyword) => {
-											fetchArticles(
-												selectedSubCategory
-													? Number(selectedSubCategory)
-													: undefined,
-												keyword,
-											);
-											setCurrentPage(1);
-											updatePageInUrl(1);
-										}}
-									/>
+								<div className="flex w-full items-center gap-2 md:w-auto md:max-w-md">
+									<div className="min-w-0 flex-1 border border-white">
+										<SearchBar
+											onSearch={(keyword) => {
+												fetchArticles(
+													selectedSubCategory
+														? Number(selectedSubCategory)
+														: undefined,
+													keyword,
+												);
+												setCurrentPage(1);
+												updatePageInUrl(1);
+											}}
+										/>
+									</div>
 								</div>
 							</div>
 
@@ -263,48 +278,60 @@ export default function ArticlePage() {
 							</div>
 
 							{/* 文章列表 */}
-							<div className="p-6">
+							<div className="p-4 md:p-6">
 								<div className="flex flex-col">
 									{paginatedArticles.length === 0 ? (
 										<p className="text-black text-center py-6">
 											目前沒有任何文章。
 										</p>
 									) : (
-										paginatedArticles.map((art, idx) => (
+										paginatedArticles.map((art) => (
 											<div
-												key={idx}
-												className="min-h-32 border-b border-black flex flex-col justify-between gap-2 py-3 first:-mt-3"
+												key={art.id}
+												className="flex gap-3 border-b border-black py-4 first:-mt-3 sm:gap-4"
 											>
-												<div className="flex justify-between items-start">
-													<h3 className="font-bold text-lg text-slate-900">
-														{art.title}
-													</h3>
-													<p className="whitespace-nowrap pt-1 text-xs text-gray-700">
-														{art.date}
-													</p>
+												<div className="relative min-h-36 w-32 shrink-0 self-stretch sm:w-40 md:w-44">
+													<ArticleThumbnail
+														content={art.content}
+														title={art.title}
+														width={176}
+														height={132}
+														className="absolute inset-0 h-full w-full border border-black bg-white object-cover"
+													/>
 												</div>
-												{/* 內文 */}
-												<div>
-													<p className="article-content overflow-hidden wrap-break-word text-base line-clamp-3 text-gray-600">
-														{stripHtml(art.content)}
-													</p>
-												</div>
-												<div className="flex justify-between items-center mt-1.5">
-													<div className="flex items-center">
-														<Eye size={16} />
-														<div className="ml-1 text-sm">
-															收藏次數({savedCounts[art.id] || 0})
-														</div>
+												<div className="flex min-w-0 flex-1 flex-col gap-2">
+													<div className="flex min-w-0 items-start justify-between gap-3">
+														<h3 className="min-w-0 flex-1 font-bold text-lg leading-6 text-slate-900">
+															{art.title}
+														</h3>
+														<p className="shrink-0 whitespace-nowrap pt-1 text-xs text-gray-700">
+															{art.date}
+														</p>
 													</div>
-													<Link href={`/article/${art.id}`}>
-														<Button
-															variant="outline"
-															size="sm"
-															className="h-7 border-black bg-red-600 text-slate-100 px-3 text-xs"
+													<p className="line-clamp-3 wrap-break-word overflow-hidden text-base leading-6 text-gray-600">
+														{getArticleSummary(art.content)}
+													</p>
+													<div className="mt-auto flex items-center justify-between gap-3">
+														<div className="flex min-w-0 items-center gap-1 text-xs text-gray-500 sm:text-sm">
+															<FontAwesomeIcon
+																icon={faBookmark}
+																className="shrink-0"
+															/>
+															<span>被收藏 {savedCounts[art.id] || 0} 次</span>
+														</div>
+														<Link
+															href={`/article/${art.id}`}
+															className="shrink-0"
 														>
-															閱讀全文
-														</Button>
-													</Link>
+															<Button
+																variant="outline"
+																size="sm"
+																className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100"
+															>
+																閱讀全文
+															</Button>
+														</Link>
+													</div>
 												</div>
 											</div>
 										))

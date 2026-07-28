@@ -35,7 +35,9 @@ export default function AvatarUploader({
   const [activeTab, setActiveTab] = useState<"default" | "upload">("default");
 
   // 2. 預設頭像狀態
-  const [selectedDefault, setSelectedDefault] = useState<string>(DEFAULT_AVATARS[0]);
+  const [selectedDefault, setSelectedDefault] = useState<string>(
+    DEFAULT_AVATARS[0],
+  );
 
   // 3. 上傳與裁切狀態
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -53,7 +55,9 @@ export default function AvatarUploader({
     setSelectedFile(null);
     setScale(1);
     setActiveTab("default");
-    const fileInput = document.getElementById("avatar-input") as HTMLInputElement;
+    const fileInput = document.getElementById(
+      "avatar-input",
+    ) as HTMLInputElement;
     if (fileInput) fileInput.value = "";
   };
 
@@ -158,8 +162,15 @@ export default function AvatarUploader({
   // 🌟 修正 2：精準的比對邏輯
   let displayAvatar: string | StaticImageData = defaultAvatar;
 
-  if (currentAvatar && typeof currentAvatar === "string" && currentAvatar.trim() !== "") {
-    if (currentAvatar.startsWith("http://") || currentAvatar.startsWith("https://")) {
+  if (
+    currentAvatar &&
+    typeof currentAvatar === "string" &&
+    currentAvatar.trim() !== ""
+  ) {
+    if (
+      currentAvatar.startsWith("http://") ||
+      currentAvatar.startsWith("https://")
+    ) {
       // 1. 完整網址 (如 Google 第三方登入)
       displayAvatar = currentAvatar;
     } else if (
@@ -171,13 +182,15 @@ export default function AvatarUploader({
     } else {
       // 3. 用戶自訂上傳的照片 (放在後端 Node.js 伺服器，例如 /user/avatars/avatar-xxx.jpeg)
       const backendBase = API_URL.replace("/user/api", "");
-      const cleanPath = currentAvatar.startsWith("/") ? currentAvatar : `/${currentAvatar}`;
+      const cleanPath = currentAvatar.startsWith("/")
+        ? currentAvatar
+        : `/${currentAvatar}`;
       displayAvatar = `${backendBase}${cleanPath}`;
     }
   }
 
   return (
-    <div className="w-32 h-32">
+    <div className="relative w-32 h-32">
       {/* 大頭貼與點擊彈窗按鈕 */}
       <div className="relative h-32 w-32">
         <div className="h-full w-full overflow-hidden rounded-full border-2 border-gray-200 shadow-inner">
@@ -209,10 +222,12 @@ export default function AvatarUploader({
           onClick={handleBackdropClick}
         >
           <div
-            className="border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] h-130 flex w-full max-w-sm flex-col items-center bg-white p-6 cursor-default mx-4 animate-pop-in"
+            className="relative border-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] h-130 flex w-full max-w-sm flex-col items-center bg-white p-6 cursor-default mx-4 animate-pop-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="mb-4 text-base font-bold text-gray-800">修改大頭貼</h3>
+            <h3 className="mb-4 text-base font-bold text-gray-800">
+              修改大頭貼
+            </h3>
 
             {/* 頁籤切換按鈕 (Tabs) */}
             <div className="mb-4 flex w-full border-b text-sm">
@@ -267,7 +282,7 @@ export default function AvatarUploader({
 
             {/* === Tab 2: 自訂圖片 (包含檔名選擇與裁切編輯器) === */}
             {activeTab === "upload" && (
-              <div className="flex flex-col items-center w-full">
+              <div className="flex flex-col items-center w-full relative">
                 {!selectedFile ? (
                   <div className="py-8 flex flex-col items-center">
                     <label className="cursor-pointer rounded-lg bg-blue-50 px-4 py-2 text-xs font-medium text-blue-600 hover:bg-blue-100 transition">
@@ -328,12 +343,13 @@ export default function AvatarUploader({
             )}
 
             {/* Modal 操作按鈕 */}
-            <div className="mt-6 flex w-full justify-end space-x-3 border-t pt-4">
+            <div className=" absolute right-4 bottom-4 mt-6 flex w-full justify-end space-x-3 border-t pt-4">
               <button
                 type="button"
                 onClick={handleCancel}
                 disabled={isUploading}
-                className="rounded-md bg-gray-100 px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-200 transition"
+                // className=" bg-gray-100 px-4 py-2 text-xs font-medium text-gray-600 hover:bg-gray-200 transition"
+                className="mr-4 w-20 h-10 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-white bg-gray-400 hover:bg-[#9e9d9d] cursor-pointer hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               >
                 取消
               </button>
@@ -341,7 +357,8 @@ export default function AvatarUploader({
                 type="button"
                 onClick={handleConfirmSave}
                 disabled={isUploading}
-                className="rounded-md bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:bg-blue-700 transition disabled:bg-blue-400"
+                // className=" bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:bg-blue-700 transition disabled:bg-blue-400"
+                className="w-20 h-10 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] text-white bg-[#F02A2D] hover:bg-[#e50004] cursor-pointer hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               >
                 {isUploading ? "保存中..." : "確認變更"}
               </button>

@@ -19,6 +19,7 @@ export default function CategoryFilter({
   const [slideMax, setSlideMax] = useState(clampedMax);
   const [minStr, setMinStr] = useState(String(minPrice));
   const [maxStr, setMaxStr] = useState(String(maxPrice));
+  const [isCustomPriceOpen, setIsCustomPriceOpen] = useState(false);
   const committing = useRef(false);
   const raf = useRef(0);
 
@@ -31,7 +32,11 @@ export default function CategoryFilter({
   const handleSlider = (type: "min" | "max", v: number) => {
     if (type === "min" && v > slideMax) return;
     if (type === "max" && v < slideMin) return;
-    type === "min" ? setSlideMin(v) : setSlideMax(v);
+    if (type === "min") {
+      setSlideMin(v);
+    } else {
+      setSlideMax(v);
+    }
     cancelAnimationFrame(raf.current);
     raf.current = requestAnimationFrame(() => {
       commitPrice(type === "min" ? v : slideMin, type === "max" ? v : slideMax);
@@ -55,14 +60,24 @@ export default function CategoryFilter({
   };
 
   const tags = [
-    { label: "火鍋", keyword: "鍋" },
-    { label: "速食", keyword: "麥丹勞" },
-    { label: "吃到飽", keyword: "饗食" },
-    { label: "炸物", keyword: "炸雞" },
+    { label: "鍋物", keyword: "hotpot" },
+    { label: "炸雞／炸物", keyword: "fried" },
+    { label: "漢堡", keyword: "burger" },
+    { label: "比薩", keyword: "pizza" },
+    { label: "鍋貼／水餃", keyword: "dumplings" },
+    { label: "吃到飽", keyword: "buffet" },
+  ];
+  const pricePresets = [
+    { label: "全部", min: 0, max: priceMax },
+    { label: "$199以下", min: 0, max: 199 },
+    { label: "$200–499", min: 200, max: 499 },
+    { label: "$500–999", min: 500, max: 999 },
+    { label: "$1,000以上", min: 1000, max: priceMax },
   ];
 
   return (
-    <div className="flex items-center flex-wrap gap-x-3 gap-y-2 w-full px-4 py-2.5 bg-white text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
+    <div className="flex flex-col gap-3 w-full px-4 py-3 bg-white text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
+      <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
       {/* 全部商品（重置） */}
       <button
         onClick={onReset}
@@ -73,8 +88,8 @@ export default function CategoryFilter({
 
       <span className="w-px h-5 bg-[#3D2419]/20 shrink-0" />
 
-      {/* 熱門標籤 */}
-      <span className="text-sm font-bold text-[#3D2419]/60 shrink-0">熱門：</span>
+      {/* Demo 商品的快速導覽；未使用資料庫標籤。 */}
+      <span className="text-sm font-bold text-[#3D2419]/60 shrink-0">快速篩選：</span>
       {tags.map((tag) => (
         <button key={tag.label}
           className={`px-3 py-1 text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors
@@ -84,48 +99,103 @@ export default function CategoryFilter({
           {tag.label}
         </button>
       ))}
-
-      <span className="w-px h-5 bg-[#3D2419]/20 shrink-0" />
-
-      {/* 價格 */}
-      <span className="text-sm font-bold text-[#3D2419]/60 shrink-0">價格：</span>
-
-      {/* 桌面版拉桿 */}
-      <div className="hidden lg:flex items-center gap-2">
-        <span className="text-xs text-[#3D2419]/80 w-10 text-right">${slideMin}</span>
-        <div className="relative w-28 h-6">
-          <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-[#3D2419]/20" />
-          <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-[#3D2419]"
-            style={{ left: `${(slideMin / priceMax) * 100}%`, width: `${((slideMax - slideMin) / priceMax) * 100}%` }} />
-          <input type="range" min={0} max={priceMax} step={1} value={slideMin}
-            onChange={(e) => handleSlider("min", Number(e.target.value))}
-            className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
-              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
-              [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
-          <input type="range" min={0} max={priceMax} step={1} value={slideMax}
-            onChange={(e) => handleSlider("max", Number(e.target.value))}
-            className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
-              [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
-              [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
-              [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
-              [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
-        </div>
-        <span className="text-xs text-[#3D2419]/80 w-10">${slideMax}</span>
       </div>
 
-      {/* 手機版輸入框 */}
-      <div className="flex lg:hidden items-center gap-1">
-        <input type="text" inputMode="numeric" placeholder="最低"
-          value={minStr} onChange={(e) => setMinStr(e.target.value)}
-          onBlur={applyInput} onKeyDown={(e) => e.key === "Enter" && applyInput()}
-          className="w-16 h-7 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none placeholder-[#3D2419]/40" />
-        <span className="text-xs text-[#3D2419]/60">—</span>
-        <input type="text" inputMode="numeric" placeholder="最高"
-          value={maxStr} onChange={(e) => setMaxStr(e.target.value)}
-          onBlur={applyInput} onKeyDown={(e) => e.key === "Enter" && applyInput()}
-          className="w-16 h-7 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none placeholder-[#3D2419]/40" />
+      <div className="flex items-center flex-wrap gap-x-3 gap-y-2 pt-3 border-t-2 border-dashed border-[#3D2419]/20">
+        {/* 價格快捷篩選 */}
+        <span className="text-sm font-bold text-[#3D2419]/60 shrink-0">價格：</span>
+        <div className="flex items-center flex-wrap gap-2">
+        {pricePresets.map((preset) => {
+          const isActive = minPrice === preset.min && maxPrice === preset.max;
+          return (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => onPriceChange(preset.min, preset.max)}
+              className={`px-2.5 py-1 text-xs border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors ${
+                isActive ? "bg-[#3D2419] text-white" : "bg-white hover:bg-[#FBDF58]"
+              }`}
+            >
+              {preset.label}
+            </button>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setIsCustomPriceOpen((value) => !value)}
+          className={`px-2.5 py-1 text-xs border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors ${
+            isCustomPriceOpen ? "bg-[#FFD3B6]" : "bg-white hover:bg-[#FBDF58]"
+          }`}
+        >
+          自訂價格 {isCustomPriceOpen ? "▴" : "▾"}
+        </button>
+        </div>
+
+        {isCustomPriceOpen && (
+          <div className="w-full mt-1 pt-3 border-t-2 border-dashed border-[#3D2419]/20">
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              <label className="flex items-center gap-1 text-xs text-[#3D2419]/80">
+                最低 $
+                <input
+                  type="number"
+                  min="0"
+                  max={priceMax}
+                  inputMode="numeric"
+                  value={minStr}
+                  onChange={(e) => setMinStr(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && applyInput()}
+                  className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
+                />
+              </label>
+              <span className="text-sm text-[#3D2419]/60">～</span>
+              <label className="flex items-center gap-1 text-xs text-[#3D2419]/80">
+                最高 $
+                <input
+                  type="number"
+                  min="0"
+                  max={priceMax}
+                  inputMode="numeric"
+                  value={maxStr}
+                  onChange={(e) => setMaxStr(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && applyInput()}
+                  className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={applyInput}
+                className="h-8 px-3 text-xs bg-[#FFD3B6] border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-[#ffbe94] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
+              >
+                套用
+              </button>
+              <span className="text-xs text-[#3D2419]/50">可輸入 $0～${priceMax.toLocaleString()}</span>
+            </div>
+
+            <div className="flex items-center gap-2 w-full max-w-lg">
+              <span className="text-xs text-[#3D2419]/80 w-10 text-right">${slideMin}</span>
+              <div className="relative flex-1 h-6">
+                <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-[#3D2419]/20" />
+                <div className="absolute top-1/2 -translate-y-1/2 h-2 bg-[#3D2419]"
+                  style={{ left: `${(slideMin / priceMax) * 100}%`, width: `${((slideMax - slideMin) / priceMax) * 100}%` }} />
+                <input type="range" min={0} max={priceMax} step={1} value={slideMin}
+                  onChange={(e) => handleSlider("min", Number(e.target.value))}
+                  className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
+                    [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
+                    [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
+                <input type="range" min={0} max={priceMax} step={1} value={slideMax}
+                  onChange={(e) => handleSlider("max", Number(e.target.value))}
+                  className="absolute top-0 w-full h-full appearance-none bg-transparent pointer-events-none
+                    [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-[#FF6B6B] [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-[#3D2419]
+                    [&::-webkit-slider-thumb]:shadow-[1px_1px_0px_0px_#3D2419] [&::-webkit-slider-thumb]:cursor-pointer" />
+              </div>
+              <span className="text-xs text-[#3D2419]/80 w-10">${slideMax}</span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -33,6 +33,7 @@ export const config = {
     // 登入頁本身也要檢查（防止重複登入）
     '/user/login',
     '/user/account',
+    '/user/account/saved-articles',
     '/user/chatroom',
     // '/user/personal'
   ],

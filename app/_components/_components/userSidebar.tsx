@@ -1,6 +1,13 @@
 "use client";
 
-import { FaUser, FaBook, FaShoppingCart, FaTicketAlt } from "react-icons/fa";
+import {
+  FaUser,
+  FaBook,
+  FaBookmark,
+  FaShoppingCart,
+  FaTicketAlt,
+  FaHeart,
+} from "react-icons/fa";
 import { AiFillSafetyCertificate } from "react-icons/ai";
 import { MdOutlineLogout } from "react-icons/md";
 import { FaXmark } from "react-icons/fa6";
@@ -105,6 +112,14 @@ export default function UserSidebar() {
                   <Link
                     onClick={() => setIsOpening(false)}
                     className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
+                    href={`/user/account/saved-articles`}
+                  >
+                    <FaBookmark />
+                    <span className="ml-4">文章收藏</span>
+                  </Link>
+                  <Link
+                    onClick={() => setIsOpening(false)}
+                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
                     href={`/user/account/orders`}
                   >
                     <FaShoppingCart />
@@ -117,6 +132,14 @@ export default function UserSidebar() {
                   >
                     <FaTicketAlt />
                     <span className="ml-4">我的票券</span>
+                  </Link>
+                  <Link
+                    onClick={() => setIsOpening(false)}
+                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
+                    href={`/user/account/favorites`}
+                  >
+                    <FaHeart />
+                    <span className="ml-4">我的收藏</span>
                   </Link>
                   <button
                     onClick={() => {

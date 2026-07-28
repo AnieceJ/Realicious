@@ -5,6 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+	--font-pixel: var(--font-pixel); /* pixel 字體 */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--font-sans: var(--font-sans);
@@ -144,10 +145,23 @@
 }
 
 .article-editor .ck.ck-toolbar {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
 	border: 0;
 	border-bottom: 1px solid var(--ck-color-base-border);
 	border-radius: 0;
-	overflow-x: auto;
+	/* CKEditor 的下拉面板位於工具列內；不可用 overflow 裁切它。 */
+	overflow: visible;
+	flex-wrap: wrap;
+	position: relative;
+	z-index: 1;
+}
+
+.article-editor .ck.ck-toolbar > .ck-toolbar__items {
+	min-width: 0;
+	max-width: 100%;
+	flex-wrap: wrap;
 }
 
 .article-editor .ck-editor__editable {
@@ -176,6 +190,12 @@
 	padding-left: 2.5em !important;
 }
 
+:root {
+	--ck-z-default: 1 !important;
+	--ck-z-panel: 20 !important;
+	--ck-z-dialog: 25 !important;
+}
+
 .article-content {
 	line-height: 1.8;
 }
@@ -187,6 +207,66 @@
 .article-content img {
 	height: auto;
 	max-width: 100%;
+}
+
+.article-content figure.image {
+	clear: both;
+	margin: 1rem auto;
+	max-width: 100%;
+}
+
+.article-content figure.image img {
+	display: block;
+	margin-inline: auto;
+}
+
+.article-content span.image-inline {
+	display: inline-flex;
+	max-width: 100%;
+	vertical-align: middle;
+}
+
+.article-content .image-style-side,
+.article-content .image-style-align-right {
+	float: right;
+	margin-left: 1.5rem;
+	max-width: 50%;
+}
+
+.article-content .image-style-align-left {
+	float: left;
+	margin-right: 1.5rem;
+	max-width: 50%;
+}
+
+.article-content .image-style-align-center,
+.article-content .image-style-block-align-left,
+.article-content .image-style-block-align-right {
+	max-width: 100%;
+}
+
+.article-content .image-style-block-align-left {
+	margin-left: 0;
+}
+
+.article-content .image-style-block-align-right {
+	margin-right: 0;
+}
+
+.article-content::after {
+	clear: both;
+	content: "";
+	display: block;
+}
+
+@media (max-width: 639px) {
+	.article-content .image-style-side,
+	.article-content .image-style-align-left,
+	.article-content .image-style-align-right {
+		float: none;
+		margin-inline: auto;
+		max-width: 100%;
+	}
 }
 
 .article-content figure.table {
@@ -284,7 +364,6 @@
 	animation: counter-orbit-step 9s cubic-bezier(0.77, 0, 0.175, 1) infinite;
 }
 
-/* 外層順時針軌道旋轉 */
 @keyframes orbit-step {
 	/* 第一張停留 (0s ~ 2s) */
 	0%,
@@ -294,7 +373,7 @@
 	/* 滑動到第二張 (2s ~ 3s) */
 	33.3%,
 	55.5% {
-		transform: rotate(-120deg); /* 改為負向旋轉以配合結構，或維持正向 */
+		transform: rotate(-120deg);
 	}
 	/* 滑動到第三張 (5s ~ 6s) */
 	66.6%,
@@ -307,7 +386,6 @@
 	}
 }
 
-/* 內層逆時針反轉（維持圖片端正） */
 @keyframes counter-orbit-step {
 	0%,
 	22.2% {
@@ -346,8 +424,7 @@
 
 .article-editor {
 	position: relative;
-	z-index: 1000;
 }
-.ck-dropdown__panel {
-	z-index: 99999 !important;
+.article-editor .ck-dropdown__panel {
+	z-index: 21 !important;
 }

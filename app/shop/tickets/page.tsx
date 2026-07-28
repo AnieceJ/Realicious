@@ -8,16 +8,23 @@ import PageHeader from "@/app/_components/PageHeader";
 
 const FILTERS = [
   { key: "all", label: "全部票券" },
-  { key: "1", label: "未使用" },
+  { key: "usable", label: "未使用" },
+  { key: "expired", label: "已過期" },
   { key: "2", label: "已使用" },
-  { key: "3", label: "已過期" },
 ] as const;
+
+function isPromotionExpired(ticket: Ticket, now: number) {
+  return ticket.status === 1 && Boolean(
+    ticket.expires_at && new Date(ticket.expires_at).getTime() < now,
+  );
+}
 
 export default function TicketPage() {
   const { user } = useUser();
   const userId = user?.id;
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [now] = useState(() => Date.now());
 
   const fetchTickets = useCallback(() => {
     if (!userId) return;
@@ -32,12 +39,13 @@ export default function TicketPage() {
 
   const filteredTickets = useMemo(() => {
     if (activeFilter === "all") return tickets;
+    if (activeFilter === "usable") return tickets.filter((ticket) => ticket.status === 1 && !isPromotionExpired(ticket, now));
+    if (activeFilter === "expired") return tickets.filter((ticket) => isPromotionExpired(ticket, now) || ticket.status === 3);
     return tickets.filter((t) => String(t.status) === activeFilter);
-  }, [tickets, activeFilter]);
+  }, [tickets, activeFilter, now]);
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
         <PageHeader icon={<TicketIcon className="h-5 w-5" />} title="我的票券" />
 

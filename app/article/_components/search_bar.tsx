@@ -13,7 +13,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 	const [keyword, setKeyword] = useState("");
 
 	return (
-		<Field orientation="horizontal" className="max-w-sm gap-0">
+		<Field orientation="horizontal" className="w-full max-w-none min-w-0 gap-0">
 			<Input
 				type="search"
 				placeholder="搜尋文章..."
@@ -24,7 +24,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 						onSearch(keyword);
 					}
 				}}
-				className="border-b-gray-500 bg-gray-200"
+				className="flex-1 border-b-gray-500 bg-gray-200"
 			/>
 
 			<Button

@@ -2,12 +2,42 @@ import React, { useState } from "react";
 import Link from "next/link";
 import type { Product } from "@/lib/shop/product";
 import { addToCart } from "@/lib/shop/cart";
+import { addFavorite, removeFavorite } from "@/lib/shop/favorites";
+import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
-export default function ProductCard({ product }: { product: Product }) {
-  const [favorited, setFavorited] = useState(false);
+const API_BASE = "http://localhost:3001";
+const FALLBACK_IMAGE = `${API_BASE}/images/optimized/吃到飽.webp`;
+
+export default function ProductCard({
+  product,
+  favoritedProductIds = [],
+  onFavoriteChange,
+}: {
+  product: Product;
+  favoritedProductIds?: number[];
+  onFavoriteChange: (productId: number, isFavorited: boolean) => void;
+}) {
+  const { user } = useUser();
   const [showCart, setShowCart] = useState(false);
   const { toastComponent, showToast } = useToast();
+  const favorited = favoritedProductIds.includes(product.id);
+
+  const toggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!user?.id) {
+      showToast("請先登入會員後再收藏商品");
+      return;
+    }
+    const userId = Number(user.id);
+    if (favorited) {
+      const result = await removeFavorite(userId, product.id);
+      if (result.success) onFavoriteChange(product.id, false);
+    } else {
+      const result = await addFavorite(userId, product.id);
+      if (result.success) onFavoriteChange(product.id, true);
+    }
+  };
 
   return (
     <>
@@ -19,18 +49,22 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* 點圖片跳轉詳細頁 */}
       <Link href={`/shop/products/${product.id}`} className="absolute inset-0 block cursor-pointer">
         <img
-          src={`http://localhost:3001${product.main_img}`}
+          src={product.main_img ? `${API_BASE}${product.main_img}` : FALLBACK_IMAGE}
           alt={product.name}
+          onError={(event) => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = FALLBACK_IMAGE;
+          }}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       </Link>
 
       {/* 飄浮字卡 */}
       <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left pointer-events-none">
-        <p className="text-[#3D2419] font-black text-base truncate tracking-wide">
+        <p className="flex-1 min-w-0 text-[#3D2419] font-black text-base leading-snug line-clamp-2 tracking-wide">
           {product.name}
         </p>
-        <p className="text-[#8C5230] font-black text-lg tracking-wider">
+        <p className="shrink-0 text-[#8C5230] font-black text-lg tracking-wider">
           ${product.price}
         </p>
       </div>
@@ -45,7 +79,7 @@ export default function ProductCard({ product }: { product: Product }) {
             加入購物車
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); setFavorited(!favorited); }}
+            onClick={toggleFavorite}
             className="w-10 h-10 flex items-center justify-center bg-white border-2 border-[#3D2419] shadow-md hover:bg-red-50 transition-colors cursor-pointer"
           >
             <svg className="w-5 h-5 transition-all" viewBox="0 0 24 24"

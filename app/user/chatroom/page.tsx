@@ -1,33 +1,81 @@
 "use client";
-import Container from "../_components/container";
-import Left from "./_components/left";
 
-export default function Account() {
+import { useUser } from "@/app/context/user";
+import { useChatroom } from "./hooks/useChatroom";
+import Container from "@/app/user/_components/container";
+
+import RoomList from "./_components/RoomList";
+import CreateRoomForm from "./_components/CreateRoomForm";
+import CreateRoomModal from "./_components/CreateRoomForm";
+import ChatWindow from "./_components/ChatWindow";
+import PasswordModal from "./_components/PasswordModal";
+
+export default function Chatroom() {
+  const { user, loading } = useUser();
+  const {
+    currentRoom,
+    messages,
+    passwordModalRoom,
+    filteredRooms,
+    activeTab,
+    setActiveTab,
+    setPasswordModalRoom,
+    createRoom,
+    joinRoom,
+    sendMessage,
+    leaveRoom,
+    deleteRoom,
+    toggleFavorite,
+  } = useChatroom();
+
+  if (loading)
+    return (
+      <div className="flex h-screen items-center justify-center">載入中...</div>
+    );
+  if (!user)
+    return (
+      <div className="flex h-screen items-center justify-center">請先登入</div>
+    );
+
+  const currentUserId = Number(user.id);
+
   return (
-    <Container className="bg-white flex-col sm:flex-row overflow-hidden">
-      <Left></Left>
-      <div className="w-[70%] h-180 p-4 flex-col justify-center items-center">
-        <div className="w-full h-125 overflow-y-auto border flex flex-col">
-          <div className="w-150 bg-gray-100 flex my-4">
-            <div className=" w-12.5 border mx-4"></div>
-            <div>
-              <p>XXX</p>
-              <p>今天天氣真好</p>
-            </div>
-          </div>
-          <div className="w-150 bg-gray-100 flex flex-row-reverse my-4">
-            <div className="w-12.5 border mx-4 "></div>
-            <div className="">
-              <p>XXX</p>
-              <p>今天天氣真好</p>
-            </div>
-          </div>
-        </div>
-        <div className="w-full h-50 border">
-          <input className="w-50 h-12.5 border" type="text" />
-          <button className="w-25 h-12.5 border">送出</button>
+    <Container className="py-2 md:py-6 overflow-x-auto">
+      <div className="flex flex-row h-[600px] md:h-[750px] gap-2 md:gap-6 min-w-[640px]">
+        {/* 左側：大廳 */}
+        <RoomList
+          rooms={filteredRooms} /* 傳入過濾後的資料庫清單 */
+          activeTab={activeTab} /*  頁籤狀態 */
+          onTabChange={setActiveTab} /* 頁籤切換事件 */
+          currentRoomId={currentRoom?.id}
+          currentUserId={currentUserId}
+          onJoinRoom={(room) => joinRoom(room.id)} //傳入房間id
+          onDeleteRoom={deleteRoom}
+          onToggleFavorite={toggleFavorite} /*  傳入追蹤函式 */
+        />
+
+        {/* 右側：控制台 & 聊天室 */}
+        <div className="flex flex-1 flex-col gap-2 md:gap-4 shrink-0">
+          {/* <CreateRoomForm onCreateRoom={createRoom} /> */}
+          <CreateRoomModal onCreateRoom={createRoom} />
+          <ChatWindow
+            currentRoom={currentRoom}
+            messages={messages}
+            currentUserId={currentUserId}
+            onSendMessage={sendMessage}
+            onLeaveRoom={leaveRoom}
+          />
         </div>
       </div>
+
+      {/* 彈窗 */}
+      {passwordModalRoom && (
+        <PasswordModal
+          roomName={passwordModalRoom.name}
+          onSubmit={(pwd) => joinRoom(passwordModalRoom.id, pwd)}
+          onClose={() => setPasswordModalRoom(null)}
+        />
+      )}
     </Container>
   );
 }
