@@ -75,11 +75,23 @@ export default function CheckoutFinishedPage() {
       <div className="max-w-7xl mx-auto">
         <FinishedPhoto />
       </div>
-      <div className="flex flex-col items-center justify-center mb-4">
-        <h2 className="text-3xl text-center">
-          感謝您的購買！
-          <br /> Thank You for Your Order!
+      <div className="flex flex-col items-center justify-center text-center px-4 mb-8">
+        <span className="inline-flex items-center bg-[#FFD45C] px-3 py-1.5 border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] text-xs font-mono font-black tracking-[0.16em] text-[#1A1721]">
+          ORDER COMPLETE
+        </span>
+        <h2 className="mt-5 text-4xl sm:text-5xl font-black tracking-wide text-[#1A1721]">
+          付款成功！
         </h2>
+        <p className="mt-3 text-base font-medium text-[#1A1721]/70">
+          感謝您的購買，電子票券已發送至票券中心。
+        </p>
+        <div className="flex items-center gap-2 w-full max-w-md mt-6" aria-hidden>
+          <span className="w-2.5 h-2.5 bg-[#BB0015] border border-[#1A1721]" />
+          <span className="h-0.5 flex-1 bg-[#1A1721]" />
+          <span className="w-2.5 h-2.5 bg-[#FFD45C] border border-[#1A1721]" />
+          <span className="h-0.5 flex-1 bg-[#1A1721]" />
+          <span className="w-2.5 h-2.5 bg-[#BB0015] border border-[#1A1721]" />
+        </div>
       </div>
       <div className="flex flex-col items-center justify-center">
         <div className="w-[60%]">
