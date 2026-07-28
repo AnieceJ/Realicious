@@ -61,7 +61,7 @@ export default function CheckoutFinishedPage() {
           <h2 className="text-3xl font-bold text-[#3D2419] mb-2">付款失敗</h2>
           <p className="text-gray-500 mb-6">交易未完成，購物車內容已保留</p>
           <Link href="/shop/checkout"
-            className="px-6 py-3 bg-[#3D2419] text-white font-bold text-base border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_rgba(61,36,25,0.4)] hover:bg-[#5a3a2a] transition-all"
+            className="px-6 py-3 bg-[#BB0015] text-white font-bold text-base border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_rgba(61,36,25,0.4)] hover:bg-[#8E0010] transition-all"
           >
             返回結帳
           </Link>

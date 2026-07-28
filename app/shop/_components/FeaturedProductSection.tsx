@@ -113,22 +113,22 @@ export default function FeaturedProductSection({
 
         {/* 右側：商品資訊 */}
         <div className="w-1/2 flex flex-col justify-center px-6 py-4">
-          <span className="inline-block bg-amber-500 text-white text-xs px-2 py-0.5 border border-[#3D2419] w-fit mb-3">
+          <span className="inline-block bg-[#BB0015] text-white text-xs px-2 py-0.5 border border-[#3D2419] w-fit mb-3">
             今日主打
           </span>
           <h3 className="text-xl font-black text-[#3D2419] mb-2">
             {currentProduct.name}
           </h3>
-          <p className="text-sm font-medium text-amber-950 mb-4 line-clamp-2">
+          <p className="text-sm font-medium text-[#3D2419]/80 mb-4 line-clamp-2">
             限時特惠主打商品！【{currentProduct.name}】現正熱賣中。
           </p>
           <div className="flex items-center gap-2 mt-auto">
-            <span className="inline-flex items-center h-9 px-3 text-base font-black text-amber-700 bg-amber-100/80 border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419]">
+            <span className="inline-flex items-center h-9 px-3 text-base font-black text-[#BB0015] bg-[#FFF0B8] border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419]">
               ${currentProduct.price}
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
-              className="inline-flex items-center h-9 px-4 bg-purple-400 hover:bg-purple-500 active:translate-x-[.0625rem] active:translate-y-[.0625rem] text-[#3D2419] font-bold text-sm border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] cursor-pointer whitespace-nowrap"
+              className="inline-flex items-center h-9 px-4 bg-[#BB0015] hover:bg-[#8E0010] active:translate-x-[.0625rem] active:translate-y-[.0625rem] text-white font-bold text-sm border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] cursor-pointer whitespace-nowrap"
             >
               加入購物車
             </button>

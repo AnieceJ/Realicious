@@ -12,7 +12,7 @@ export default function OrderSidebar() {
       >
         <div className="flex flex-row items-center">
           {/* 個人頭像 */}
-          <div className="bg-purple-300 w-20 h-20">個人頭像</div>
+          <div className="bg-[#FFF0B8] w-20 h-20">個人頭像</div>
           {/* 名字 */}
           <div className="ml-8">
             <span className="text-xl">[user.name]</span>
