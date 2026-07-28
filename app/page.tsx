@@ -38,7 +38,7 @@ export default function HomePage() {
 				<div className="relative z-10 max-w-7xl mx-auto px-5">
 					<ArticleSection />
 				</div>
-				<div className="max-w-7xl mx-auto px-5">
+				<div className="mx-auto mt-30 bg-gray-200">
 					<PopularChatroomsSection />
 				</div>
 			</section>
