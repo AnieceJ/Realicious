@@ -9,6 +9,9 @@ import Cookies from "js-cookie";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMessage } from "@fortawesome/free-regular-svg-icons";
 import { FaXmark, FaStar, FaCrown } from "react-icons/fa6";
+import { FcLike } from "react-icons/fc";
+import { FaArrowRight } from "react-icons/fa";
+
 
 // 💡 補強型別定義：對應後端回傳的欄位
 interface RoomSummary {
@@ -29,7 +32,7 @@ function useIsClient() {
   return useSyncExternalStore(
     emptySubscribe,
     () => true,
-    () => false
+    () => false,
   );
 }
 
@@ -88,12 +91,12 @@ export default function Chatroom() {
     return (
       <Link
         key={room.id}
-        href={`/user/chatroom/${room.id}`}
+        href={`/user/chatroom/?roomId=${room.id}`}
         onClick={() => setIsOpening(false)}
         className="w-full p-3 mb-2 flex items-center gap-3 hover:bg-gray-100 rounded-xl transition-colors border border-transparent hover:border-gray-200 group"
       >
         {/* 預覽頭像 */}
-        <div className="relative w-11 h-11 shrink-0 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center font-bold overflow-hidden border">
+        <div className="relative w-11 h-11 shrink-0 bg-amber-100 text-amber-800 rounded-full flex items-center justify-center font-bold overflow-hidden ">
           {room.imageUrl ? (
             <Image
               src={room.imageUrl}
@@ -146,19 +149,26 @@ export default function Chatroom() {
                 isOpening ? "translate-x-0" : "translate-x-full"
               } transition-transform duration-300 ease-in-out`}
             >
-              <div className="pt-14 relative h-full flex flex-col">
-                {/* 關閉按鈕 */}
-                <button
-                  onClick={() => setIsOpening(false)}
-                  className="absolute top-4 right-4 p-2 text-gray-500 hover:text-black hover:bg-gray-200/50 rounded-full cursor-pointer transition-colors"
-                  aria-label="Close chatroom"
-                >
-                  <FaXmark className="text-2xl" />
-                </button>
+              <div className="pt-14 relative h-full flex flex-col ">
+                <div className="mb-8">
+                  {/* 關閉按鈕 */}
+                  <button
+                    onClick={() => setIsOpening(false)}
+                    className="absolute top-4 right-4 p-2 text-gray-500 hover:text-black hover:bg-gray-200/50 rounded-full cursor-pointer transition-colors"
+                    aria-label="Close chatroom"
+                  >
+                    <FaXmark className="text-2xl" />
+                  </button>
 
-                <h2 className="text-2xl px-5 font-bold text-black mb-4">
-                  聊天室
-                </h2>
+                  <Link
+                    href="/user/chatroom"
+            className=" gap-2 mr-4 ml-4 flex items-center font-bold text-[#BB0015] border-b-2 border-[#BB0015] hover:text-[#8E0010] hover:border-[#8E0010] transition"
+        onClick={() => setIsOpening(!isOpening)}
+                  >
+                    聊天室大廳<FaArrowRight />
+
+                  </Link>
+                </div>
 
                 {/* 列表內容區 */}
                 <div className="overflow-y-auto grow px-4 pb-6 space-y-6">
@@ -171,7 +181,7 @@ export default function Chatroom() {
                       {/* 1. 追蹤的聊天室 */}
                       <div>
                         <div className="flex items-center gap-2 mb-2 text-xs font-bold text-gray-400 tracking-wider uppercase px-1">
-                          <FaStar className="text-amber-500" />
+                          <FcLike className="text-amber-500" />
                           <span>追蹤的聊天室</span>
                           <span className="bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded-full text-[10px]">
                             {favoriteRooms.length}
@@ -217,7 +227,7 @@ export default function Chatroom() {
               }`}
             ></div>
           </>,
-          document.body
+          document.body,
         )}
     </>
   );
