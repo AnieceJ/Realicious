@@ -10,6 +10,8 @@ import { getArticleSummary } from "@/lib/article-preview";
 import SearchBar from "./_components/search_bar";
 import { useToast } from "./_components/article_toast";
 import Link from "next/link";
+import AmbientBackground from "@/components/AmbientBackground";
+
 import {
 	Menubar,
 	MenubarContent,
@@ -143,17 +145,18 @@ export default function ArticlePage() {
 	return (
 		<>
 			{toastComponent}
-			<div className="min-h-screen">
-				<div className="max-w-7xl mx-auto w-full py-4">
-					<div className="relative border-2 border-black">
-						<div
+			<div className="relative min-h-screen overflow-hidden">
+				<AmbientBackground />
+				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
+					<div className="relative border-2 border-black bg-[#FCF9F6]">
+						{/* <div
 							className="absolute inset-0 opacity-[0.5] pointer-events-none"
 							style={{
 								backgroundImage: "url('/article/noise.png')",
 								backgroundRepeat: "repeat",
 								backgroundSize: "90px",
 							}}
-						/>
+						/> */}
 						<div className="relative z-10">
 							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
 								<div className="flex w-full min-w-0 flex-1 items-center">

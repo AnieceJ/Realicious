@@ -53,7 +53,7 @@ export default function ArticleSection() {
 		<section>
 			<div className="max-w-7xl mx-auto">
 				<div className="mb-12">
-					<p className="text-[#BB0015] font-bold">POPULAR</p>
+					<p className="text-[#BB0015] font-bold">POPULAR ARTICLES</p>
 					<h2 className="text-4xl font-bold mt-2">熱門文章</h2>
 				</div>
 

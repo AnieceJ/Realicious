@@ -34,13 +34,23 @@ export default function HomePage() {
 
 				<AccountingSection />
 
-				<section className="relative py-24 overflow-hidden">
+				<section className="relative pt-15 overflow-hidden">
 					<AmbientBackground />
 					<div className="relative z-10 max-w-7xl mx-auto px-5">
 						<ArticleSection />
 					</div>
-					<div className="mx-auto mt-30 bg-gray-200">
-						<PopularChatroomsSection />
+					<div className="relative z-10 bg-gray-200">
+						<div
+							className="absolute inset-0 opacity-[0.5] pointer-events-none"
+							style={{
+								backgroundImage: "url('/article/noise.png')",
+								backgroundRepeat: "repeat",
+								backgroundSize: "90px",
+							}}
+						/>
+						<div className="relative z-10 mt-15">
+							<PopularChatroomsSection />
+						</div>
 					</div>
 				</section>
 			</div>
