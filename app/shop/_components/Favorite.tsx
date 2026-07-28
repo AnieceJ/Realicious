@@ -22,7 +22,7 @@ export default function Favorite({ productId, initialFavorited = false }: { prod
   return (
     <button
       onClick={toggle}
-      className="w-12 h-12 flex items-center justify-center bg-white border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
+      className="w-14 h-14 flex items-center justify-center bg-white border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-red-50 active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
     >
       <svg className="w-5 h-5 transition-all" viewBox="0 0 24 24"
         fill={favorited ? "#ef4444" : "none"}
