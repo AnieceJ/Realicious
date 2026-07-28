@@ -5,6 +5,7 @@ import AccountingSection from "./_components/AccountingSection";
 import ArticleSection from "./_components/ArticleSection";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect } from "react";
+import PopularChatroomsSection from "./_components/PopularChatroomsSection";
 
 export default function HomePage() {
   const searchParams = useSearchParams();
@@ -33,6 +34,9 @@ export default function HomePage() {
       <section className="py-24  bg-white">
         <div className="max-w-7xl mx-auto px-5">
           <ArticleSection />
+        </div>
+        <div className="max-w-7xl mx-auto px-5">
+          <PopularChatroomsSection />
         </div>
       </section>
     </>
