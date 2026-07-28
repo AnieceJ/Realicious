@@ -118,7 +118,6 @@ export default function ShopPage() {
 
   return (
     <div className="relative min-h-screen p-4">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto">
         {/* 頂層：麵包屑 + 搜尋 + 排序 + 篩選 */}
         <div className="flex flex-wrap items-center gap-3 mb-4">

@@ -38,8 +38,7 @@ export default function ProductsPage() {
 
   if (!product) {
     return (
-      <div className="relative min-h-screen flex items-center justify-center bg-white">
-        <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
+      <div className="relative min-h-screen flex items-center justify-center">
         {/* 載入中狀態提示框 */}
         <div className="p-8 bg-[#FCF9F6] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] text-xl font-black text-[#3D2419] tracking-wider select-none">
           🎒 正在翻找背包中...
@@ -49,8 +48,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-white pb-16">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
+    <div className="relative min-h-screen pb-16">
       <div className="max-w-7xl mx-auto px-6">
         {/* 麵包屑導覽 */}
         <div className="py-6">

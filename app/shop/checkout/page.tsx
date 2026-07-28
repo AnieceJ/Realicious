@@ -62,12 +62,11 @@ export default function CheckoutPage() {
   };
 
   if (loading || !user?.id) {
-    return <div className="min-h-screen bg-white" />;
+    return <div className="min-h-screen" />;
   }
 
   return (
     <div className="relative min-h-screen scroll-smooth">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 pt-4">
           <Breadcrumbs items={[

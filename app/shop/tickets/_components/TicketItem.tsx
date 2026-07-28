@@ -91,7 +91,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
                 disabled={!isUsable}
                 className={`px-4 py-2.5 font-black text-sm flex items-center gap-2 transition-all ${
                   isUsable
-                    ? "bg-white border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-[#3D2419]"
+                    ? "bg-[#FFD45C] border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-[#FFE37A] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-[#3D2419]"
                     : "bg-gray-200 border-[3px] border-gray-400 text-gray-400 cursor-not-allowed"
                 }`}
               >
