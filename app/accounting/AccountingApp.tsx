@@ -25,6 +25,7 @@ import {
   savePet,
 } from "./api";
 import { getOnboardingState } from "./onboarding";
+import TutorialSpotlight from "./pixel/TutorialSpotlight";
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
    白 #FFFFFF ｜ 卡片/次要 #FCF9F6 ｜ 輸入框 #E3E3E3
@@ -180,6 +181,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [justFed, setJustFed] = useState(false);
 
   const [showAdd, setShowAdd] = useState(false);
+  const [tutorialSkipped, setTutorialSkipped] = useState(false);
+  const addBtnRef = useRef<HTMLButtonElement | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showBudget, setShowBudget] = useState(false);
   const [junkMode, setJunkMode] = useState(false);
@@ -426,6 +429,12 @@ const addTx = async () => {
       />
       <CoinBurst fire={burst} originRef={stageRef} />
 
+{onboarding.type === "tutorial" && !showAdd && !tutorialSkipped && (
+  <TutorialSpotlight
+    targetRef={addBtnRef}
+    onSkip={() => setTutorialSkipped(true)}
+  />
+)}
 
       <section className={`${CARD} p-4 md:p-5`} aria-label="小雞狀態">
           <div className="flex items-center gap-3 mb-4">
@@ -536,6 +545,7 @@ const addTx = async () => {
         <div className="flex items-center justify-between mb-4">
           <h2 className={`${pixel} text-[15px]`}>記帳明細</h2>
           <button
+              ref={addBtnRef}
               onClick={() => {
               setEditingId(null);
               setFAmt("");

@@ -13,7 +13,7 @@
 import type { Tx } from "./api";
 
 // 幾天沒記帳算「久違」
-export const WELCOME_BACK_DAYS = 30;
+export const WELCOME_BACK_DAYS = 0;
 
 export type OnboardingState =
   | { type: "tutorial" }                    // 新用戶：跑教學
