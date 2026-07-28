@@ -11,16 +11,23 @@ import "@/app/shop/shop-theme.css";
 
 const FILTERS = [
   { key: "all", label: "全部票券" },
-  { key: "1", label: "未使用" },
+  { key: "usable", label: "未使用" },
+  { key: "expired", label: "已過期" },
   { key: "2", label: "已使用" },
-  { key: "3", label: "已過期" },
 ] as const;
+
+function isPromotionExpired(ticket: Ticket, now: number) {
+  return ticket.status === 1 && Boolean(
+    ticket.expires_at && new Date(ticket.expires_at).getTime() < now,
+  );
+}
 
 export default function AccountTickets() {
   const { user } = useUser();
   const userId = user?.id;
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [now] = useState(() => Date.now());
 
   const fetchTickets = useCallback(() => {
     if (!userId) return;
@@ -35,8 +42,10 @@ export default function AccountTickets() {
 
   const filteredTickets = useMemo(() => {
     if (activeFilter === "all") return tickets;
+    if (activeFilter === "usable") return tickets.filter((ticket) => ticket.status === 1 && !isPromotionExpired(ticket, now));
+    if (activeFilter === "expired") return tickets.filter((ticket) => isPromotionExpired(ticket, now) || ticket.status === 3);
     return tickets.filter((t) => String(t.status) === activeFilter);
-  }, [tickets, activeFilter]);
+  }, [tickets, activeFilter, now]);
 
   return (
     <Container className="shop-theme bg-white flex-col sm:flex-row overflow-hidden">

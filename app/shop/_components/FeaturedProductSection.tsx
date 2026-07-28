@@ -66,12 +66,12 @@ export default function FeaturedProductSection({
   return (
     <>
       {toastComponent}
-      <div className="flex flex-row w-full h-72 bg-[#FFD45C] border-[.1875rem] border-[#3D2419] shadow-[.25rem_.25rem_0rem_0rem_#3D2419] select-none overflow-hidden"
+      <div className="flex flex-row w-full h-72 bg-black border-[.1875rem] border-[#3D2419] shadow-[.25rem_.25rem_0rem_0rem_#3D2419] select-none overflow-hidden"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
         {/* 左側：圖片輪播 */}
-        <div className="relative w-1/2 h-full overflow-hidden group">
+        <div className="relative h-full w-1/2 overflow-hidden border-[5px] border-black group">
           {/* 圖層容器 */}
           <div className="flex h-full transition-transform duration-400 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -112,29 +112,29 @@ export default function FeaturedProductSection({
         </div>
 
         {/* 右側：商品資訊 */}
-        <div className="w-1/2 flex flex-col justify-center px-6 py-4">
-          <span className="inline-block bg-[#BB0015] text-white text-xs px-2 py-0.5 border border-[#3D2419] w-fit mb-3">
+        <div className="flex w-1/2 flex-col justify-center bg-black px-6 py-4">
+          <span className="mb-3 inline-block w-fit border border-white bg-[#BB0015] px-2 py-0.5 text-xs text-white">
             今日主打
           </span>
-          <h3 className="text-xl font-black text-[#3D2419] mb-2">
+          <h3 className="mb-2 text-xl font-black text-white">
             {currentProduct.name}
           </h3>
-          <p className="text-sm font-medium text-[#3D2419]/80 mb-4 line-clamp-2">
+          <p className="mb-4 line-clamp-2 text-sm font-medium text-white/75">
             限時特惠主打商品！【{currentProduct.name}】現正熱賣中。
           </p>
           <div className="flex items-center gap-2 mt-auto">
-            <span className="inline-flex items-center h-9 px-3 text-base font-black text-[#BB0015] bg-[#FFF0B8] border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419]">
+            <span className="inline-flex h-9 items-center bg-[#FFF0B8] px-3 text-base font-black text-[#BB0015]">
               ${currentProduct.price}
             </span>
             <button
               onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
-              className="inline-flex items-center h-9 px-4 bg-[#BB0015] hover:bg-[#8E0010] active:translate-x-[.0625rem] active:translate-y-[.0625rem] text-white font-bold text-sm border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] cursor-pointer whitespace-nowrap"
+              className="inline-flex h-9 cursor-pointer items-center whitespace-nowrap bg-[#BB0015] px-4 text-sm font-bold text-white shadow-[4px_4px_0px_0px_#000] hover:bg-[#8E0010] active:translate-x-[.0625rem] active:translate-y-[.0625rem]"
             >
               加入購物車
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); toggleFavorite(); }}
-              className="flex items-center justify-center h-9 w-9 bg-white border-2 border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] hover:bg-red-50 transition-colors cursor-pointer"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center bg-white shadow-[4px_4px_0px_0px_#000] transition-colors hover:bg-red-50"
             >
               <svg className="w-4 h-4 transition-all" viewBox="0 0 24 24"
                 fill={favorited ? "#ef4444" : "none"}

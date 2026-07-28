@@ -19,17 +19,20 @@ function getImageUrl(imagePath: string) {
 export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRefresh?: () => void }) {
   const [showQR, setShowQR] = useState(false);
   const [acting, setActing] = useState(false);
+  const [now] = useState(() => Date.now());
   const date = new Date(ticket.created_at).toLocaleDateString("zh-TW");
   const expiresAt = ticket.expires_at
     ? new Date(ticket.expires_at).toLocaleDateString("zh-TW")
     : null;
+  const isPromotionExpired = Boolean(
+    ticket.status === 1 && ticket.expires_at && new Date(ticket.expires_at).getTime() < now,
+  );
   const isUsable = ticket.status === 1;
 
   const demoAction = async (action: "redeem" | "expire") => {
     if (!ticket.redeem_code || acting) return;
     setActing(true);
-    const endpoint = action === "redeem" ? "redeem" : "expire";
-    await fetch(`${API_BASE}/tickets/${endpoint}/${ticket.redeem_code}`, { method: "PUT" });
+    await fetch(`${API_BASE}/tickets/${action}/${ticket.redeem_code}`, { method: "PUT" });
     setActing(false);
     setShowQR(false);
     onRefresh?.();
@@ -63,11 +66,13 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
                   {TYPE_LABEL[ticket.type] || ticket.type}
                 </span>
                 <span className={`inline-flex items-center px-2.5 py-0.5 text-xs font-semibold ${
+                  isPromotionExpired ? "bg-red-100 text-red-700" :
                   ticket.status === 1 ? "bg-green-100 text-green-800" :
                   ticket.status === 2 ? "bg-gray-100 text-gray-600" :
                   "bg-red-100 text-red-700"
                 }`}>
-                  {ticket.status === 1 ? "未使用" :
+                  {isPromotionExpired ? "已過期" :
+                   ticket.status === 1 ? "未使用" :
                    ticket.status === 2 ? "已使用" :
                    "已過期"}
                 </span>
@@ -124,8 +129,13 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
               請出示此 QR Code 給店家掃碼核銷
             </p>
             {expiresAt && (
-              <p className="text-xs text-red-500 text-center mt-1">
-                有效期限：{expiresAt}
+              <p className={`mt-1 text-center text-xs ${isPromotionExpired ? "text-red-500" : "text-gray-500"}`}>
+                優惠兌換期限：{expiresAt}
+              </p>
+            )}
+            {isPromotionExpired && (
+              <p className="mt-1 text-center text-xs leading-relaxed text-red-500">
+                已超過優惠兌換期限，請洽門市依現場規則補差額使用。
               </p>
             )}
 
@@ -145,7 +155,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
                   disabled={acting}
                   className="flex-1 py-2 text-xs font-bold text-white bg-red-400 border-2 border-red-600 shadow-[2px_2px_0px_0px_#dc2626] hover:bg-red-500 active:translate-x-[1px] active:translate-y-[1px] transition-all cursor-pointer disabled:opacity-50"
                 >
-                  設為過期
+                  模擬逾期
                 </button>
               </div>
             </div>

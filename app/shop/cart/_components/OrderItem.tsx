@@ -25,13 +25,13 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
     <div className="mb-3">
       {confirmComponent}
       <div
-        className="flex w-full px-4 py-2.5 
+        className="flex flex-col sm:flex-row gap-4 w-full px-4 py-4
                   bg-[#FCF9F6] text-[#3D2419] font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419]"
       >
-        <div>
-          <div className="bg-pink-300 w-30 h-30 flex items-center justify-center">
+        <div className="shrink-0">
+          <div className="bg-[#FFF0B8] w-full h-48 sm:w-30 sm:h-30 flex items-center justify-center">
             <img
               src={item.main_img ? getImageUrl(item.main_img) : FALLBACK_IMAGE}
               alt={item.name}
@@ -43,37 +43,28 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
             />
           </div>
         </div>
-        <div className="flex flex-col ml-3">
-          <div className="mb-9 mt-3">
-            <h3>{item.name}</h3>
-          </div>
-          <div>
-            <span>${item.price}</span>
-          </div>
+        <div className="flex flex-1 flex-col justify-between min-w-0 py-1">
+          <h3 className="text-lg leading-snug">{item.name}</h3>
+          <span className="mt-3 text-lg text-[#8C5230]">${item.price}</span>
         </div>
-        <div className="flex flex-col items-center ml-auto">
-          <div className="mt-6 mb-5 ml-5">
+
+        <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center gap-4 sm:gap-5 sm:ml-auto">
+          <div>
             <QuantityPicker
               value={item.qty}
               onChange={(qty) => { updateQty(item.id, qty); onUpdate(); }}
               onReachMin={handleRemove}
             />
           </div>
-          <div className="ml-15 mt-3">
-            <button
-              onClick={handleRemove}
-              className="flex flex-row w-fit items-center justify-between cursor-pointer
-                        active:translate-x-[1px] active:translate-y-[1px] transition-all duration-75"
-            >
-              <svg
-                className="w-6 h-6 fill-[#3D2419] transition-colors hover:fill-red-500 mb-1"
-                viewBox="0 0 24 24"
-              >
-                <path d="M9 3h6v2H9V3zm-4 4h14v2H5V7zm2 4h10v10H7V11zm2 2v5h2v-5H9zm4 0v5h2v-5h-2z" />
-              </svg>
-              <span>移除商品</span>
-            </button>
-          </div>
+          <button
+            onClick={handleRemove}
+            className="flex items-center gap-1.5 px-2 py-1 text-sm text-[#BB0015] hover:bg-red-50 cursor-pointer active:translate-x-[1px] active:translate-y-[1px] transition-all duration-75"
+          >
+            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M9 3h6v2H9V3zm-4 4h14v2H5V7zm2 4h10v10H7V11zm2 2v5h2v-5H9zm4 0v5h2v-5h-2z" />
+            </svg>
+            <span>移除</span>
+          </button>
         </div>
       </div>
     </div>

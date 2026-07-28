@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { paymentMethods, type PaymentMethod } from "@/lib/shop/payment";
 
@@ -13,6 +13,14 @@ type PaymentMethodDialogProps = {
 export default function PaymentMethodDialog({ orderId, createOrder, onClose }: PaymentMethodDialogProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 從綠界按瀏覽器上一頁時，頁面可能由 bfcache 還原，
+  // 需解除送出中的鎖定，讓使用者能關閉燈箱或重新選擇付款方式。
+  useEffect(() => {
+    const resetSubmitting = () => setIsSubmitting(false);
+    window.addEventListener("pageshow", resetSubmitting);
+    return () => window.removeEventListener("pageshow", resetSubmitting);
+  }, []);
 
   const handlePayment = async (methodId: PaymentMethod) => {
     if (isSubmitting) return;

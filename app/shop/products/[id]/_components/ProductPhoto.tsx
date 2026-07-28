@@ -41,8 +41,8 @@ export default function ProductPhoto({ mainImage, images = EMPTY_IMAGES, product
   if (!selectedImage) return null;
 
   return (
-    <div className="flex w-[600px] h-[520px] gap-3">
-      <div className="flex flex-col w-20 gap-3">
+    <div className="flex flex-col-reverse sm:flex-row w-full gap-3">
+      <div className="flex flex-row sm:flex-col w-full sm:w-20 gap-3 overflow-x-auto sm:overflow-visible pb-1 sm:pb-0">
         {photoPaths.map((path, index) => (
           <button
             key={path}
@@ -52,7 +52,7 @@ export default function ProductPhoto({ mainImage, images = EMPTY_IMAGES, product
               setSelectedImage(path);
               setIsLoading(true);
             }}
-            className={`h-20 w-20 overflow-hidden border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-transform hover:translate-x-[1px] hover:translate-y-[1px] ${
+            className={`h-16 w-16 sm:h-20 sm:w-20 shrink-0 overflow-hidden border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-transform hover:translate-x-[1px] hover:translate-y-[1px] ${
               selectedImage === path ? "ring-4 ring-[#FBDF58]" : ""
             }`}
           >
@@ -60,7 +60,7 @@ export default function ProductPhoto({ mainImage, images = EMPTY_IMAGES, product
           </button>
         ))}
       </div>
-      <div className="relative h-full flex-1 overflow-hidden bg-[#FCF9F6] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
+      <div className="relative w-full aspect-square sm:aspect-auto sm:h-[520px] flex-1 overflow-hidden bg-[#FCF9F6] border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
         {isLoading && (
           <div className="absolute inset-0 animate-pulse bg-linear-to-br from-[#F2E8DF] via-[#FCF9F6] to-[#E6D4C5]" aria-label="圖片載入中" />
         )}

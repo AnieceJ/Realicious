@@ -53,8 +53,8 @@ export default function CartPage() {
             { label: "購物車" }
           ]} />
         </div>
-        <div className="flex flex-row gap-8">
-          <div className={items.length === 0 ? "w-full" : "w-[60%]"}>
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          <div className={items.length === 0 ? "w-full" : "w-full lg:w-[60%]"}>
             {items.length === 0 ? (
               <EmptyCart />
             ) : (
@@ -97,7 +97,7 @@ export default function CartPage() {
           </div>
 
           {items.length > 0 && (
-            <div className="w-[40%] self-start sticky top-8">
+            <div className="w-full lg:w-[40%] self-start lg:sticky lg:top-8">
               <OrderSummary items={items} />
             </div>
           )}
