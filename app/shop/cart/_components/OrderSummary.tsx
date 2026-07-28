@@ -37,12 +37,12 @@ export default function OrderSummary({ items }: { items: CartItem[] }) {
                   shadow-[4px_4px_0px_0px_#3D2419]"
     >
       <div className="flex items-center justify-center mt-6">
-        <h3 className="text-3xl">訂單摘要/ORDER SUMMARY</h3>
+        <h3 className="text-3xl">訂單摘要</h3>
       </div>
       <hr className="border-t-4 w-full mx-auto mt-5 border-gray-600" />
       <div className="flex flex-col gap-4 mt-6 w-full px-4 py-3">
         <div className="flex justify-between mb-4">
-          <span>小計(Subtotal)</span>
+          <span>小計</span>
           <span>${subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-sm text-gray-500">
@@ -51,7 +51,7 @@ export default function OrderSummary({ items }: { items: CartItem[] }) {
         </div>
         <hr className="border-t-4 border-dashed border-gray-600 mt-6 mx-auto w-full" />
         <div className="flex justify-between mt-6">
-          <h3 className="text-3xl">總計 TOTAL：</h3>
+          <h3 className="text-3xl">總計</h3>
           <h3 className="text-3xl">${subtotal.toLocaleString()}</h3>
         </div>
         <div
@@ -62,7 +62,7 @@ export default function OrderSummary({ items }: { items: CartItem[] }) {
                      shadow-[4px_4px_0px_0px_#3D2419]
                      hover:bg-[#a06040] active:translate-x-[2px] active:translate-y-[2px] transition-all"
         >
-          <span className="text-3xl">前往結帳<br />CHECKOUT</span>
+          <span className="text-3xl">前往結帳</span>
         </div>
       </div>
     </div>
