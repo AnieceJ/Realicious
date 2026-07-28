@@ -18,7 +18,17 @@ function authHeaders(): Record<string, string> {
 }
 
 async function json<T>(res: Response): Promise<T> {
-  if (!res.ok) throw new Error(`API ${res.status}`);
+  if (!res.ok) {
+    // 先試著讀後端回的訊息（例如「這名字太over了啦」）
+    let message = `API ${res.status}`;
+    try {
+      const body = await res.json();
+      if (body?.message) message = body.message;
+    } catch {
+      // 後端沒回 JSON 就用預設
+    }
+    throw new Error(message);
+  }
   return res.json();
 }
 

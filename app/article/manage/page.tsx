@@ -219,6 +219,11 @@ export default function ArticleManagePage() {
 									<Menubar className="flex h-auto min-w-0 flex-wrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
 										<MenubarMenu>
 											<MenubarTrigger
+												className={
+													selectedSubCategory === ""
+														? "bg-gray-600 hover:bg-gray-400"
+														: undefined
+												}
 												onClick={async () => {
 													setSelectedSubCategory("");
 													setCurrentPage(1);
@@ -239,7 +244,18 @@ export default function ArticleManagePage() {
 											categories.map((cat, index) => (
 												<React.Fragment key={cat.category_name}>
 													<MenubarMenu>
-														<MenubarTrigger>{cat.category_name}</MenubarTrigger>
+														<MenubarTrigger
+															className={
+																cat.sub_category.some(
+																	(sub) =>
+																		String(sub.id) === selectedSubCategory,
+																)
+																	? "bg-gray-600 hover:bg-gray-400"
+																	: undefined
+															}
+														>
+															{cat.category_name}
+														</MenubarTrigger>
 														<MenubarContent>
 															<MenubarRadioGroup
 																value={selectedSubCategory}

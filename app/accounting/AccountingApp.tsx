@@ -1,5 +1,6 @@
 "use client";
 
+import { getChickTalk } from "./chickTalk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBurger, faMugHot, faTrainSubway, faBook, faGamepad, faShirt,
@@ -23,7 +24,8 @@ import {
   saveBudget,
   savePet,
 } from "./api";
-
+import { getOnboardingState } from "./onboarding";
+import TutorialSpotlight from "./pixel/TutorialSpotlight";
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
    白 #FFFFFF ｜ 卡片/次要 #FCF9F6 ｜ 輸入框 #E3E3E3
@@ -179,10 +181,14 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [justFed, setJustFed] = useState(false);
 
   const [showAdd, setShowAdd] = useState(false);
+  const [tutorialSkipped, setTutorialSkipped] = useState(false);
+  const addBtnRef = useRef<HTMLButtonElement | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showBudget, setShowBudget] = useState(false);
   const [junkMode, setJunkMode] = useState(false);
   const [junkDismissed, setJunkDismissed] = useState(false);
+  const [pokeCount, setPokeCount] = useState(0);
+  const [talk, setTalk] = useState<{ text: string; sub?: string } | null>(null);
 
   // 表單
   const [fType, setFType] = useState<"expense" | "income">("expense");
@@ -190,6 +196,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [fAmt, setFAmt] = useState("");
   const [fNote, setFNote] = useState("");
   const [budgetInput, setBudgetInput] = useState("500");
+
+  const onboarding = useMemo(() => getOnboardingState(txs), [txs]);
 
   useEffect(() => {
     (async () => {
@@ -211,6 +219,28 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
     })();
   }, []);
 
+useEffect(() => {
+    if (!loaded) return;
+
+    if (onboarding.type === "welcomeBack") {
+      // 用 setTimeout 讓它下一輪才執行，避開 React 19 的同步 setState 警告
+      const id = setTimeout(() => {
+        setTalk({
+          text: `好久不見！你${onboarding.days}天沒來了，本雞都長灰了…(´;ω;\`)`,
+        });
+      }, 0);
+      return () => clearTimeout(id);
+    }
+    // onboarding.type === "tutorial" → 交給美術做的教學元件去讀這個狀態
+  }, [loaded, onboarding]);
+
+// 台詞泡泡:出現後自動消失。每戳一次 getChickTalk 都回傳新物件 →
+// talk 參考變了 → 這個 effect 重跑 → 計時器重置,連戳不會提早消失。
+useEffect(() => {
+  if (!talk) return;
+  const id = setTimeout(() => setTalk(null), 3500);
+  return () => clearTimeout(id);
+}, [talk]);
 
   // 換頭飾（擇一，再點同一個 = 脫下）
   const toggleHead = async (item: "bow" | "cap" | "crown") => {
@@ -250,10 +280,11 @@ const saveName = async () => {
     try {
       await savePet({ petName: n });
     } catch (e) {
-      console.error("[lia] 改名失敗", e);
-      setPetName(petName);  // 失敗就回復
-      setNameInput(petName);
-    }
+        console.error("[lia] 改名失敗", e);
+        setPetName(petName);
+        setNameInput(petName);
+        setTalk({ text: e instanceof Error ? e.message : "改名失敗了" });
+      }
   };
 
   const pet = useMemo(() => calcPet(txs), [txs]);
@@ -280,6 +311,26 @@ const saveName = async () => {
   const balance = monthIncome - monthExpense;
   const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
   const over = spent > budget;
+  const pokeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handlePoke = () => {
+    const next = pokeCount + 1;
+    setPokeCount(next);
+  setTalk(
+      getChickTalk({
+        name: petName,
+        hp: pet.hp,
+        streak: pet.streak,
+        alive: pet.alive,
+        loggedToday: pet.loggedToday,
+        isOver: junkMode,
+        justFed,
+        pokeCount: next,
+      })
+    );
+    if (pokeTimer.current) clearTimeout(pokeTimer.current);
+    pokeTimer.current = setTimeout(() => setPokeCount(0), 3000);
+  };
   const spentAnim = useCountUp(spent); // 金額用「數」的，不要用「跳」的
 
   const spendDays = useMemo(
@@ -378,6 +429,12 @@ const addTx = async () => {
       />
       <CoinBurst fire={burst} originRef={stageRef} />
 
+{onboarding.type === "tutorial" && !showAdd && !tutorialSkipped && (
+  <TutorialSpotlight
+    targetRef={addBtnRef}
+    onSkip={() => setTutorialSkipped(true)}
+  />
+)}
 
       <section className={`${CARD} p-4 md:p-5`} aria-label="小雞狀態">
           <div className="flex items-center gap-3 mb-4">
@@ -488,6 +545,7 @@ const addTx = async () => {
         <div className="flex items-center justify-between mb-4">
           <h2 className={`${pixel} text-[15px]`}>記帳明細</h2>
           <button
+              ref={addBtnRef}
               onClick={() => {
               setEditingId(null);
               setFAmt("");
@@ -817,6 +875,8 @@ const addTx = async () => {
         spriteSize={SPRITE}
         groundHeight={GROUND_H}
         x={12}
+        onPoke={handlePoke}   // ← 戳一下 → 播台詞
+        talk={talk}           // ← 把氣泡內容交給 ChickGround 定位渲染
       />
 
       {/* ============ 衣櫃 Modal ============
@@ -960,3 +1020,4 @@ function Bar({
     </div>
   );
 }
+
