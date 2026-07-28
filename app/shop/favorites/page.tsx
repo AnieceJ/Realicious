@@ -45,7 +45,6 @@ export default function ShopFavorites() {
           onConfirm={() => handleRemove(pendingRemoval.product_id)}
         />
       )}
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto">
         <PageHeader icon={<Heart className="h-5 w-5" />} title="我的收藏" />
 
