@@ -24,7 +24,7 @@ import {
   saveBudget,
   savePet,
 } from "./api";
-
+import { getOnboardingState } from "./onboarding";
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
    白 #FFFFFF ｜ 卡片/次要 #FCF9F6 ｜ 輸入框 #E3E3E3
@@ -194,6 +194,8 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [fNote, setFNote] = useState("");
   const [budgetInput, setBudgetInput] = useState("500");
 
+  const onboarding = useMemo(() => getOnboardingState(txs), [txs]);
+
   useEffect(() => {
     (async () => {
       try {
@@ -213,6 +215,21 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
       }
     })();
   }, []);
+
+useEffect(() => {
+    if (!loaded) return;
+
+    if (onboarding.type === "welcomeBack") {
+      // 用 setTimeout 讓它下一輪才執行，避開 React 19 的同步 setState 警告
+      const id = setTimeout(() => {
+        setTalk({
+          text: `好久不見！你${onboarding.days}天沒來了，本雞都長灰了…(´;ω;\`)`,
+        });
+      }, 0);
+      return () => clearTimeout(id);
+    }
+    // onboarding.type === "tutorial" → 交給美術做的教學元件去讀這個狀態
+  }, [loaded, onboarding]);
 
 // 台詞泡泡:出現後自動消失。每戳一次 getChickTalk 都回傳新物件 →
 // talk 參考變了 → 這個 effect 重跑 → 計時器重置,連戳不會提早消失。
