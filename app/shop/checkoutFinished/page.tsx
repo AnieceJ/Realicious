@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import FinishedPhoto from "./_components/FinishedPhoto";
@@ -9,39 +9,46 @@ import { clearCart, getCartItems, getLastOrder, saveLastOrder, type CartItem } f
 
 export default function CheckoutFinishedPage() {
   const searchParams = useSearchParams();
-  const itemsRef = useRef<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [orderId, setOrderId] = useState("");
   const [status, setStatus] = useState<"loading" | "success" | "fail">("loading");
 
   useEffect(() => {
-    const rtnCode = searchParams.get("RtnCode");
-    const isCancelled = searchParams.get("cancel") === "1";
-    const isSuccess = rtnCode === "1" || (searchParams.get("from") === "linepay" && !isCancelled);
+    let cancelled = false;
 
-    if (isSuccess) {
-      const pendingId = localStorage.getItem("realicious-pending-order") || searchParams.get("orderId") || "";
-      const cart = getCartItems().length > 0 ? getCartItems() : getLastOrder();
-      itemsRef.current = cart;
-      setOrderId(pendingId);
-      saveLastOrder(cart);
-      clearCart();
-      localStorage.removeItem("realicious-pending-order");
+    Promise.resolve().then(() => {
+      const rtnCode = searchParams.get("RtnCode");
+      const isCancelled = searchParams.get("cancel") === "1";
+      const isSuccess = rtnCode === "1" || (searchParams.get("from") === "linepay" && !isCancelled);
 
-      console.log("=== 完成頁除錯 ===");
-      console.log("RtnCode:", rtnCode);
-      console.log("pendingId:", pendingId);
-      console.log("cart items:", cart);
+      if (isSuccess) {
+        const pendingId = localStorage.getItem("realicious-pending-order") || searchParams.get("orderId") || "";
+        const currentCart = getCartItems();
+        const cart = currentCart.length > 0 ? currentCart : getLastOrder();
+        saveLastOrder(cart);
+        clearCart();
+        localStorage.removeItem("realicious-pending-order");
 
-      if (pendingId && !sessionStorage.getItem("confirm-sent-" + pendingId)) {
-        sessionStorage.setItem("confirm-sent-" + pendingId, "1");
-        fetch(`http://localhost:3001/payment/confirm/${pendingId}`, { method: "PUT" }).catch(() => {});
+        if (pendingId && !sessionStorage.getItem("confirm-sent-" + pendingId)) {
+          sessionStorage.setItem("confirm-sent-" + pendingId, "1");
+          fetch(`http://localhost:3001/payment/confirm/${pendingId}`, { method: "PUT" }).catch(() => {});
+        }
+
+        if (!cancelled) {
+          setItems(cart);
+          setOrderId(pendingId);
+          setStatus("success");
+        }
+        return;
       }
 
-      setStatus("success");
-    } else {
       localStorage.removeItem("realicious-pending-order");
-      setStatus("fail");
-    }
+      if (!cancelled) setStatus("fail");
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [searchParams]);
 
   if (status === "loading") return null;
@@ -78,7 +85,7 @@ export default function CheckoutFinishedPage() {
       </div>
       <div className="flex flex-col items-center justify-center">
         <div className="w-[60%]">
-          <FinishedOrderList items={itemsRef.current} orderId={`ORD-${orderId}`} />
+          <FinishedOrderList items={items} orderId={`ORD-${orderId}`} />
         </div>
       </div>
       <div className="flex flex-col items-center justify-center">
