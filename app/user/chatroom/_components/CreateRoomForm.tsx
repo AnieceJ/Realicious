@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
+import { useAlert } from "@/app/user/context/alert";
 
 // 預設風格封面庫（直接填寫 public 裡面的相對字串路徑）
 const DEFAULT_ROOM_COVERS = [
@@ -58,6 +59,8 @@ export default function CreateRoomModal({
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { showAlert } = useAlert();
+
   // 關閉 Modal 並重置所有狀態
   const handleClose = () => {
     setIsOpen(false);
@@ -69,10 +72,10 @@ export default function CreateRoomModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newRoomName.trim()) return alert("請輸入房間名稱");
+    if (!newRoomName.trim()) return showAlert("error","請輸入房間名稱");
 
     if (newRoomType === "PRIVATE_GROUP" && !newRoomPassword.trim()) {
-      alert("建立私密房間時請設定密碼！");
+      showAlert('error',"建立私密房間時請設定密碼");
       return;
     }
 
@@ -88,7 +91,7 @@ export default function CreateRoomModal({
       if (result.success) {
         handleClose(); // 成功後自動關閉彈窗
       } else {
-        alert(result.message || "建立房間失敗");
+        showAlert("error","建立房間失敗");
       }
     } finally {
       setIsSubmitting(false);
@@ -100,7 +103,8 @@ export default function CreateRoomModal({
       {/* 觸發彈窗的創建按鈕 */}
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+        // className="flex items-center gap-1.5 bg-indigo-600 px-3.5 py-2 text-xs font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+        className="w-20 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-white bg-[#F02A2D] hover:bg-[#e50004] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
       >
         <span>➕</span> 建立房間
       </button>
@@ -108,7 +112,7 @@ export default function CreateRoomModal({
       {/* Modal 彈出視窗 */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-md rounded-2xl border border-slate-100 bg-white p-5 shadow-2xl transition-all">
+          <div className="w-full max-w-md border-3 bg-white p-5 shadow-2xl transition-all">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
@@ -134,7 +138,7 @@ export default function CreateRoomModal({
                   placeholder="請輸入房間名稱..."
                   value={newRoomName}
                   onChange={(e) => setNewRoomName(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-full border border-slate-200 px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
               </div>
 
@@ -194,7 +198,7 @@ export default function CreateRoomModal({
                       key={cover.id}
                       type="button"
                       onClick={() => setSelectedImage(cover.url)}
-                      className={`group relative aspect-video overflow-hidden rounded-lg border-2 transition-all ${
+                      className={`group relative aspect-video overflow-hidden rounded border-2 transition-all ${
                         selectedImage === cover.url
                           ? "border-indigo-600 ring-2 ring-indigo-500/20"
                           : "border-transparent opacity-70 hover:opacity-100"
@@ -207,8 +211,8 @@ export default function CreateRoomModal({
                         className="object-cover transition-transform group-hover:scale-105"
                       />
                       {cover.label && (
-                        <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent py-1 text-[10px] font-medium text-white text-center">
-                          {cover.label}
+                        <span className="absolute inset-x-0 bottom-0  from-black/80 to-transparent py-1 text-[10px] font-medium text-white text-center">
+                          {/* {cover.label} */}
                         </span>
                       )}
                     </button>
@@ -221,14 +225,15 @@ export default function CreateRoomModal({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="rounded-xl px-3.5 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 transition-colors"
+                  className="w-20 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-white bg-gray-400 hover:bg-[#9e9d9d] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="rounded-xl bg-indigo-600 px-4 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
+                  className=  "w-20 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-white bg-[#F02A2D] hover:bg-[#e50004] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
+
                 >
                   {isSubmitting ? "建立中..." : "確認建立"}
                 </button>

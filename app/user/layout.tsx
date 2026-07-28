@@ -1,6 +1,5 @@
 "use client";
 import "./user.css";
-import { AlertProvider } from "./context/alert";
 
 export default function UserLayout({
   children,
@@ -8,9 +7,8 @@ export default function UserLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div>
-      {/* <AlertProvider>{children}</AlertProvider>; */}
-      {children};
+    <div className="py-4 bg-[#fafafa] bg-[url(/user/always-grey.png)] bg-repeat bg-size-32px_32px">
+      {children}
     </div>
   );
 }
