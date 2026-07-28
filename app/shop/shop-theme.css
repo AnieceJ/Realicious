@@ -32,3 +32,20 @@
 /* 深色按鈕保留為次要操作，但 hover 時使用首頁同款深墨黑。 */
 .shop-theme .hover\:bg-\[\#5a3a2a\]:hover,
 .shop-theme .hover\:bg-\[\#523324\]:hover { background-color: #302a3b; }
+
+@keyframes shop-confetti-pop {
+  0%, 100% { transform: translateX(var(--confetti-x)) translateY(0); }
+  50% { transform: translateX(var(--confetti-x)) translateY(-7px); }
+}
+
+.shop-confetti {
+  animation: shop-confetti-pop 1.5s steps(2, end) infinite;
+}
+
+.shop-confetti-delay {
+  animation-delay: -0.75s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shop-confetti { animation: none; }
+}
