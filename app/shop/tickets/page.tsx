@@ -37,7 +37,6 @@ export default function TicketPage() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
         <PageHeader icon={<TicketIcon className="h-5 w-5" />} title="我的票券" />
 

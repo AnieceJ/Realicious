@@ -56,7 +56,6 @@ export default function CheckoutFinishedPage() {
   if (status === "fail") {
     return (
       <div className="relative min-h-screen">
-        <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
           <div className="text-6xl mb-4">✕</div>
           <h2 className="text-3xl font-bold text-[#3D2419] mb-2">付款失敗</h2>
@@ -73,7 +72,6 @@ export default function CheckoutFinishedPage() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto">
         <FinishedPhoto />
       </div>

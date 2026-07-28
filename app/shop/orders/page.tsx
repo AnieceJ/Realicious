@@ -31,7 +31,6 @@ export default function OrderPage() {
 
   return (
     <div className="relative min-h-screen">
-      <div className="fixed inset-0 -z-10 bg-[#FFFFFF]" />
       <div className="max-w-7xl mx-auto px-4">
         <PageHeader icon={<ClipboardList className="h-5 w-5" />} title="我的訂單" />
 
