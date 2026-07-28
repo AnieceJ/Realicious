@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Socket, io } from "socket.io-client";
 import Cookies from "js-cookie";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export interface Room {
   id: number;
@@ -9,23 +10,25 @@ export interface Room {
   createdBy: number;
   imageUrl?: string;
   _count?: { members: number };
-  isFavorited?: boolean; 
+  isFavorited?: boolean;
 }
 
 export interface UserProfile {
   nick_name?: string | null;
   avatar?: string | null;
 }
+
 export interface Sender {
   id: number;
   account: string;
-  user_profile?: UserProfile | null; 
+  user_profile?: UserProfile | null;
 }
+
 export interface Message {
   id?: number;
   senderId: number;
   content: string;
-  sender?: Sender
+  sender?: Sender;
 }
 
 export function useChatroom() {
@@ -33,12 +36,16 @@ export function useChatroom() {
   const [currentRoom, setCurrentRoom] = useState<Room | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [passwordModalRoom, setPasswordModalRoom] = useState<Room | null>(null);
-  
-  // 🌟 1. 新增：頁籤狀態 (all | favorites)
   const [activeTab, setActiveTab] = useState<"all" | "favorites">("all");
 
   const socketRef = useRef<Socket | null>(null);
 
+  // 取得網址 Query 參數與 Router
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const roomIdFromUrl = searchParams.get("roomId");
+
+  // 1. 抓取房間清單 API
   const fetchRooms = async () => {
     const token = Cookies.get("token");
     try {
@@ -52,6 +59,7 @@ export function useChatroom() {
     }
   };
 
+  // 2. 初始化 Socket 連線與綁定事件（僅執行一次）
   useEffect(() => {
     const token = Cookies.get("token");
     if (!token) return;
@@ -76,22 +84,22 @@ export function useChatroom() {
         prev.map((r) => (r.id === roomId ? { ...r, _count: { members: memberCount } } : r))
       );
       const targetRoomId = Number(roomId);
-     setCurrentRoom((prevRoom) => {
-    if (prevRoom && Number(prevRoom.id) === targetRoomId) {
-      return {
-        ...prevRoom,
-        _count: {
-          ...prevRoom?._count, // 保留原本 _count 裡的其他屬性（如果有）
-          members: memberCount,
-        },
-      };
-    }
-    return prevRoom;
-  });
+      setCurrentRoom((prevRoom) => {
+        if (prevRoom && Number(prevRoom.id) === targetRoomId) {
+          return {
+            ...prevRoom,
+            _count: {
+              ...prevRoom._count,
+              members: memberCount,
+            },
+          };
+        }
+        return prevRoom;
+      });
     });
 
     socket.on("join_success", ({ room }: { room: Room }) => {
-      setCurrentRoom({...room});
+      setCurrentRoom({ ...room });
       setPasswordModalRoom(null);
     });
 
@@ -107,44 +115,78 @@ export function useChatroom() {
 
     socket.on("room_deleted", ({ roomId }: { roomId: number }) => {
       setRooms((prev) => prev.filter((r) => r.id !== roomId));
-      setCurrentRoom((prev) => (prev?.id === roomId ? null : prev));
+      setCurrentRoom((prev) => {
+        if (prev?.id === roomId) {
+          router.push("/user/chatroom");
+          return null;
+        }
+        return prev;
+      });
     });
+
+    fetchRooms();
 
     return () => {
       socket.disconnect();
     };
   }, []);
 
-  useEffect(() => {
-    const loadInitialData = async () => {
-      await fetchRooms();
-    };
-    loadInitialData();
-  }, []);
-
-  const createRoom = async (
-  name: string,
-  type: "PUBLIC_GROUP" | "PRIVATE_GROUP",
-  imageUrl?: string, 
-  password?: string
-) => {
-  const token = Cookies.get("token");
-  const res = await fetch("http://localhost:3001/user/api/chatrooms", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ name, type, imageUrl, password }), // 
-  });
-  return res.json();
-};
-
-  const joinRoom = (roomId: number, password?: string) => {
+  // 3. 底層真正的 Socket Emit Join 動作
+  const emitJoinRoom = useCallback((roomId: number, password?: string) => {
     if (!socketRef.current) return;
     if (!socketRef.current.connected) socketRef.current.connect();
+
     setMessages([]);
     socketRef.current.emit("join_room", { roomId, password });
+  }, []);
+
+  // 4. 監聽網址的 roomId 變化，自動呼叫 Socket 加入房間
+  useEffect(() => {
+    if (!roomIdFromUrl) {
+      // 網址沒有 roomId，重置狀態
+      if (currentRoom) {
+        setCurrentRoom(null);
+        setMessages([]);
+      }
+      return;
+    }
+
+    const targetId = Number(roomIdFromUrl);
+    // 只有當網址上的 ID 與當前房間不同時才加入
+    if (currentRoom?.id !== targetId) {
+      emitJoinRoom(targetId);
+    }
+  }, [roomIdFromUrl, currentRoom?.id, emitJoinRoom]);
+
+  // 5. 對外提供的 joinRoom：只負責改網址，讓上面的 Effect 統一處理連線
+  const joinRoom = useCallback(
+    (roomId: number, password?: string) => {
+      // 如果是有密碼的直接嘗試發送；如果是普通切換，直接走 router.push
+      if (password) {
+        emitJoinRoom(roomId, password);
+      } else {
+        router.push(`/user/chatroom?roomId=${roomId}`);
+      }
+    },
+    [router, emitJoinRoom]
+  );
+
+  const createRoom = async (
+    name: string,
+    type: "PUBLIC_GROUP" | "PRIVATE_GROUP",
+    imageUrl?: string,
+    password?: string
+  ) => {
+    const token = Cookies.get("token");
+    const res = await fetch("http://localhost:3001/user/api/chatrooms", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name, type, imageUrl, password }),
+    });
+    return res.json();
   };
 
   const sendMessage = (content: string) => {
@@ -157,6 +199,7 @@ export function useChatroom() {
     socketRef.current.emit("leave_room", { roomId: currentRoom.id });
     setCurrentRoom(null);
     setMessages([]);
+    router.push("/user/chatroom");
   };
 
   const deleteRoom = async (roomId: number) => {
@@ -171,7 +214,6 @@ export function useChatroom() {
   const toggleFavorite = async (roomId: number, e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // 畫面先行更新 (Optimistic UI)
     setRooms((prevRooms) =>
       prevRooms.map((room) =>
         room.id === roomId ? { ...room, isFavorited: !room.isFavorited } : room
@@ -195,7 +237,6 @@ export function useChatroom() {
     }
   };
 
-  // 🌟 2. 依據 activeTab 計算出過濾後的房間清單
   const filteredRooms = rooms.filter((room) => {
     if (activeTab === "favorites") return room.isFavorited;
     return true;
@@ -203,9 +244,9 @@ export function useChatroom() {
 
   return {
     rooms,
-    filteredRooms, // 👈 匯出過濾後的資料
-    activeTab,     // 👈 匯出頁籤狀態
-    setActiveTab,  // 👈 匯出切換頁籤函式
+    filteredRooms,
+    activeTab,
+    setActiveTab,
     currentRoom,
     messages,
     passwordModalRoom,
