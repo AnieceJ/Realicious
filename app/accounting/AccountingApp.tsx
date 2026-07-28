@@ -265,6 +265,7 @@ const saveName = async () => {
         setNameInput(petName);
         setTalk({ text: e instanceof Error ? e.message : "改名失敗了" });
       }
+  };
 
   const pet = useMemo(() => calcPet(txs), [txs]);
 
