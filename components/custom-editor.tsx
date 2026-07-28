@@ -92,6 +92,8 @@ export default function CustomEditor({
 					],
 				},
 				toolbar: {
+					// 窄螢幕時將按鈕換行，避免 CKEditor 的預設群組工具列撐出容器。
+					shouldNotGroupWhenFull: true,
 					items: [
 						"heading",
 						"|",

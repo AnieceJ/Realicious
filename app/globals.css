@@ -144,6 +144,9 @@
 }
 
 .article-editor .ck.ck-toolbar {
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
 	border: 0;
 	border-bottom: 1px solid var(--ck-color-base-border);
 	border-radius: 0;
@@ -152,6 +155,12 @@
 	flex-wrap: wrap;
 	position: relative;
 	z-index: 1;
+}
+
+.article-editor .ck.ck-toolbar > .ck-toolbar__items {
+	min-width: 0;
+	max-width: 100%;
+	flex-wrap: wrap;
 }
 
 .article-editor .ck-editor__editable {
@@ -180,7 +189,6 @@
 	padding-left: 2.5em !important;
 }
 
-/* CKEditor 預設浮層為 z-index: 1000，會蓋過網站的固定 header。 */
 :root {
 	--ck-z-default: 1 !important;
 	--ck-z-panel: 20 !important;
@@ -355,7 +363,6 @@
 	animation: counter-orbit-step 9s cubic-bezier(0.77, 0, 0.175, 1) infinite;
 }
 
-/* 外層順時針軌道旋轉 */
 @keyframes orbit-step {
 	/* 第一張停留 (0s ~ 2s) */
 	0%,
@@ -365,7 +372,7 @@
 	/* 滑動到第二張 (2s ~ 3s) */
 	33.3%,
 	55.5% {
-		transform: rotate(-120deg); /* 改為負向旋轉以配合結構，或維持正向 */
+		transform: rotate(-120deg);
 	}
 	/* 滑動到第三張 (5s ~ 6s) */
 	66.6%,
@@ -378,7 +385,6 @@
 	}
 }
 
-/* 內層逆時針反轉（維持圖片端正） */
 @keyframes counter-orbit-step {
 	0%,
 	22.2% {
@@ -419,6 +425,5 @@
 	position: relative;
 }
 .article-editor .ck-dropdown__panel {
-	/* 高於可編輯區與工具列，但低於 header（z-30）與 sidebar（z-50）。 */
 	z-index: 21 !important;
 }

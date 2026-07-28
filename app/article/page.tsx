@@ -164,57 +164,71 @@ export default function ArticlePage() {
 										<House size={22} />
 									</Link>
 									<Menubar className="flex h-auto min-w-0 flex-wrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
-											<MenubarMenu>
-												<MenubarTrigger
-													onClick={() => {
-														setSelectedSubCategory("");
-														setCurrentPage(1);
-														updatePageInUrl(1);
-														fetchArticles();
-													}}
-												>
-													全部
-												</MenubarTrigger>
-											</MenubarMenu>
-											<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
-											{loading ? (
-												<div className="px-3 text-sm text-gray-400 self-center">
-													載入中...
-												</div>
-											) : (
-												categories.map((cat, index) => (
-													<React.Fragment key={cat.category_name}>
-														<MenubarMenu key={cat.category_name}>
-															<MenubarTrigger>
-																{cat.category_name}
-															</MenubarTrigger>
-															<MenubarContent>
-																<MenubarRadioGroup
-																	value={selectedSubCategory}
-																	onValueChange={(value) => {
-																		setSelectedSubCategory(value);
-																		setCurrentPage(1);
-																		updatePageInUrl(1);
-																		fetchArticles(Number(value));
-																	}}
-																>
-																	{cat.sub_category.map((sub) => (
-																		<MenubarRadioItem
-																			key={sub.id}
-																			value={String(sub.id)}
-																		>
-																			{sub.sub_category_name}
-																		</MenubarRadioItem>
-																	))}
-																</MenubarRadioGroup>
-															</MenubarContent>
-														</MenubarMenu>
-														{index < categories.length - 1 && (
-															<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
-														)}
-													</React.Fragment>
-												))
-											)}
+										<MenubarMenu>
+											<MenubarTrigger
+												className={
+													selectedSubCategory === ""
+														? "bg-gray-600 hover:bg-gray-500"
+														: undefined
+												}
+												onClick={() => {
+													setSelectedSubCategory("");
+													setCurrentPage(1);
+													updatePageInUrl(1);
+													fetchArticles();
+												}}
+											>
+												全部
+											</MenubarTrigger>
+										</MenubarMenu>
+										<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
+										{loading ? (
+											<div className="px-3 text-sm text-gray-500 self-center">
+												載入中...
+											</div>
+										) : (
+											categories.map((cat, index) => (
+												<React.Fragment key={cat.category_name}>
+													<MenubarMenu key={cat.category_name}>
+														<MenubarTrigger
+															className={
+																cat.sub_category.some(
+																	(sub) =>
+																		String(sub.id) === selectedSubCategory,
+																)
+																	? "bg-gray-600 hover:bg-gray-400"
+																	: undefined
+															}
+														>
+															{cat.category_name}
+														</MenubarTrigger>
+														<MenubarContent>
+															<MenubarRadioGroup
+																value={selectedSubCategory}
+																onValueChange={(value) => {
+																	setSelectedSubCategory(value);
+																	setCurrentPage(1);
+																	updatePageInUrl(1);
+																	fetchArticles(Number(value));
+																}}
+															>
+																{cat.sub_category.map((sub) => (
+																	<MenubarRadioItem
+																		key={sub.id}
+																		value={String(sub.id)}
+																	>
+																		{sub.sub_category_name}
+																	</MenubarRadioItem>
+																))}
+															</MenubarRadioGroup>
+														</MenubarContent>
+													</MenubarMenu>
+													{index < categories.length - 1 && (
+														<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
+													)}
+												</React.Fragment>
+											))
+										)}
 									</Menubar>
 								</div>
 								<div className="flex w-full items-center gap-2 md:w-auto md:max-w-md">

@@ -33,6 +33,8 @@ interface ArticleDetailPageProps {
 }
 
 interface Comment {
+	nick_name: string;
+	avatar: string;
 	author: string;
 	content: string;
 	created_at: string;
@@ -169,17 +171,14 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		try {
 			if (navigator.share) {
 				await navigator.share(shareData);
-
-				// 使用者完成分享流程（分享或複製連結都會到這裡）
-				showToast("分享完成");
+				showToast("已複製連結");
 			} else if (navigator.clipboard) {
 				await navigator.clipboard.writeText(shareData.url);
-				showToast("連結已複製");
+				showToast("已複製連結");
 			} else {
 				showToast("此瀏覽器不支援分享功能");
 			}
 		} catch (error) {
-			// 使用者按取消，不提示錯誤
 			if (error instanceof DOMException && error.name === "AbortError") {
 				return;
 			}
@@ -253,6 +252,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 			if (response.ok) {
 				setComments((prev) => [...prev, data.comment]);
 				setInputText("");
+				showToast(data.message);
 			} else {
 				showToast(`操作失敗：${data.error || "未知錯誤"}`);
 			}
@@ -399,17 +399,17 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 															<div className="flex gap-4">
 																<div className="shrink-0">
 																	<Image
-																		src="/article/chicken_happy.png"
-																		alt="profile"
-																		className="rounded-full object-cover border border-black"
-																		width={60}
-																		height={60}
+																		src={comment.avatar}
+																		alt={`${comment.author} profile`}
+																		width={40}
+																		height={40}
+																		className="size-15 rounded-full border-2 border-black object-cover"
 																	/>
 																</div>
 																<div className="flex-1">
 																	<div className="flex justify-between items-center">
-																		<div className="font-semibold">
-																			{comment.author}
+																		<div className="text-sm font-semibold">
+																			{`${comment.nick_name} (${comment.author})`}
 																		</div>
 																		<div className="text-sm text-gray-500">
 																			{comment.created_at}
