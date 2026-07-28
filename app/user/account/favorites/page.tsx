@@ -9,6 +9,7 @@ import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
 import { useToast } from "@/app/shop/_components/Toast";
 import ConfirmRemoveFavoriteDialog from "@/app/shop/_components/ConfirmRemoveFavoriteDialog";
+import "@/app/shop/shop-theme.css";
 
 export default function AccountFavorites() {
   const { user } = useUser();
@@ -38,7 +39,7 @@ export default function AccountFavorites() {
   };
 
   return (
-    <Container className="bg-white flex-col sm:flex-row overflow-hidden">
+    <Container className="shop-theme bg-white flex-col sm:flex-row overflow-hidden">
       {toastComponent}
       {pendingRemoval && (
         <ConfirmRemoveFavoriteDialog
@@ -72,7 +73,7 @@ export default function AccountFavorites() {
                     <span className="font-black text-[#8C5230]">${fav.product_price}</span>
                     <button
                       onClick={() => setPendingRemoval(fav)}
-                      className="text-xs text-red-500 hover:text-red-700 cursor-pointer"
+                      className="px-2.5 py-1 text-xs font-bold text-white bg-[#BB0015] border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-[#8E0010] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
                     >
                       移除
                     </button>
