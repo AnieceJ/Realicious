@@ -28,7 +28,9 @@ export default function PurchaseButton({ product, qty }: PurchaseButtonProps) {
         "電子票券、訂單紀錄與待付款續付都會綁定會員帳號。\n\n請先登入會員後再結帳。",
         { confirmLabel: "前往登入" },
       );
-      if (goToLogin) router.push("/user/login?next=/shop/checkout");
+      if (goToLogin) {
+        window.location.assign("/user/login?next=%2Fshop%2Fcheckout");
+      }
       return;
     }
 
