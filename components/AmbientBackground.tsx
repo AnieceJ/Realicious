@@ -162,8 +162,8 @@ export default function AmbientBackground() {
 	}, []);
 
 	const sky = {
-		top: "#FFF4D6",
-		mid: "#FFFAF0",
+		top: "#FFFFFF",
+		mid: "#FFFFFF",
 		low: "#FFFFFF",
 	};
 

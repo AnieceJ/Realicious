@@ -148,16 +148,22 @@ export default function ArticlePage() {
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
 				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
-					<div className="relative border-2 border-black bg-[#FCF9F6]">
-						{/* <div
+					<div className="relative border-5 border-black bg-[#FDFCF9]">
+						<div
 							className="absolute inset-0 opacity-[0.5] pointer-events-none"
 							style={{
 								backgroundImage: "url('/article/noise.png')",
 								backgroundRepeat: "repeat",
 								backgroundSize: "90px",
 							}}
-						/> */}
+						/>
 						<div className="relative z-10">
+							{/* <div className="">
+								<div className="font-pixel text-[120px] font-bold text-center tracking-[0.45em]">
+									ARTICLES
+								</div>
+							</div> */}
+
 							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
 								<div className="flex w-full min-w-0 flex-1 items-center">
 									<Link
@@ -258,11 +264,11 @@ export default function ArticlePage() {
 									<Breadcrumb>
 										<BreadcrumbList>
 											<BreadcrumbItem>
-												<BreadcrumbLink render={<Link href="/">Home</Link>} />
+												<BreadcrumbLink render={<Link href="/">首頁</Link>} />
 											</BreadcrumbItem>
 											<BreadcrumbSeparator />
 											<BreadcrumbItem>
-												<BreadcrumbPage>Article</BreadcrumbPage>
+												<BreadcrumbPage>文章列表</BreadcrumbPage>
 											</BreadcrumbItem>
 										</BreadcrumbList>
 									</Breadcrumb>
@@ -274,7 +280,7 @@ export default function ArticlePage() {
 									/>
 								</div>
 								{/* breadcrumb */}
-								<div className="mt-4 border-b border-black" />
+								<div className="mt-4 border-b-2 border-black" />
 							</div>
 
 							{/* 文章列表 */}
@@ -288,7 +294,7 @@ export default function ArticlePage() {
 										paginatedArticles.map((art) => (
 											<div
 												key={art.id}
-												className="flex gap-3 border-b border-black py-4 first:-mt-3 sm:gap-4"
+												className="flex gap-3 border-b-2 border-black py-4 first:-mt-3 sm:gap-4"
 											>
 												<div className="relative min-h-36 w-32 shrink-0 self-stretch sm:w-40 md:w-44">
 													<ArticleThumbnail

@@ -66,7 +66,7 @@ function getArticleBreadcrumb(
 ): { label: string; href: string } {
 	if (articleSource === "my-article") {
 		return {
-			label: "My Article",
+			label: "我的文章",
 			href: getSafeReturnHref(
 				returnTo,
 				MY_ARTICLE_PATHS,
@@ -77,7 +77,7 @@ function getArticleBreadcrumb(
 
 	if (articleSource === "saved-articles") {
 		return {
-			label: "Saved Articles",
+			label: "文章收藏",
 			href: getSafeReturnHref(
 				returnTo,
 				SAVED_ARTICLE_PATHS,
@@ -86,7 +86,7 @@ function getArticleBreadcrumb(
 		};
 	}
 
-	return { label: "Article", href: "/article" };
+	return { label: "文章", href: "/article" };
 }
 
 export default function ArticlePages({ params }: ArticleDetailPageProps) {
@@ -304,7 +304,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 								<Breadcrumb>
 									<BreadcrumbList>
 										<BreadcrumbItem>
-											<BreadcrumbLink render={<Link href="/">Home</Link>} />
+											<BreadcrumbLink render={<Link href="/">首頁</Link>} />
 										</BreadcrumbItem>
 										<BreadcrumbSeparator />
 										<BreadcrumbItem>
