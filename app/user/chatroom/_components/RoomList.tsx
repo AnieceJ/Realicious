@@ -1,5 +1,8 @@
 import { Room } from "../hooks/useChatroom";
 import Image from "next/image";
+import CreateRoomModal from "./CreateRoomForm";
+import { useAlert } from "@/app/user/context/alert";
+
 
 interface RoomListProps {
   rooms: Room[];
@@ -10,6 +13,7 @@ interface RoomListProps {
   onJoinRoom: (room: Room) => void;
   onDeleteRoom: (roomId: number, e: React.MouseEvent) => void;
   onToggleFavorite: (roomId: number, e: React.MouseEvent) => void; // 🌟 補上介面定義
+  createRoom:any
 }
 
   /* 預設圖庫備用網址 */
@@ -24,13 +28,16 @@ export default function RoomList({
   onJoinRoom,
   onDeleteRoom,
   onToggleFavorite,
+  createRoom
 }: RoomListProps) {
+  const { showAlert } = useAlert();
+
   return (
-    <div className="flex flex-[1.4] flex-col rounded-xl md:rounded-2xl border border-slate-200 bg-slate-50/50 p-2.5 md:p-5 shadow-sm">
+    <div className="sm:w-750 flex flex-[1.4] flex-col border-gray-600 bg-slate-50/50 p-2.5 md:p-5 min-h-0">
       {/* 大廳 Header */}
       <div className="mb-2 md:mb-4 flex items-center justify-between gap-1">
         <div>
-          <h2 className="text-base md:text-xl font-bold text-slate-800">
+          <h2 className="text-base md:text-xl font-bold text-slate-800 shrink-0">
             聊天大廳
           </h2>
           <p className="text-[10px] md:text-xs text-slate-500 hidden sm:block">
@@ -39,11 +46,12 @@ export default function RoomList({
         </div>
 
         {/* 頁籤 */}
-        <div className="flex rounded-lg bg-slate-200/70 p-0.5 md:p-1 text-[11px] md:text-xs shrink-0">
+        <div className="flex bg-slate-200/70 p-0.5 md:p-1 text-[11px] md:text-xs shrink-0">
+          
           <button
             type="button"
             onClick={() => onTabChange("all")}
-            className={`rounded-md px-2 md:px-3 py-1 font-medium transition-all ${
+            className={` px-2 md:px-3 py-1 font-medium transition-all ${
               activeTab === "all"
                 ? "bg-white text-slate-800 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
@@ -54,7 +62,7 @@ export default function RoomList({
           <button
             type="button"
             onClick={() => onTabChange("favorites")}
-            className={`rounded-md px-2 md:px-3 py-1 font-medium transition-all ${
+            className={`mr-3 px-2 md:px-3 py-1 font-medium transition-all ${
               activeTab === "favorites"
                 ? "bg-white text-slate-800 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
@@ -62,18 +70,20 @@ export default function RoomList({
           >
             已追蹤 ❤️
           </button>
+          <CreateRoomModal onCreateRoom={createRoom}/>
         </div>
       </div>
 
       {/* 房間卡片列表 */}
-      <div className="flex-1 overflow-y-auto pr-1">
+      <div className="flex-1 overflow-y-auto pr-1 flex flex-col">
         {rooms.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-slate-400 py-10">
+          <div className="flex flex-1 w-175 flex-col items-center justify-center text-slate-400 py-10">
             <span className="text-3xl mb-2">❤️</span>
-            <p className="text-xs">
+            <p className="text-xs ">
               {activeTab === "favorites" ? "尚未追蹤任何房間" : "目前沒有房間"}
             </p>
           </div>
+          
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
             {rooms.map((room) => {
@@ -128,12 +138,13 @@ export default function RoomList({
                       <button
                         type="button"
                         onClick={(e) => {
-                          e.stopPropagation();
-                          if (
-                            confirm("確定要刪除這個房間嗎？此動作無法復原！")
-                          ) {
-                            onDeleteRoom(room.id, e);
-                          }
+                          // e.stopPropagation();
+                          // if (
+                          //   confirm("確定要刪除這個房間嗎？此動作無法復原！")
+                          // ) {
+                          //   onDeleteRoom(room.id, e);
+                          // }
+                          showAlert('confirm','注意!','確定要刪除這個房間嗎？此動作無法復原！',()=>{onDeleteRoom(room.id, e)})
                         }}
                         className="rounded px-1 text-[10px] md:text-xs font-medium text-red-500 hover:bg-red-50 shrink-0 ml-1"
                       >

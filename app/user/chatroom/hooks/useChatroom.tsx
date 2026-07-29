@@ -111,25 +111,30 @@ export function useChatroom() {
       });
     });
 
-    socket.on("error_message", (data: { message: string }) => alert(data.message));
+    socket.on("error_message", (data: { message: string }) => (data.message));
 
     socket.on("room_deleted", ({ roomId }: { roomId: number }) => {
       setRooms((prev) => prev.filter((r) => r.id !== roomId));
       setCurrentRoom((prev) => {
         if (prev?.id === roomId) {
-          router.push("/user/chatroom");
+          // router.push("/user/chatroom");
           return null;
         }
         return prev;
       });
     });
 
-    fetchRooms();
+    // fetchRooms();
 
     return () => {
       socket.disconnect();
     };
   }, []);
+
+  useEffect(()=>{
+    const fetch = async ()=>{await fetchRooms()}
+    fetch()
+  },[])
 
   // 3. 底層真正的 Socket Emit Join 動作
   const emitJoinRoom = useCallback((roomId: number, password?: string) => {
@@ -145,8 +150,10 @@ export function useChatroom() {
     if (!roomIdFromUrl) {
       // 網址沒有 roomId，重置狀態
       if (currentRoom) {
-        setCurrentRoom(null);
-        setMessages([]);
+        const set = async ()=>{await setCurrentRoom(null);await setMessages([]);}
+        // setCurrentRoom(null);
+        // setMessages([]);
+        set()
       }
       return;
     }

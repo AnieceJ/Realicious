@@ -41,7 +41,7 @@ export default function Chatroom() {
 
   return (
     <Container className="py-2 md:py-6 overflow-x-auto">
-      <div className="flex flex-row h-[600px] md:h-[750px] gap-2 md:gap-6 min-w-[640px]">
+      <div className="flex flex-row h-[600px] lg:h-[600px] xl:h-[750px] xl:h- gap-2 md:gap-6 min-w-[640px] border-3">
         {/* 左側：大廳 */}
         <RoomList
           rooms={filteredRooms} /* 傳入過濾後的資料庫清單 */
@@ -52,12 +52,12 @@ export default function Chatroom() {
           onJoinRoom={(room) => joinRoom(room.id)} //傳入房間id
           onDeleteRoom={deleteRoom}
           onToggleFavorite={toggleFavorite} /*  傳入追蹤函式 */
+          createRoom={createRoom}
         />
 
         {/* 右側：控制台 & 聊天室 */}
         <div className="flex flex-1 flex-col gap-2 md:gap-4 shrink-0">
-          {/* <CreateRoomForm onCreateRoom={createRoom} /> */}
-          <CreateRoomModal onCreateRoom={createRoom} />
+          {/* <CreateRoomModal onCreateRoom={createRoom} /> */}
           <ChatWindow
             currentRoom={currentRoom}
             messages={messages}

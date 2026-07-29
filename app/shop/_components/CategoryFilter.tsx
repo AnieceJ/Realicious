@@ -34,8 +34,10 @@ export default function CategoryFilter({
     if (type === "max" && v < slideMin) return;
     if (type === "min") {
       setSlideMin(v);
+      setMinStr(String(v));
     } else {
       setSlideMax(v);
+      setMaxStr(String(v));
     }
     cancelAnimationFrame(raf.current);
     raf.current = requestAnimationFrame(() => {
@@ -48,15 +50,35 @@ export default function CategoryFilter({
   }, [minPrice, maxPrice]);
 
   const applyInput = () => {
-    const min = Math.max(0, parseInt(minStr) || 0);
-    const max = Math.min(priceMax, parseInt(maxStr) || priceMax);
+    const parsedMin = minStr.trim() === "" ? 0 : Number(minStr);
+    const parsedMax = maxStr.trim() === "" ? priceMax : Number(maxStr);
+    const min = Math.max(0, Math.min(priceMax, Number.isFinite(parsedMin) ? parsedMin : 0));
+    const max = Math.max(0, Math.min(priceMax, Number.isFinite(parsedMax) ? parsedMax : priceMax));
     const clampedMin = Math.min(min, max);
     const clampedMax = Math.max(min, max);
     setMinStr(String(clampedMin));
     setMaxStr(String(clampedMax));
     setSlideMin(clampedMin);
     setSlideMax(clampedMax);
-    onPriceChange(clampedMin, clampedMax);
+    commitPrice(clampedMin, clampedMax);
+  };
+
+  const handlePriceInput = (type: "min" | "max", value: string) => {
+    const nextMinStr = type === "min" ? value : minStr;
+    const nextMaxStr = type === "max" ? value : maxStr;
+    if (type === "min") setMinStr(value);
+    else setMaxStr(value);
+
+    const parsedMin = nextMinStr.trim() === "" ? 0 : Number(nextMinStr);
+    const parsedMax = nextMaxStr.trim() === "" ? priceMax : Number(nextMaxStr);
+    const rawMin = Math.max(0, Math.min(priceMax, Number.isFinite(parsedMin) ? parsedMin : 0));
+    const rawMax = Math.max(0, Math.min(priceMax, Number.isFinite(parsedMax) ? parsedMax : priceMax));
+    const nextMin = Math.min(rawMin, rawMax);
+    const nextMax = Math.max(rawMin, rawMax);
+
+    setSlideMin(nextMin);
+    setSlideMax(nextMax);
+    commitPrice(nextMin, nextMax);
   };
 
   const tags = [
@@ -142,7 +164,8 @@ export default function CategoryFilter({
                   max={priceMax}
                   inputMode="numeric"
                   value={minStr}
-                  onChange={(e) => setMinStr(e.target.value)}
+                  onChange={(e) => handlePriceInput("min", e.target.value)}
+                  onBlur={applyInput}
                   onKeyDown={(e) => e.key === "Enter" && applyInput()}
                   className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
                 />
@@ -156,19 +179,15 @@ export default function CategoryFilter({
                   max={priceMax}
                   inputMode="numeric"
                   value={maxStr}
-                  onChange={(e) => setMaxStr(e.target.value)}
+                  onChange={(e) => handlePriceInput("max", e.target.value)}
+                  onBlur={applyInput}
                   onKeyDown={(e) => e.key === "Enter" && applyInput()}
                   className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
                 />
               </label>
-              <button
-                type="button"
-                onClick={applyInput}
-                className="h-8 px-3 text-xs bg-[#FFD3B6] border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] hover:bg-[#ffbe94] active:translate-x-[1px] active:translate-y-[1px] active:shadow-none cursor-pointer"
-              >
-                套用
-              </button>
-              <span className="text-xs text-[#3D2419]/50">可輸入 $0～${priceMax.toLocaleString()}</span>
+              <span className="text-xs text-[#3D2419]/50">
+                輸入後即時篩選，可輸入 $0～${priceMax.toLocaleString()}
+              </span>
             </div>
 
             <div className="flex items-center gap-2 w-full max-w-lg">

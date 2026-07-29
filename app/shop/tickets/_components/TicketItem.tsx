@@ -16,6 +16,10 @@ function getImageUrl(imagePath: string) {
   return imagePath.startsWith("http") ? imagePath : `${API_BASE}${imagePath}`;
 }
 
+function getOrderNumber(orderId: number) {
+  return `ORD-${String(orderId).padStart(6, "0")}`;
+}
+
 export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRefresh?: () => void }) {
   const [showQR, setShowQR] = useState(false);
   const [acting, setActing] = useState(false);
@@ -43,7 +47,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
       <div className="w-full mb-6">
         <div className="flex flex-col w-full p-5 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] select-none">
           <div className="flex flex-row items-center justify-between w-full">
-            <div className="flex flex-col items-start gap-1.5 shrink-0 w-48 text-left">
+            <div className="flex w-56 shrink-0 flex-col items-start gap-1.5 text-left">
               <div className="flex items-center gap-2">
                 <img
                   src={ticket.product_img ? getImageUrl(ticket.product_img) : FALLBACK_IMAGE}
@@ -55,10 +59,18 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
                   }}
                 />
                 <div>
-                  <div className="text-sm font-black tracking-wide">
-                    TICKET ID: <span className="text-[#8C5230]">#{ticket.id}</span>
+                  <div className="whitespace-nowrap text-sm font-black">
+                    {ticket.order_id ? (
+                      <>
+                        訂單編號：<span className="text-[#8C5230]">{getOrderNumber(ticket.order_id)}</span>
+                      </>
+                    ) : (
+                      <>
+                        發放方式：<span className="text-[#8C5230]">活動贈送</span>
+                      </>
+                    )}
                   </div>
-                  <div className="text-xs text-[#3D2419]/50 font-medium">{date}</div>
+                  <div className="text-xs text-[#3D2419]/50 font-medium">取得日期：{date}</div>
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 mt-1">
@@ -115,7 +127,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
               {ticket.product_name || ticket.name}
             </h3>
             <p className="text-xs text-gray-500 text-center mb-4">
-              {TYPE_LABEL[ticket.type]} · #{ticket.id}
+              {TYPE_LABEL[ticket.type]} · {ticket.order_id ? getOrderNumber(ticket.order_id) : "活動贈送"}
             </p>
             <div className="flex justify-center mb-4">
               <div className="border-[3px] border-[#3D2419] p-3">

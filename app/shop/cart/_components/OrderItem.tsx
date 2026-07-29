@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import QuantityPicker from "../../_components/QuantityPicker";
 import { removeFromCart, updateQty, type CartItem } from "@/lib/shop/cart";
 import { useConfirm } from "../../_components/ConfirmModal";
@@ -10,8 +11,21 @@ function getImageUrl(imagePath: string) {
   return imagePath.startsWith("http") ? imagePath : `${API_BASE}${imagePath}`;
 }
 
-export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate: () => void }) {
+type OrderItemProps = {
+  item: CartItem;
+  checked: boolean;
+  onCheckedChange: () => void;
+  onUpdate: () => void;
+};
+
+export default function OrderItem({
+  item,
+  checked,
+  onCheckedChange,
+  onUpdate,
+}: OrderItemProps) {
   const { confirmComponent, showConfirm } = useConfirm();
+  const soldOut = item.stock_qty <= 0;
 
   const handleRemove = async () => {
     const confirmed = await showConfirm(`確定移除 ${item.name} 嗎？`);
@@ -30,7 +44,22 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419]"
       >
-        <div className="shrink-0">
+        <label className={`flex shrink-0 items-center gap-2 font-bold ${soldOut ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}>
+          <input
+            type="checkbox"
+            checked={checked}
+            disabled={soldOut}
+            onChange={onCheckedChange}
+            aria-label={`選擇 ${item.name}`}
+            className="h-5 w-5 cursor-pointer accent-[#BB0015] disabled:cursor-not-allowed"
+          />
+          <span className="sm:hidden">本次結帳</span>
+        </label>
+        <Link
+          href={`/shop/products/${item.id}`}
+          aria-label={`查看 ${item.name} 商品詳情`}
+          className="shrink-0 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#BB0015]"
+        >
           <div className="bg-[#FFF0B8] w-full h-48 sm:w-30 sm:h-30 flex items-center justify-center">
             <img
               src={item.main_img ? getImageUrl(item.main_img) : FALLBACK_IMAGE}
@@ -42,19 +71,34 @@ export default function OrderItem({ item, onUpdate }: { item: CartItem; onUpdate
               }}
             />
           </div>
-        </div>
+        </Link>
         <div className="flex flex-1 flex-col justify-between min-w-0 py-1">
-          <h3 className="text-lg leading-snug">{item.name}</h3>
+          <Link
+            href={`/shop/products/${item.id}`}
+            className="w-fit text-lg leading-snug underline-offset-4 hover:text-[#BB0015] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BB0015]"
+          >
+            {item.name}
+          </Link>
           <span className="mt-3 text-lg text-[#8C5230]">${item.price}</span>
+          <span className={`mt-1 text-xs ${soldOut ? "text-[#BB0015]" : "text-[#3D2419]/55"}`}>
+            {soldOut ? "目前已售完，無法結帳" : `庫存上限 ${item.stock_qty} 件`}
+          </span>
         </div>
 
         <div className="flex flex-row sm:flex-col items-center justify-between sm:justify-center gap-4 sm:gap-5 sm:ml-auto">
           <div>
-            <QuantityPicker
-              value={item.qty}
-              onChange={(qty) => { updateQty(item.id, qty); onUpdate(); }}
-              onReachMin={handleRemove}
-            />
+            {soldOut ? (
+              <span className="inline-flex border-2 border-[#BB0015] bg-red-50 px-3 py-2 text-sm text-[#BB0015]">
+                已售完
+              </span>
+            ) : (
+              <QuantityPicker
+                value={item.qty}
+                max={item.stock_qty}
+                onChange={(qty) => { updateQty(item.id, qty); onUpdate(); }}
+                onReachMin={handleRemove}
+              />
+            )}
           </div>
           <button
             onClick={handleRemove}

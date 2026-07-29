@@ -20,7 +20,7 @@ export default function FeaturedProductSection({
   const { user } = useUser();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { toastComponent, showToast } = useToast();
 
   const featuredList = products.slice(0, 3);
@@ -30,7 +30,9 @@ export default function FeaturedProductSection({
     timerRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev === featuredList.length - 1 ? 0 : prev + 1));
     }, 4000);
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [paused, featuredList.length]);
 
   if (featuredList.length === 0) {
@@ -39,6 +41,7 @@ export default function FeaturedProductSection({
 
   const currentProduct = featuredList[currentIndex];
   const favorited = favoritedProductIds.includes(currentProduct.id);
+  const soldOut = currentProduct.stock_qty <= 0;
 
   const toggleFavorite = async () => {
     if (!user?.id) {
@@ -114,7 +117,7 @@ export default function FeaturedProductSection({
         {/* 右側：商品資訊 */}
         <div className="flex w-1/2 flex-col justify-center bg-black px-6 py-4">
           <span className="mb-3 inline-block w-fit border border-white bg-[#BB0015] px-2 py-0.5 text-xs text-white">
-            今日主打
+            {soldOut ? "暫時售完" : "今日主打"}
           </span>
           <h3 className="mb-2 text-xl font-black text-white">
             {currentProduct.name}
@@ -127,10 +130,23 @@ export default function FeaturedProductSection({
               ${currentProduct.price}
             </span>
             <button
-              onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
-              className="inline-flex h-9 cursor-pointer items-center whitespace-nowrap bg-[#BB0015] px-4 text-sm font-bold text-white shadow-[4px_4px_0px_0px_#000] hover:bg-[#8E0010] active:translate-x-[.0625rem] active:translate-y-[.0625rem]"
+              type="button"
+              disabled={soldOut}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (soldOut) return;
+                const result = addToCart(currentProduct, 1);
+                showToast(result.addedQty > 0
+                  ? `已將 ${currentProduct.name} 加入購物車`
+                  : `已達可購買上限 ${result.stockLimit} 件`);
+              }}
+              className={`inline-flex h-9 items-center whitespace-nowrap px-4 text-sm font-bold text-white shadow-[4px_4px_0px_0px_#000] ${
+                soldOut
+                  ? "cursor-not-allowed bg-gray-500 shadow-none"
+                  : "cursor-pointer bg-[#BB0015] hover:bg-[#8E0010] active:translate-x-[.0625rem] active:translate-y-[.0625rem]"
+              }`}
             >
-              加入購物車
+              {soldOut ? "已售完" : "加入購物車"}
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); toggleFavorite(); }}

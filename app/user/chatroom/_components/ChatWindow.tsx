@@ -96,7 +96,6 @@ export default function ChatWindow({
       </div>
     );
   }
-console.log(currentRoom)
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -119,7 +118,8 @@ console.log(currentRoom)
         </div>
         <button
           onClick={onLeaveRoom}
-          className="px-2 py-0.5 text-xs border rounded hover:bg-slate-100"
+          // className="px-2 py-0.5 text-xs border rounded hover:bg-slate-100"
+          className="w-20 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]  bg-gray-200 hover:bg-gray-300 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]  cursor-pointer hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
         >
           離開 🚪
         </button>
@@ -167,9 +167,10 @@ console.log(currentRoom)
 
                   {/* 對話氣泡 */}
                   <div
-                    className={`px-3 py-1.5 text-xs rounded-2xl max-w-[260px] sm:max-w-[360px] break-words shadow-sm ${
+                    className={`px-3 py-1.5 rounded-2xl max-w-[260px] sm:max-w-[360px] break-words shadow-sm ${
                       isMe
-                        ? "bg-indigo-600 text-white rounded-tr-none"
+                        // ? "bg-indigo-600 text-white rounded-tr-none"
+                        ? "bg-[#d1021a] text-red-50 rounded-tr-none"
                         : "bg-slate-100 text-slate-800 rounded-tl-none"
                     }`}
                   >
@@ -185,7 +186,7 @@ console.log(currentRoom)
         {unreadCount > 0 && (
           <button
             onClick={scrollToBottom}
-            className="absolute bottom-3 right-4 bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 transition-all animate-bounce cursor-pointer z-10"
+            className="absolute bottom-3 right-4 bg-gray-100 hover:bg-gray-300 border text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 transition-all animate-bounce cursor-pointer z-10"
           >
             <span>↓ 有 {unreadCount} 則新訊息</span>
           </button>
@@ -202,11 +203,13 @@ console.log(currentRoom)
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="輸入訊息..."
-          className="flex-1 border rounded px-2 py-1 text-xs focus:outline-none"
+          className="flex-1 border rounded px-2 py-1 focus:outline-none"
         />
         <button
           type="submit"
-          className="bg-indigo-600 text-white text-xs px-3 py-1 rounded"
+          // className="bg-indigo-600 text-white text-xs px-3 py-1 rounded"
+        className=  "bg-[#FFD45C] hover:bg-[#fbc632] w-15 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
+
         >
           發送
         </button>
