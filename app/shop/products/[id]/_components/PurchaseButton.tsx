@@ -2,6 +2,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { addToCart } from "@/lib/shop/cart";
 import { useConfirm } from "../../../_components/ConfirmModal";
+import { useUser } from "@/app/context/user";
 
 type PurchaseButtonProps = {
   product: { id: number; name: string; price: number; main_img?: string };
@@ -10,6 +11,7 @@ type PurchaseButtonProps = {
 
 export default function PurchaseButton({ product, qty }: PurchaseButtonProps) {
   const router = useRouter();
+  const { user, loading } = useUser();
   const { confirmComponent, showConfirm } = useConfirm();
 
   const handleClick = async () => {
@@ -17,10 +19,20 @@ export default function PurchaseButton({ product, qty }: PurchaseButtonProps) {
     const confirmed = await showConfirm(
       `確認購買以下商品？\n\n商品：${product.name}\n數量：${qty}\n單價：$${product.price}\n總計：$${total}\n\n確定要前往結帳嗎？`
     );
-    if (confirmed) {
-      addToCart(product, qty);
-      router.push("/shop/checkout");
+    if (!confirmed || loading) return;
+
+    addToCart(product, qty);
+
+    if (!user?.id) {
+      const goToLogin = await showConfirm(
+        "電子票券、訂單紀錄與待付款續付都會綁定會員帳號。\n\n請先登入會員後再結帳。",
+        { confirmLabel: "前往登入" },
+      );
+      if (goToLogin) router.push("/user/login?next=/shop/checkout");
+      return;
     }
+
+    router.push("/shop/checkout");
   };
 
   return (
