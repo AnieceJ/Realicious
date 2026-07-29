@@ -48,6 +48,8 @@ export default function ProductsPage() {
     );
   }
 
+  const soldOut = product.stock_qty <= 0;
+
   return (
     <div className="relative min-h-screen pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -103,10 +105,22 @@ export default function ProductsPage() {
 
               {/* 數量選擇器 */}
               <div className="flex flex-wrap items-center gap-4 text-base font-bold text-[#3D2419]">
-                <QuantityPicker value={qty} onChange={setQty} max={product.stock_qty} />
-                <span className="text-sm text-[#3D2419]/60 bg-gray-100 px-2.5 py-1 border border-gray-300">
-                  可購買數量: {product.stock_qty}
-                </span>
+                {soldOut ? (
+                  <div
+                    role="status"
+                    className="flex w-full items-center justify-between gap-3 border-[3px] border-[#3D2419] bg-[#FFF0B8] px-4 py-3 shadow-[3px_3px_0px_0px_#3D2419]"
+                  >
+                    <span className="font-black text-[#BB0015]">暫時售完</span>
+                    <span className="text-sm text-[#3D2419]/65">目前無可購買數量，敬請期待補貨</span>
+                  </div>
+                ) : (
+                  <>
+                    <QuantityPicker value={qty} onChange={setQty} max={product.stock_qty} />
+                    <span className="text-sm text-[#3D2419]/60 bg-gray-100 px-2.5 py-1 border border-gray-300">
+                      可購買數量: {product.stock_qty}
+                    </span>
+                  </>
+                )}
               </div>
 
               {/* 加入購物車 + 收藏 按鈕列 */}
@@ -123,7 +137,16 @@ export default function ProductsPage() {
 
               {/* 立即購買大按鈕 */}
               <div className="w-full">
-                <PurchaseButton product={{ id: product.id, name: product.name, price: product.price, main_img: product.main_img }} qty={qty} />
+                <PurchaseButton
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    main_img: product.main_img,
+                    stock_qty: product.stock_qty,
+                  }}
+                  qty={qty}
+                />
               </div>
             </div>
 

@@ -33,7 +33,6 @@ export default function ShopPage() {
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [favoriteProductIds, setFavoriteProductIds] = useState<number[]>([]);
-  const [categoryId, setCategoryId] = useState("")
   const [keyword, setKeyword] = useState(searchParams.get("keyword") || "")
   const [tagKeyword, setTagKeyword] = useState("")
   const [sortId, setSortId] = useState("")
@@ -49,12 +48,11 @@ export default function ShopPage() {
     let list = [...filteredProducts].filter(
       (p) => p.price >= minPrice && p.price <= maxPrice
     );
-    if (categoryId) list = list.filter((p) => String(p.category_id) === categoryId);
     if (tagKeyword) list = list.filter((p) => matchesQuickFilter(p, tagKeyword));
     if (sortId === "price_low") list.sort((a, b) => a.price - b.price);
     if (sortId === "price_high") list.sort((a, b) => b.price - a.price);
     return list;
-  }, [filteredProducts, sortId, minPrice, maxPrice, categoryId, tagKeyword]);
+  }, [filteredProducts, sortId, minPrice, maxPrice, tagKeyword]);
 
   useEffect(() => {
     getProducts().then((res) => {
@@ -125,7 +123,7 @@ export default function ShopPage() {
           <div className="flex-1 min-w-[200px]">
             <Searchbar value={keyword} onSearch={(kw) => setKeyword(kw)} />
           </div>
-          <Sort onSort={(id) => { setSortId(id); if (id === "") { setKeyword(""); setTagKeyword(""); } }} />
+          <Sort value={sortId} onSort={setSortId} />
         </div>
 
         {/* 標籤 + 價格列 */}

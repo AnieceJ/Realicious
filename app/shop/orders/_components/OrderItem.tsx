@@ -1,13 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import type { Order } from "@/lib/shop/orders";
+import Link from "next/link";
+import type { Order, OrderItem as OrderDetailItem } from "@/lib/shop/orders";
 import { getOrderDetail } from "@/lib/shop/orders";
 import PaymentMethodDialog from "../../_components/PaymentMethodDialog";
 
 export default function OrderItem({ order }: { order: Order }) {
   const [expanded, setExpanded] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
-  const [items, setItems] = useState<{ product_name: string; quantity: number; unit_price: number }[]>([]);
+  const [items, setItems] = useState<OrderDetailItem[]>([]);
 
   useEffect(() => {
     if (expanded && items.length === 0) {
@@ -80,16 +81,33 @@ export default function OrderItem({ order }: { order: Order }) {
             <div className="text-xs text-[#3D2419]/60 text-left tracking-wider mb-1">
               訂單明細 / ITEM DETAILS
             </div>
-            {items.map((item, i) => (
-              <div key={i} className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
+            {items.map((item) => {
+              const canOpenProduct = Boolean(item.product_id && item.is_active);
+              return (
+              <div key={item.id} className="flex flex-row justify-between items-center bg-white border-[2px] border-[#3D2419] px-4 py-3 shadow-[2px_2px_0px_0px_#3D2419]">
                 <div className="flex items-center gap-2.5">
-                  <span className="text-base text-[#3D2419]">{item.product_name}</span>
+                  {canOpenProduct ? (
+                    <Link
+                      href={`/shop/products/${item.product_id}`}
+                      className="text-base text-[#3D2419] underline-offset-4 hover:text-[#BB0015] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BB0015]"
+                    >
+                      {item.product_name}
+                    </Link>
+                  ) : (
+                    <>
+                      <span className="text-base text-[#3D2419]/60">{item.product_name || "商品資料已移除"}</span>
+                      <span className="shrink-0 border-2 border-[#3D2419]/40 bg-gray-100 px-2 py-0.5 text-xs text-[#3D2419]/60">
+                        商品已下架
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="text-base text-[#3D2419]/80">
                   數量: <span className="font-black text-[#3D2419]">x{item.quantity}</span> │ <span className="text-[#8C5230] font-black">${item.unit_price}</span>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

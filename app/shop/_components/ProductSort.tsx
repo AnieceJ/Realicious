@@ -7,13 +7,21 @@ type SortOption = {
 };
 
 type ProductSortProps = {
+  value: string;
   onSort: (sortId: string) => void;
 };
 
-export default function SortDropdown({ onSort }: ProductSortProps) {
+const sortOptions: SortOption[] = [
+  { id: "", label: "預設排序" },
+  { id: "popular", label: "銷量／熱門商品" },
+  { id: "price_low", label: "價格：低 → 高" },
+  { id: "price_high", label: "價格：高 → 低" },
+];
+
+export default function SortDropdown({ value, onSort }: ProductSortProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentSort, setCurrentSort] = useState("全部商品");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const currentSort = sortOptions.find((option) => option.id === value)?.label || "預設排序";
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -25,15 +33,7 @@ export default function SortDropdown({ onSort }: ProductSortProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const sortOptions: SortOption[] = [
-    { id: "", label: "全部商品" },
-    { id: "popular", label: "銷量/熱門商品" },
-    { id: "price_low", label: "價格：低 → 高" },
-    { id: "price_high", label: "價格：高 → 低" },
-  ];  
-
   const handleSelect = (option: SortOption) => {
-    setCurrentSort(option.label);
     onSort(option.id);
     setIsOpen(false);
   };
@@ -47,8 +47,8 @@ export default function SortDropdown({ onSort }: ProductSortProps) {
                   bg-white text-[#3D2419] font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419] 
-                  hover:translate-x-[1px] hover:translate-y-[1px]hover:shadow-[3px_3px_0px_0px_#3D2419]
-                  active:translate-x-[3px] active:translate-y-[3px]active:shadow-none
+                  hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[3px_3px_0px_0px_#3D2419]
+                  active:translate-x-[3px] active:translate-y-[3px] active:shadow-none
                   transition-all duration-100 ease-in-out cursor-pointer"
       >
         <span>{currentSort}</span>
@@ -74,9 +74,11 @@ export default function SortDropdown({ onSort }: ProductSortProps) {
               <button
                 key={option.id}
                 onClick={() => handleSelect(option)}
-                className="px-4 py-3 text-sm text-left hover:bg-[#FFD3B6] 
+                className={`px-4 py-3 text-sm text-left hover:bg-[#FFD3B6]
                           transition-colors border-b-2 border-[#3D2419]/10 
-                          last:border-b-0 flex items-center justify-between cursor-pointer"
+                          last:border-b-0 flex items-center justify-between cursor-pointer ${
+                            option.id === value ? "bg-[#FFF0B8]" : ""
+                          }`}
               >
                 <span>{option.label}</span>
                 {option.badge && (

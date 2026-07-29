@@ -1,9 +1,15 @@
+import Cookies from "js-cookie";
+
 const API_BASE = "http://localhost:3001";
 
 async function pay(method: string, orderId: number) {
+  const token = Cookies.get("token");
   const res = await fetch(`${API_BASE}/payment/pay`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify({ method, orderId }),
   });
   return res.json();

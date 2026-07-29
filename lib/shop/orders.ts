@@ -1,3 +1,5 @@
+import Cookies from "js-cookie";
+
 const API_BASE = "http://localhost:3001";
 
 export type OrderContact = {
@@ -10,14 +12,16 @@ export type OrderContact = {
 export async function createOrder(
   items: { id: number; name: string; price: number; qty: number }[],
   contact: OrderContact,
-  userId?: number,
 ) {
+  const token = Cookies.get("token");
   const res = await fetch(`${API_BASE}/orders`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify({
       items,
-      user_id: userId,
       address: contact.address,
       recipient_name: contact.name,
       recipient_email: contact.email,
@@ -42,6 +46,7 @@ export type OrderItem = {
   quantity: number;
   unit_price: number;
   product_name: string;
+  is_active?: number | boolean | null;
 };
 
 export async function getOrders(userId?: number) {

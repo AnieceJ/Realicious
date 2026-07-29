@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Cookies from "js-cookie";
 import FinishedPhoto from "./_components/FinishedPhoto";
 import FinishedOrderList from "./_components/FinishedOrderList";
 import FinishedAction from "./_components/FinishedAction";
-import { clearCart, getCartItems, getLastOrder, saveLastOrder, type CartItem } from "@/lib/shop/cart";
+import { getLastOrder, type CartItem } from "@/lib/shop/cart";
+import { completeCheckoutSession } from "@/lib/shop/checkout";
 
 export default function CheckoutFinishedPage() {
   const searchParams = useSearchParams();
@@ -23,15 +25,17 @@ export default function CheckoutFinishedPage() {
 
       if (isSuccess) {
         const pendingId = localStorage.getItem("realicious-pending-order") || searchParams.get("orderId") || "";
-        const currentCart = getCartItems();
-        const cart = currentCart.length > 0 ? currentCart : getLastOrder();
-        saveLastOrder(cart);
-        clearCart();
+        const completedItems = completeCheckoutSession();
+        const cart = completedItems.length > 0 ? completedItems : getLastOrder();
         localStorage.removeItem("realicious-pending-order");
 
         if (pendingId && !sessionStorage.getItem("confirm-sent-" + pendingId)) {
           sessionStorage.setItem("confirm-sent-" + pendingId, "1");
-          fetch(`http://localhost:3001/payment/confirm/${pendingId}`, { method: "PUT" }).catch(() => {});
+          const token = Cookies.get("token");
+          fetch(`http://localhost:3001/payment/confirm/${pendingId}`, {
+            method: "PUT",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }).catch(() => {});
         }
 
         if (!cancelled) {
