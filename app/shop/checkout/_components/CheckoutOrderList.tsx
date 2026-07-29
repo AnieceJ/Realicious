@@ -12,9 +12,9 @@ export default function CheckoutOrderList({ items }: { items: CartItem[] }) {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col w-full px-4 py-2.5 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
+      <div className="flex flex-col w-full px-4 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
         {showItems.map((item) => (
-          <div key={item.id} className="flex items-center justify-between gap-3 border-b-2 border-dashed border-[#3D2419] py-3 last:border-b-0">
+          <div key={item.id} className="flex items-center justify-between gap-3 border-b-2 border-dashed border-[#3D2419] py-4 last:border-b-0">
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center bg-[#FFF0B8] text-sm sm:h-20 sm:w-20">
                 {item.main_img ? (
@@ -34,7 +34,7 @@ export default function CheckoutOrderList({ items }: { items: CartItem[] }) {
         {hiddenCount > 0 && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="mb-1 mt-3 flex w-full items-center justify-center gap-2 border-[3px] border-[#3D2419] bg-[#FFD3B6] py-3 text-sm font-bold text-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] transition-all hover:bg-[#ffbe94] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
+            className="mb-4 mt-3 flex w-full items-center justify-center gap-2 border-[3px] border-[#3D2419] bg-[#FFD3B6] py-3 text-sm font-bold text-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] transition-all hover:bg-[#ffbe94] active:translate-x-[1px] active:translate-y-[1px] cursor-pointer"
           >
             <span>{expanded ? "收合" : `還有 ${hiddenCount} 筆商品`}</span>
             <svg
