@@ -43,7 +43,7 @@ export default function CartPage() {
   const hiddenCount = items.length - MAX_VISIBLE;
 
   return (
-    <div className="relative min-h-screen pb-16 md:pb-24 scroll-smooth">
+    <div className="relative min-h-screen scroll-smooth">
       {confirmComponent}
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 pt-4">
@@ -53,7 +53,7 @@ export default function CartPage() {
             { label: "購物車" }
           ]} />
         </div>
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div className="flex min-h-[calc(100vh-7rem)] flex-col gap-6 pb-16 md:pb-24 lg:flex-row lg:gap-8">
           <div className={items.length === 0 ? "w-full" : "w-full lg:w-[60%]"}>
             {items.length === 0 ? (
               <EmptyCart />
@@ -97,7 +97,7 @@ export default function CartPage() {
           </div>
 
           {items.length > 0 && (
-            <div className="w-full lg:w-[40%] self-start lg:sticky lg:top-8">
+            <div className="w-full self-start lg:sticky lg:top-[76px] lg:w-[40%]">
               <OrderSummary items={items} />
             </div>
           )}

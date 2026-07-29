@@ -67,7 +67,7 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="relative min-h-screen pb-16 md:pb-24 scroll-smooth">
+    <div className="relative min-h-screen scroll-smooth">
       <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 pt-4">
           <Link
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
             ]} />
           </div>
         </div>
-        <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+        <div className="flex min-h-[calc(100vh-7rem)] flex-col gap-6 pb-16 md:pb-24 lg:flex-row lg:gap-8">
           <div className="w-full lg:w-[60%]">
             <div className="mb-6">
               <CheckoutContactInfo
@@ -97,7 +97,7 @@ export default function CheckoutPage() {
               <CheckoutOrderList items={items} />
             </div>
           </div>
-          <div className="w-full self-start transition-all duration-300 lg:sticky lg:top-8 lg:w-[40%]">
+          <div className="w-full self-start lg:sticky lg:top-[76px] lg:w-[40%]">
             <CheckoutSummary items={items} onCheckout={() => setShowPayment(true)} />
           </div>
         </div>
