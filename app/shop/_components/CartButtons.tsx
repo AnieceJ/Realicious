@@ -9,11 +9,14 @@ type CartButtonsProps = {
 
 export default function CartButtons({ product, qty }: CartButtonsProps) {
   const { toastComponent, showToast } = useToast();
+  const soldOut = product.stock_qty <= 0;
 
   return (
     <>
       {toastComponent}
-      <div
+      <button
+        type="button"
+        disabled={soldOut}
         onClick={() => {
           const result = addToCart(product, qty);
           if (result.addedQty === 0) {
@@ -24,16 +27,19 @@ export default function CartButtons({ product, qty }: CartButtonsProps) {
             showToast(`已將 ${product.name} x${result.addedQty} 加入購物車`);
           }
         }}
-        className="flex items-center justify-center w-full h-14 px-4
-                    bg-[#3D2419] text-white font-black text-lg tracking-wide
+        className={`flex items-center justify-center w-full h-14 px-4
+                    text-white font-black text-lg tracking-wide
                     border-[3px] border-[#3D2419]
                     shadow-[3px_3px_0px_0px_rgba(61,36,25,0.4)]
-                    hover:bg-[#523324]
                     active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
-                    transition-all duration-100 cursor-pointer select-none text-center"
+                    transition-all duration-100 select-none text-center ${
+                      soldOut
+                        ? "cursor-not-allowed bg-gray-400 text-white/85 shadow-none"
+                        : "cursor-pointer bg-[#3D2419] hover:bg-[#523324]"
+                    }`}
       >
-        加入購物車
-      </div>
+        {soldOut ? "暫時售完" : "加入購物車"}
+      </button>
     </>
   );
 }

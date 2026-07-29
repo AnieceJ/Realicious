@@ -22,6 +22,7 @@ export default function ProductCard({
   const [showCart, setShowCart] = useState(false);
   const { toastComponent, showToast } = useToast();
   const favorited = favoritedProductIds.includes(product.id);
+  const soldOut = product.stock_qty <= 0;
 
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -59,6 +60,12 @@ export default function ProductCard({
         />
       </Link>
 
+      {soldOut && (
+        <div className="absolute left-3 top-3 z-10 border-[3px] border-[#3D2419] bg-[#BB0015] px-3 py-1.5 text-sm font-black text-white shadow-[2px_2px_0px_0px_#3D2419]">
+          暫時售完
+        </div>
+      )}
+
       {/* 飄浮字卡 */}
       <div className="flex flex-row items-center justify-center gap-3 absolute bottom-3 left-3 right-3 bg-white/85 border-[2px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] p-3 text-left pointer-events-none">
         <p className="flex-1 min-w-0 text-[#3D2419] font-black text-base leading-snug line-clamp-2 tracking-wide">
@@ -73,16 +80,23 @@ export default function ProductCard({
       {showCart && (
         <div className="absolute bottom-20 left-3 right-3 flex items-center justify-between transition-opacity duration-200">
           <button
+            type="button"
+            disabled={soldOut}
             onClick={(e) => {
               e.stopPropagation();
+              if (soldOut) return;
               const result = addToCart(product, 1);
               showToast(result.addedQty > 0
                 ? `${product.name} 已加入購物車`
                 : `已達可購買上限 ${result.stockLimit} 件`);
             }}
-            className="px-4 py-2 bg-[#3D2419] text-white font-bold text-sm border-2 border-white shadow-md hover:bg-[#5a3a2a] transition-colors cursor-pointer"
+            className={`px-4 py-2 text-white font-bold text-sm border-2 border-white shadow-md transition-colors ${
+              soldOut
+                ? "cursor-not-allowed bg-gray-500"
+                : "cursor-pointer bg-[#3D2419] hover:bg-[#5a3a2a]"
+            }`}
           >
-            加入購物車
+            {soldOut ? "已售完" : "加入購物車"}
           </button>
           <button
             onClick={toggleFavorite}

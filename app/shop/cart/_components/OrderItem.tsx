@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import QuantityPicker from "../../_components/QuantityPicker";
 import { removeFromCart, updateQty, type CartItem } from "@/lib/shop/cart";
 import { useConfirm } from "../../_components/ConfirmModal";
@@ -54,7 +55,11 @@ export default function OrderItem({
           />
           <span className="sm:hidden">本次結帳</span>
         </label>
-        <div className="shrink-0">
+        <Link
+          href={`/shop/products/${item.id}`}
+          aria-label={`查看 ${item.name} 商品詳情`}
+          className="shrink-0 focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[#BB0015]"
+        >
           <div className="bg-[#FFF0B8] w-full h-48 sm:w-30 sm:h-30 flex items-center justify-center">
             <img
               src={item.main_img ? getImageUrl(item.main_img) : FALLBACK_IMAGE}
@@ -66,9 +71,14 @@ export default function OrderItem({
               }}
             />
           </div>
-        </div>
+        </Link>
         <div className="flex flex-1 flex-col justify-between min-w-0 py-1">
-          <h3 className="text-lg leading-snug">{item.name}</h3>
+          <Link
+            href={`/shop/products/${item.id}`}
+            className="w-fit text-lg leading-snug underline-offset-4 hover:text-[#BB0015] hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#BB0015]"
+          >
+            {item.name}
+          </Link>
           <span className="mt-3 text-lg text-[#8C5230]">${item.price}</span>
           <span className={`mt-1 text-xs ${soldOut ? "text-[#BB0015]" : "text-[#3D2419]/55"}`}>
             {soldOut ? "目前已售完，無法結帳" : `庫存上限 ${item.stock_qty} 件`}

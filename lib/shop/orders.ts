@@ -46,6 +46,7 @@ export type OrderItem = {
   quantity: number;
   unit_price: number;
   product_name: string;
+  is_active?: number | boolean | null;
 };
 
 export async function getOrders(userId?: number) {
