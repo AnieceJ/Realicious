@@ -123,7 +123,16 @@ export default function ProductsPage() {
 
               {/* 立即購買大按鈕 */}
               <div className="w-full">
-                <PurchaseButton product={{ id: product.id, name: product.name, price: product.price, main_img: product.main_img }} qty={qty} />
+                <PurchaseButton
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    main_img: product.main_img,
+                    stock_qty: product.stock_qty,
+                  }}
+                  qty={qty}
+                />
               </div>
             </div>
 

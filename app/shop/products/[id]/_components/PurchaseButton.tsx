@@ -1,11 +1,18 @@
 import React from "react";
 import { useRouter } from "next/navigation";
-import { addToCart } from "@/lib/shop/cart";
+import type { CartItem } from "@/lib/shop/cart";
+import { startCheckout } from "@/lib/shop/checkout";
 import { useConfirm } from "../../../_components/ConfirmModal";
 import { useUser } from "@/app/context/user";
 
 type PurchaseButtonProps = {
-  product: { id: number; name: string; price: number; main_img?: string };
+  product: {
+    id: number;
+    name: string;
+    price: number;
+    main_img?: string;
+    stock_qty: number;
+  };
   qty: number;
 };
 
@@ -21,7 +28,15 @@ export default function PurchaseButton({ product, qty }: PurchaseButtonProps) {
     );
     if (!confirmed || loading) return;
 
-    addToCart(product, qty);
+    const checkoutItem: CartItem = {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      main_img: product.main_img || "",
+      qty: Math.min(qty, product.stock_qty),
+      stock_qty: product.stock_qty,
+    };
+    startCheckout("buy-now", [checkoutItem]);
 
     if (!user?.id) {
       const goToLogin = await showConfirm(

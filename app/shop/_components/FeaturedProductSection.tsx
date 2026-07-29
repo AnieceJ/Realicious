@@ -20,7 +20,7 @@ export default function FeaturedProductSection({
   const { user } = useUser();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [paused, setPaused] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { toastComponent, showToast } = useToast();
 
   const featuredList = products.slice(0, 3);
@@ -30,7 +30,9 @@ export default function FeaturedProductSection({
     timerRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev === featuredList.length - 1 ? 0 : prev + 1));
     }, 4000);
-    return () => clearInterval(timerRef.current);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
   }, [paused, featuredList.length]);
 
   if (featuredList.length === 0) {
@@ -127,7 +129,13 @@ export default function FeaturedProductSection({
               ${currentProduct.price}
             </span>
             <button
-              onClick={(e) => { e.stopPropagation(); addToCart(currentProduct, 1); showToast(`已將 ${currentProduct.name} 加入購物車`); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                const result = addToCart(currentProduct, 1);
+                showToast(result.addedQty > 0
+                  ? `已將 ${currentProduct.name} 加入購物車`
+                  : `已達可購買上限 ${result.stockLimit} 件`);
+              }}
               className="inline-flex h-9 cursor-pointer items-center whitespace-nowrap bg-[#BB0015] px-4 text-sm font-bold text-white shadow-[4px_4px_0px_0px_#000] hover:bg-[#8E0010] active:translate-x-[.0625rem] active:translate-y-[.0625rem]"
             >
               加入購物車

@@ -26,8 +26,21 @@ export default function CheckoutSummary({ items, onCheckout }: { items: CartItem
       </div>
       <hr className="border-t-4 w-full mx-auto mt-5 border-gray-600" />
       <div className="flex flex-col gap-4 mt-6 w-full px-4 py-3">
-        <div className="flex justify-between mb-4">
-          <span>小計</span>
+        <div className="space-y-3">
+          {items.map((item) => (
+            <div key={item.id} className="flex items-start justify-between gap-3 text-sm">
+              <span className="min-w-0 line-clamp-2">
+                {item.name}
+                <span className="ml-1 whitespace-nowrap text-[#3D2419]/55">
+                  ${item.price.toLocaleString()} × {item.qty}
+                </span>
+              </span>
+              <span className="shrink-0">${(item.price * item.qty).toLocaleString()}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between border-t-2 border-[#3D2419]/20 pt-4">
+          <span>商品小計</span>
           <span>${subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between">

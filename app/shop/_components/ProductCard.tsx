@@ -73,7 +73,13 @@ export default function ProductCard({
       {showCart && (
         <div className="absolute bottom-20 left-3 right-3 flex items-center justify-between transition-opacity duration-200">
           <button
-            onClick={(e) => { e.stopPropagation(); addToCart(product, 1); showToast(`${product.name} 已加入購物車`); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              const result = addToCart(product, 1);
+              showToast(result.addedQty > 0
+                ? `${product.name} 已加入購物車`
+                : `已達可購買上限 ${result.stockLimit} 件`);
+            }}
             className="px-4 py-2 bg-[#3D2419] text-white font-bold text-sm border-2 border-white shadow-md hover:bg-[#5a3a2a] transition-colors cursor-pointer"
           >
             加入購物車

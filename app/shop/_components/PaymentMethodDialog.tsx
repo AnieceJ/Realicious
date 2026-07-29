@@ -41,9 +41,9 @@ export default function PaymentMethodDialog({ orderId, createOrder, onClose }: P
       if (methodId === "mock") {
         router.push(`/shop/checkoutFinished?RtnCode=1&orderId=${targetOrderId}`);
       }
-    } catch {
+    } catch (error) {
       localStorage.removeItem("realicious-pending-order");
-      alert("付款導向失敗，請稍後再試");
+      alert(error instanceof Error ? error.message : "付款導向失敗，請稍後再試");
       setIsSubmitting(false);
     }
   };
