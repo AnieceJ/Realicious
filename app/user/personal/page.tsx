@@ -196,7 +196,7 @@ export default function OnboardingForm() {
 
   return (
     // 移除 Left 組件，改用乾淨的置中卡片設計，專注於引導填寫
-    <Container className="bg-white justify-center items-center py-10">
+    <Container className=" justify-center items-center py-10">
       <div className="w-full max-w-lg p-6 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#FCF9F6]">
         {/* 步驟進度條提示 */}
         <div className="flex justify-between items-center mb-6 text-xs text-gray-400">
