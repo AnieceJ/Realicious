@@ -13,14 +13,14 @@ interface User {
 }
 
 interface UserContextType {
-  user: User;
+  user: User | null |undefined;
   loading: boolean; // 🆕 增加一個 loading 狀態，避免後端驗證完前畫面閃爍
   login: (
     account: string,
     password: string,
   ) => Promise<{ success: boolean; message: string }>;
   logout: () => void;
-  setUser: React.Dispatch<React.SetStateAction<User>>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -32,7 +32,7 @@ const API_URL =
 export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const router = useRouter();
-  const [user, setUser] = useState<User | null>();
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true); // 🆕 預設為載入中
 
   // 封裝一個清除本地狀態的輔助函式

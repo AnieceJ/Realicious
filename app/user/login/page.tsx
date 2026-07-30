@@ -17,6 +17,7 @@ import { button_shadow, user_input } from "@/app/user/_components/button";
 import { loginSchema, LoginInput } from "@/validations/validate";
 import { RiLoginBoxLine } from "react-icons/ri";
 import PasswordToggleIcon from "../_components/PasswordToggleIcon";
+import Banner from './_componets/banner'
 
 export default function Login() {
   const router = useRouter();
@@ -135,6 +136,7 @@ export default function Login() {
             height={720}
             priority
           />
+          {/* <Banner/> */}
         </div>
 
         <div className="w-110 h-180 bg-[#FCF9F6] flex flex-col items-center">

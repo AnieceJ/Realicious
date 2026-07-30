@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { Room, Message } from "../hooks/useChatroom";
 
 interface ChatWindowProps {
@@ -17,30 +17,33 @@ export default function ChatWindow({
   onLeaveRoom,
 }: ChatWindowProps) {
   const [input, setInput] = useState("");
-
-  // 新增：未讀訊息數量狀態
   const [unreadCount, setUnreadCount] = useState(0);
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const isNearBottomRef = useRef<boolean>(true);
   const prevMessagesLengthRef = useRef<number>(messages.length);
+  const isFirstLoadRef = useRef<boolean>(true);
 
-  // 手動滾動到底部的函式
-  const scrollToBottom = () => {
+  // 滾動到底部的通用函式
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
     const container = chatContainerRef.current;
     if (!container) return;
 
-    container.scrollTo({
-      top: container.scrollHeight,
-      behavior: "smooth",
-    });
+    if (behavior === "instant") {
+      // 瞬間跳轉：直接給值不走動畫，最乾淨
+      container.scrollTop = container.scrollHeight;
+    } else {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth",
+      });
+    }
 
-    // 滾到底部後清空未讀數
     setUnreadCount(0);
     isNearBottomRef.current = true;
   };
 
-  // 監聽使用者滾動行為
+  // 監聽使用者手動滾動行為
   const handleScroll = () => {
     const container = chatContainerRef.current;
     if (!container) return;
@@ -51,18 +54,38 @@ export default function ChatWindow({
     const isAtBottom = distanceFromBottom < 80;
     isNearBottomRef.current = isAtBottom;
 
-    // 如果使用者手動滾到底部，自動清空未讀提示
     if (isAtBottom && unreadCount > 0) {
       setUnreadCount(0);
     }
   };
 
-  // 訊息更新時的智慧滾動與未讀邏輯
+  // 切換房間時：重置狀態並標記為「準備第一次載入」
   useEffect(() => {
+    const effect =async()=>{await setUnreadCount(0);}
+    effect()
+    isNearBottomRef.current = true;
+    prevMessagesLengthRef.current = messages.length;
+    isFirstLoadRef.current = true;
+  }, [currentRoom?.id]);
+
+  // 處理訊息更新、切換房間後的第一次訊息渲染
+  useLayoutEffect(() => {
     const container = chatContainerRef.current;
     if (!container) return;
 
-    // 檢查是否有新訊息增加（避免初始化或切換房間時誤判）
+    // 情況 A：剛進入房間或訊息第一次載入/切換完畢 -> 瞬間置底
+    if (isFirstLoadRef.current) {
+      if (messages.length > 0) {
+        requestAnimationFrame(() => {
+          scrollToBottom("instant");
+          isFirstLoadRef.current = false;
+        });
+      }
+      prevMessagesLengthRef.current = messages.length;
+      return;
+    }
+
+    // 情況 B：正常對話中接收/發送新訊息
     const hasNewMessage = messages.length > prevMessagesLengthRef.current;
     prevMessagesLengthRef.current = messages.length;
 
@@ -72,21 +95,13 @@ export default function ChatWindow({
     const isMyMessage = lastMessage?.senderId === currentUserId;
 
     if (isMyMessage || isNearBottomRef.current) {
-      // 如果是我發的，或是本來就在底部 -> 自動捲動並歸零
-      scrollToBottom();
+      // 我發的訊息或原本就在底部 -> 平滑滾動
+      scrollToBottom("smooth");
     } else {
-      // 正在往上翻看歷史訊息，且來了別人的新訊息 -> 增加未讀計數
+      // 往上翻歷史紀錄時收到別人的新訊息 -> 未讀提示 +1
       setUnreadCount((prev) => prev + 1);
     }
   }, [messages, currentUserId]);
-
-  // 切換房間時重置狀態
-  useEffect(() => {
-    const reset = async()=>{await setUnreadCount(0);}
-    reset()
-    isNearBottomRef.current = true;
-    prevMessagesLengthRef.current = messages.length;
-  }, [currentRoom?.id]);
 
   if (!currentRoom) {
     return (
@@ -96,6 +111,7 @@ export default function ChatWindow({
       </div>
     );
   }
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -111,21 +127,16 @@ export default function ChatWindow({
           <h3 className="font-bold text-sm text-slate-800">
             {currentRoom.name}
           </h3>
-          {/* 待修 */}
-          {/* <p className="text-[11px] text-slate-400">
-            線上：{currentRoom._count?.members ?? 0} 人
-          </p> */}
         </div>
         <button
           onClick={onLeaveRoom}
-          // className="px-2 py-0.5 text-xs border rounded hover:bg-slate-100"
-          className="w-20 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]  bg-gray-200 hover:bg-gray-300 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]  cursor-pointer hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
+          className="w-20 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] bg-gray-200 hover:bg-gray-300 cursor-pointer hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
         >
           離開 🚪
         </button>
       </div>
 
-      {/* Messages 容器：設定 relative 讓提示按鈕定位 */}
+      {/* Messages 容器 */}
       <div className="flex-1 relative overflow-hidden flex flex-col">
         <div
           ref={chatContainerRef}
@@ -134,8 +145,6 @@ export default function ChatWindow({
         >
           {messages.map((msg, idx) => {
             const isMe = msg.senderId === currentUserId;
-
-            // 🌟 1. 讀取 user_profile 裡面的資料
             const profile = msg.sender?.user_profile;
             const avatarUrl =
               profile?.avatar ||
@@ -160,16 +169,13 @@ export default function ChatWindow({
                 <div
                   className={`flex flex-col ${isMe ? "items-end" : "items-start"}`}
                 >
-                  {/* 顯示暱稱/帳號 */}
                   <span className="text-[10px] text-slate-400 mb-1 px-0.5">
                     {displayName}
                   </span>
 
-                  {/* 對話氣泡 */}
                   <div
                     className={`px-3 py-1.5 rounded-2xl max-w-[260px] sm:max-w-[360px] break-words shadow-sm ${
                       isMe
-                        // ? "bg-indigo-600 text-white rounded-tr-none"
                         ? "bg-[#d1021a] text-red-50 rounded-tr-none"
                         : "bg-slate-100 text-slate-800 rounded-tl-none"
                     }`}
@@ -182,10 +188,10 @@ export default function ChatWindow({
           })}
         </div>
 
-        {/* 🌟 新訊息懸浮按鈕 (當 unreadCount > 0 時顯示) */}
+        {/* 新訊息懸浮按鈕 */}
         {unreadCount > 0 && (
           <button
-            onClick={scrollToBottom}
+            onClick={() => scrollToBottom("smooth")}
             className="absolute bottom-3 right-4 bg-gray-100 hover:bg-gray-300 border text-xs px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1 transition-all animate-bounce cursor-pointer z-10"
           >
             <span>↓ 有 {unreadCount} 則新訊息</span>
@@ -207,9 +213,7 @@ export default function ChatWindow({
         />
         <button
           type="submit"
-          // className="bg-indigo-600 text-white text-xs px-3 py-1 rounded"
-        className=  "bg-[#FFD45C] hover:bg-[#fbc632] w-15 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
-
+          className="bg-[#FFD45C] hover:bg-[#fbc632] w-15 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"
         >
           發送
         </button>
