@@ -13,7 +13,12 @@ interface RoomListProps {
   onJoinRoom: (room: Room) => void;
   onDeleteRoom: (roomId: number, e: React.MouseEvent) => void;
   onToggleFavorite: (roomId: number, e: React.MouseEvent) => void; // 🌟 補上介面定義
-  createRoom: any;
+  createRoom:(
+    name: string,
+    type: "PUBLIC_GROUP" | "PRIVATE_GROUP",
+    imageUrl?: string,
+    password?: string
+  ) =>Promise<{ success: boolean; message?: string }>
 }
 
 /* 預設圖庫備用網址 */

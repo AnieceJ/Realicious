@@ -61,7 +61,8 @@ export default function ChatWindow({
 
   // 切換房間時：重置狀態並標記為「準備第一次載入」
   useEffect(() => {
-    setUnreadCount(0);
+    const effect =async()=>{await setUnreadCount(0);}
+    effect()
     isNearBottomRef.current = true;
     prevMessagesLengthRef.current = messages.length;
     isFirstLoadRef.current = true;

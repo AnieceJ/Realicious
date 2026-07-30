@@ -229,11 +229,14 @@ export default function OnboardingForm() {
                 currentAvatar={formData.avatar}
                 onUploadSuccess={(newUrl) => {
                   setFormData((prev) => ({ ...prev, avatar: newUrl }));
-                  setUser((prev) => ({ ...prev, avatar: newUrl }));
-                  const updatedUser = { ...user, avatar: newUrl };
-                  Cookies.set("user", JSON.stringify(updatedUser), {
-                    expires: 1,
-                  });
+                  setUser((prev) => {
+                if (!prev) return null;
+                const updatedUser = { ...prev, avatar: newUrl };
+                Cookies.set("user", JSON.stringify(updatedUser), {
+                  expires: 1,
+                });
+                return updatedUser;
+              });
                 }}
               />
             </div>
