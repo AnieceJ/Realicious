@@ -37,7 +37,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis, faBookmark } from "@fortawesome/free-solid-svg-icons";
 import Cookies from "js-cookie";
-
+import AmbientBackground from "@/components/AmbientBackground";
 interface SubCategory {
 	id: number;
 	sub_category_name: string;
@@ -196,9 +196,10 @@ export default function ArticleManagePage() {
 	return (
 		<>
 			{toastComponent}
-			<div className="min-h-screen">
-				<div className="max-w-7xl mx-auto w-full py-4">
-					<div className="relative border-2 border-black">
+			<div className="relative min-h-screen overflow-hidden">
+				<AmbientBackground />
+				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
+					<div className="relative border-5 border-black bg-[#FDFCF9]">
 						<div
 							className="absolute inset-0 opacity-[0.5] pointer-events-none"
 							style={{
@@ -312,7 +313,7 @@ export default function ArticleManagePage() {
 							<div className="p-4">
 								<div className="flex justify-between items-center">
 									<Breadcrumb>
-										<BreadcrumbList>
+										<BreadcrumbList className="text-sm">
 											<BreadcrumbItem>
 												<BreadcrumbLink render={<Link href="/">首頁</Link>} />
 											</BreadcrumbItem>
@@ -329,7 +330,7 @@ export default function ArticleManagePage() {
 										onPageChange={updatePageInUrl}
 									/>
 								</div>
-								<div className="mt-4 border-b border-black" />
+								<div className="mt-4 border-b-2 border-black" />
 							</div>
 
 							{/* 文章列表 */}
@@ -343,7 +344,7 @@ export default function ArticleManagePage() {
 										paginatedArticles.map((art) => (
 											<div
 												key={art.id}
-												className="flex gap-3 border-b border-black py-4 sm:gap-4"
+												className="flex gap-3 border-b-2 border-black py-4 first:-mt-3 sm:gap-4"
 											>
 												<div className="relative min-h-36 w-32 shrink-0 self-stretch sm:w-40 md:w-44">
 													<ArticleThumbnail
@@ -355,7 +356,7 @@ export default function ArticleManagePage() {
 													/>
 												</div>
 												<div className="flex min-w-0 flex-1 flex-col gap-2">
-													<div className="flex min-w-0 items-start justify-between gap-2">
+													<div className="flex min-w-0 items-start justify-between gap-3">
 														<h3 className="min-w-0 flex-1 font-bold text-lg leading-6 text-slate-900">
 															{art.title}
 														</h3>
@@ -410,7 +411,7 @@ export default function ArticleManagePage() {
 															<Button
 																variant="outline"
 																size="sm"
-																className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100 hover:bg-red-700 hover:text-white"
+																className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100 shadow-[2px_2px_0px_0px_#000]"
 															>
 																閱讀全文
 															</Button>

@@ -34,6 +34,7 @@ import {
 	type SavedArticle,
 } from "@/lib/article-saved";
 import { getArticleSummary } from "@/lib/article-preview";
+import AmbientBackground from "@/components/AmbientBackground";
 
 interface SubCategory {
 	id: number;
@@ -200,9 +201,10 @@ export default function SavedArticlesPage() {
 	return (
 		<>
 			{toastComponent}
-			<div className="min-h-screen">
-				<div className="mx-auto w-full max-w-7xl py-4">
-					<div className="relative border-2 border-black">
+			<div className="relative min-h-screen overflow-hidden">
+				<AmbientBackground />
+				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
+					<div className="relative border-5 border-black bg-[#FDFCF9]">
 						<div
 							className="pointer-events-none absolute inset-0 opacity-50"
 							style={{
@@ -289,7 +291,7 @@ export default function SavedArticlesPage() {
 							<div className="p-4">
 								<div className="flex items-center justify-between gap-4">
 									<Breadcrumb>
-										<BreadcrumbList>
+										<BreadcrumbList className="text-sm">
 											<BreadcrumbItem>
 												<BreadcrumbLink render={<Link href="/">首頁</Link>} />
 											</BreadcrumbItem>
@@ -307,7 +309,7 @@ export default function SavedArticlesPage() {
 										onPageChange={updatePageInUrl}
 									/>
 								</div>
-								<div className="mt-4 border-b border-black" />
+								<div className="mt-4 border-b-2 border-black" />
 							</div>
 
 							<div className="p-4 md:p-6">
@@ -355,7 +357,7 @@ export default function SavedArticlesPage() {
 											return (
 												<article
 													key={article.id}
-													className="flex gap-3 border-b border-black py-4 first:-mt-3 sm:gap-4"
+													className="flex gap-3 border-b-2 border-black py-4 first:-mt-3 sm:gap-4"
 												>
 													<Link
 														href={detailHref}
@@ -372,14 +374,9 @@ export default function SavedArticlesPage() {
 
 													<div className="flex min-w-0 flex-1 flex-col gap-2">
 														<div className="flex min-w-0 items-start justify-between gap-3">
-															<Link
-																href={detailHref}
-																className="min-w-0 flex-1"
-															>
-																<h2 className="line-clamp-2 font-bold text-lg leading-6 text-slate-900 hover:underline">
-																	{article.title}
-																</h2>
-															</Link>
+															<h2 className="min-w-0 flex-1 line-clamp-2 font-bold text-lg leading-6 text-slate-900">
+																{article.title}
+															</h2>
 															<time className="shrink-0 whitespace-nowrap pt-1 text-xs text-gray-700">
 																{article.date}
 															</time>
@@ -404,7 +401,7 @@ export default function SavedArticlesPage() {
 																	variant="outline"
 																	size="sm"
 																	disabled={removingArticleId !== null}
-																	className="h-7 border-black px-3 text-xs text-red-700 hover:bg-red-50 hover:text-red-800"
+																	className="h-7 border-black px-3 text-xs text-red-700 hover:bg-white hover:text-black shadow-[2px_2px_0px_0px_#000]"
 																	onClick={() => handleRemove(article.id)}
 																>
 																	{isRemoving ? "移除中..." : "取消收藏"}
@@ -413,7 +410,7 @@ export default function SavedArticlesPage() {
 																	<Button
 																		variant="outline"
 																		size="sm"
-																		className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100 hover:bg-red-700 hover:text-white"
+																		className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100 shadow-[2px_2px_0px_0px_#000]"
 																	>
 																		閱讀全文
 																	</Button>

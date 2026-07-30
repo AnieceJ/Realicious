@@ -198,7 +198,7 @@ export default function ArticlePage() {
 										) : (
 											categories.map((cat, index) => (
 												<React.Fragment key={cat.category_name}>
-													<MenubarMenu key={cat.category_name}>
+													<MenubarMenu>
 														<MenubarTrigger
 															className={
 																cat.sub_category.some(
@@ -233,7 +233,7 @@ export default function ArticlePage() {
 														</MenubarContent>
 													</MenubarMenu>
 													{index < categories.length - 1 && (
-														<div className="mx-1 h-5 w-px bg-gray-500 self-center"></div>
+														<div className="mx-1 h-5 w-px bg-gray-500 self-center" />
 													)}
 												</React.Fragment>
 											))
@@ -260,9 +260,9 @@ export default function ArticlePage() {
 
 							{/* breadcrumb */}
 							<div className="p-4">
-								<div className="flex justify-between items-center">
+								<div className="flex flex-wrap items-center justify-between gap-3">
 									<Breadcrumb>
-										<BreadcrumbList>
+										<BreadcrumbList className="text-sm">
 											<BreadcrumbItem>
 												<BreadcrumbLink render={<Link href="/">首頁</Link>} />
 											</BreadcrumbItem>
@@ -332,7 +332,7 @@ export default function ArticlePage() {
 															<Button
 																variant="outline"
 																size="sm"
-																className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100"
+																className="h-7 border-black bg-red-600 px-3 text-xs text-slate-100 shadow-[2px_2px_0px_0px_#000]"
 															>
 																閱讀全文
 															</Button>
