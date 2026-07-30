@@ -291,11 +291,11 @@ export default function SavedArticlesPage() {
 									<Breadcrumb>
 										<BreadcrumbList>
 											<BreadcrumbItem>
-												<BreadcrumbLink render={<Link href="/">Home</Link>} />
+												<BreadcrumbLink render={<Link href="/">首頁</Link>} />
 											</BreadcrumbItem>
 											<BreadcrumbSeparator />
 											<BreadcrumbItem>
-												<BreadcrumbPage>Saved Articles</BreadcrumbPage>
+												<BreadcrumbPage>收藏文章</BreadcrumbPage>
 											</BreadcrumbItem>
 										</BreadcrumbList>
 									</Breadcrumb>

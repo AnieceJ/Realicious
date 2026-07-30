@@ -18,6 +18,7 @@ import {
 import { useToast } from "../_components/article_toast";
 import Cookies from "js-cookie";
 import { getSavedArticles } from "@/lib/article-saved";
+import AmbientBackground from "@/components/AmbientBackground";
 
 interface ArticlePage {
 	id: string;
@@ -164,7 +165,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 
 		const shareData = {
 			title: page.title,
-			text: `要不要一起吃：${page.title}`,
+			text: `我們去吃：${page.title}`,
 			url: `${window.location.origin}/article/${id}`,
 		};
 
@@ -274,13 +275,15 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 	return (
 		<>
 			{toastComponent}
-			<div className="max-w-7xl mx-auto w-full p-3 bg-white">
-				<div className=" border-black border-2">
+			<div className="relative min-h-screen overflow-hidden">
+				<AmbientBackground />
+				<div className="relative z-10 max-w-7xl mx-auto w-full p-3">
+					<div className="border-black border-2">
 					<div className="flex flex-row items-center justify-between gap-4 p-3 bg-black border border-black text-white">
 						<div className="flex items-center gap-2 shrink-0">
 							<button
 								type="button"
-								onClick={() => router.back()}
+								onClick={() => router.push(articleBreadcrumb.href)}
 								aria-label="返回上一頁"
 							>
 								<ChevronLeft size={30} className="h-10 p-1 hover:bg-gray-400" />
@@ -356,7 +359,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 										<div className=" flex gap-2">
 											<button
 												onClick={handleShare}
-												className="w-9 h-9 flex items-center justify-center gap-2 border-black border-2 bg-white shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] hover:opacity-75 transition-opacity"
+												className="w-9 h-9 flex cursor-pointer items-center justify-center gap-2 border-black border-2 bg-white shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] hover:opacity-75 transition-opacity"
 												title="複製文章連結"
 												aria-label="複製文章連結"
 											>
@@ -365,7 +368,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 											<button
 												onClick={handleSaveArticle}
 												disabled={savingArticle}
-												className="w-9 h-9 flex items-center justify-center gap-2 border-black border-2 bg-white shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] hover:opacity-75 transition-opacity disabled:opacity-50"
+												className="w-9 h-9 flex cursor-pointer items-center justify-center gap-2 border-black border-2 bg-white shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] hover:opacity-75 transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
 												title={hasToken ? "點擊儲存文章" : "請先登入"}
 											>
 												{isSaved ? (
@@ -443,57 +446,18 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 														disabled={
 															!hasToken || submitting || !inputText.trim()
 														}
-														className="bg-black text-white px-6 py-1.5 text-sm font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
+														className="bg-black cursor-pointer text-white px-6 py-1.5 text-sm font-bold border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-px hover:translate-y-px hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all disabled:bg-gray-400 disabled:cursor-not-allowed"
 													>
 														{submitting ? "傳送中..." : "送出留言"}
 													</button>
 												</div>
 											</div>
 										</div>
-										{/* 推薦文章 */}
-										{/* <div className="w-full h-full lg:top-4 p-4 bg-slate-100/70 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-								<h2 className="text-xl font-bold mb-4 tracking-tight">
-									推薦閱讀
-								</h2>
-								<div className="flex flex-col gap-3">
-									{[
-										{
-											id: "example-1",
-											title: "師大夜市必吃！流沙西多士與極厚菠蘿油",
-											author: "Wei C",
-										},
-										{
-											id: "example-2",
-											title: "民生社區不限時老宅咖啡廳，昭和硬布丁必點",
-											author: "Anon",
-										},
-										{
-											id: "example-3",
-											title: "萬華三代老店！傳承甲子的秘製紅燒肉",
-											author: "美食探員",
-										},
-									].map((article) => (
-										<Link
-											key={article.id}
-											href={`/article/page?id=${article.id}`}
-											className="block group"
-										>
-											<div className="p-3.5 border-2 border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-hover:translate-x-px group-hover:translate-y-px group-hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all">
-												<h3 className="font-bold text-sm text-gray-900 line-clamp-2 leading-snug group-hover:underline">
-													{article.title}
-												</h3>
-												<p className="text-xs text-gray-500 mt-1.5 font-medium">
-													作者：{article.author}
-												</p>
-											</div>
-										</Link>
-									))}
-								</div>
-							</div> */}
 									</div>
 								</div>
 							</article>
 						</div>
+					</div>
 					</div>
 				</div>
 			</div>

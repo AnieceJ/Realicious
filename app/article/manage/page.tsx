@@ -314,11 +314,11 @@ export default function ArticleManagePage() {
 									<Breadcrumb>
 										<BreadcrumbList>
 											<BreadcrumbItem>
-												<BreadcrumbLink render={<Link href="/">Home</Link>} />
+												<BreadcrumbLink render={<Link href="/">首頁</Link>} />
 											</BreadcrumbItem>
 											<BreadcrumbSeparator />
 											<BreadcrumbItem>
-												<BreadcrumbPage>My Article</BreadcrumbPage>
+												<BreadcrumbPage>我的文章</BreadcrumbPage>
 											</BreadcrumbItem>
 										</BreadcrumbList>
 									</Breadcrumb>

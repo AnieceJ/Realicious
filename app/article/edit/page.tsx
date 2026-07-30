@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ClientSideCustomEditor from "@/components/client-side-custom-editor";
 import Cookies from "js-cookie";
 import { useToast } from "../_components/article_toast";
+import AmbientBackground from "@/components/AmbientBackground";
 
 interface SubCategory {
 	id: number;
@@ -140,7 +141,9 @@ export default function ArticleEditPage() {
 
 			// 成功後的路由跳轉
 			if (isEditMode) {
-				router.push(`/article/${articleId}`); // 編輯完導回該文章頁
+				router.replace(
+					`/article/${articleId}?from=my-article&returnTo=${encodeURIComponent("/article/manage")}`,
+				);
 			} else {
 				const newId = data.articleId ?? data.article?.id ?? data.id;
 				router.push(newId ? `/article/${newId}` : "/article/manage");
@@ -165,8 +168,18 @@ export default function ArticleEditPage() {
 	return (
 		<main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
 			{toastComponent}
-			<div className=" border-4 border-black bg-white shadow-[6px_6px_0px_-1px_#000]">
-				<header className="border-b-4 border-black bg-black px-5 py-4 text-white sm:px-8">
+			<AmbientBackground />
+
+			<div className="relative border-4 border-black bg-white shadow-[6px_6px_0px_-1px_#000]">
+				<div
+					className="absolute inset-0 opacity-[0.5] pointer-events-none"
+					style={{
+						backgroundImage: "url('/article/noise.png')",
+						backgroundRepeat: "repeat",
+						backgroundSize: "90px",
+					}}
+				/>
+				<header className="relative z-10 border-b-4 border-black bg-black px-5 py-4 text-white sm:px-8">
 					<p className="text-sm font-bold tracking-widest text-button-yellow">
 						ARTICLE
 					</p>
@@ -175,7 +188,7 @@ export default function ArticleEditPage() {
 					</h1>
 				</header>
 
-				<div className="space-y-8 p-5 sm:p-8">
+				<div className="relative z-10 space-y-8 p-5 sm:p-8">
 					<div className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(13rem,1fr)] md:items-end">
 						<section className="min-w-0">
 							<label

@@ -24,18 +24,18 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 						onSearch(keyword);
 					}
 				}}
-				className="flex-1 border-b-gray-500 bg-gray-200"
+				className="flex-1 border-b-gray-500 bg-gray-200 pl-2"
 			/>
 
 			<Button
 				type="button"
-				className="border-0"
+				className="border-0 text-sm"
 				onClick={() => {
 					console.log("clicked");
 					onSearch(keyword);
 				}}
 			>
-				Search
+				搜尋
 			</Button>
 		</Field>
 	);

@@ -27,7 +27,7 @@ export default function Pagination({
 			<button
 				onClick={() => currentPage > 1 && goToPage(currentPage - 1)}
 				disabled={currentPage === 1}
-				className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+				className="relative inline-flex cursor-pointer items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				<span className="sr-only">Previous</span>
 				<ChevronLeftIcon className="size-5" />
@@ -38,7 +38,7 @@ export default function Pagination({
 					key={page}
 					onClick={() => goToPage(page)}
 					aria-current={page === currentPage ? "page" : undefined}
-					className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold border ${
+					className={`relative inline-flex cursor-pointer items-center px-4 py-2 text-sm font-semibold border ${
 						page === currentPage
 							? "bg-page-red text-white border-black"
 							: "text-gray-900 border-gray-300 hover:bg-gray-50"
@@ -51,7 +51,7 @@ export default function Pagination({
 			<button
 				onClick={() => currentPage < totalPages && goToPage(currentPage + 1)}
 				disabled={currentPage === totalPages}
-				className="relative inline-flex items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+				className="relative inline-flex cursor-pointer items-center px-2 py-2 bg-page-red text-white border border-black hover:bg-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
 			>
 				<span className="sr-only">Next</span>
 				<ChevronRightIcon className="size-5" />

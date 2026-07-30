@@ -138,6 +138,18 @@
 	min-width: 0;
 }
 
+.article-page
+	:is(
+		a[href],
+		button:not(:disabled),
+		select:not(:disabled),
+		[role="button"]:not([aria-disabled="true"]),
+		[role="menuitem"]:not([aria-disabled="true"]),
+		[role="menuitemradio"]:not([aria-disabled="true"])
+	) {
+	cursor: pointer;
+}
+
 .article-editor .ck.ck-editor,
 .article-editor .ck-editor__main {
 	min-width: 0;
