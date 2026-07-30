@@ -53,7 +53,7 @@ export default function Hero() {
 							<div className="plate plate-1">
 								<div className="plate-content">
 									<Image
-										src="/article/salad.jpg"
+										src="/article/Salad.jpg"
 										alt=""
 										fill
 										priority
