@@ -41,7 +41,7 @@ export default function Chatroom() {
 
   return (
     <Container className="py-2 md:py-6 overflow-x-auto">
-      <div className="flex flex-row h-[600px] xl:h-[600px] 2xl:h-[750px] xl:h- gap-2 md:gap-6 min-w-[640px] border-3">
+      <div className="bg-white/50 flex flex-row h-[600px] xl:h-[600px] 2xl:h-[750px] xl:h- gap-2 md:gap-6 min-w-[640px] border-3 border-gray-500">
         {/* 左側：大廳 */}
         <RoomList
           rooms={filteredRooms} /* 傳入過濾後的資料庫清單 */

@@ -111,7 +111,7 @@ export default function RoomList({
                     />
                     <button
                       type="button"
-                      onClick={(e) => onToggleFavorite(room.id, e)}
+                      onClick={(e) =>{onToggleFavorite(room.id, e);showToast(room.isFavorited ? "🤍取消追蹤" : "❤️追蹤房間")}}
                       className="absolute top-1.5 right-1.5 md:top-2 md:right-2 rounded-full bg-black/40 backdrop-blur-md p-1.5 text-xs transition-transform active:scale-125 hover:bg-black/60"
                       title={room.isFavorited ? "取消追蹤" : "追蹤房間"}
                     >
