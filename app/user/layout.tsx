@@ -9,9 +9,9 @@ export default function UserLayout({
 }>) {
 	return (
 		// <div className="py-4 bg-[#fafafa] bg-[url(/user/always-grey.png)] bg-repeat bg-size-32px_32px">
-		<div className="py-4 ">
+		<div className="relative min-h-screen overflow-hidden py-4">
 			<AmbientBackground />
-			{children}
+			<div className="relative z-10">{children}</div>
 		</div>
 	);
 }

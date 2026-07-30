@@ -204,9 +204,9 @@ export default function SavedArticlesPage() {
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
 				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
-					<div className="relative border-5 border-black bg-[#FDFCF9]">
+					<div className="relative z-10 border-5 border-black bg-[#FDFCF9]">
 						<div
-							className="pointer-events-none absolute inset-0 opacity-50"
+							className="pointer-events-none absolute inset-0 z-10 opacity-50"
 							style={{
 								backgroundImage: "url('/article/noise.png')",
 								backgroundRepeat: "repeat",
@@ -214,7 +214,7 @@ export default function SavedArticlesPage() {
 							}}
 						/>
 
-						<div className="relative z-10">
+						<div className="relative z-20">
 							<div className="flex flex-col md:flex-row items-stretch md:items-center w-full justify-between gap-3 p-3 bg-black">
 								<div className="flex w-full min-w-0 flex-1 items-center">
 									<Link
