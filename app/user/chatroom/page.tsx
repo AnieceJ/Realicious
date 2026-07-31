@@ -2,6 +2,7 @@
 
 import { useUser } from "@/app/context/user";
 import { useChatroom } from "./hooks/useChatroom";
+import { useSearchParams } from "next/navigation";
 import Container from "@/app/user/_components/container";
 
 import RoomList from "./_components/RoomList";
@@ -12,6 +13,9 @@ import PasswordModal from "./_components/PasswordModal";
 
 export default function Chatroom() {
   const { user, loading } = useUser();
+  const searchParams = useSearchParams();
+  const hasRoomId = Boolean(searchParams.get("roomId"));
+
   const {
     currentRoom,
     messages,
@@ -40,24 +44,29 @@ export default function Chatroom() {
   const currentUserId = Number(user.id);
 
   return (
-    <Container className="py-2 md:py-6 overflow-x-auto">
-      <div className="bg-white/50 flex flex-row h-[600px] xl:h-[600px] 2xl:h-[750px] xl:h- gap-2 md:gap-6 min-w-[640px] border-3 border-gray-500">
+    <Container className=" py-0 sm:py-2 md:py-6 overflow-x-auto">
+      <div
+        className={` bg-white/50 flex flex-col w-screen sm:flex-row h-screen sm: sm:min-w-[640px] h-[600px] xl:h-[600px] 2xl:h-[750px] gap-2 md:gap-6 border-3 border-gray-500`}
+      >
         {/* 左側：大廳 */}
-        <RoomList
-          rooms={filteredRooms} /* 傳入過濾後的資料庫清單 */
-          activeTab={activeTab} /*  頁籤狀態 */
-          onTabChange={setActiveTab} /* 頁籤切換事件 */
-          currentRoomId={currentRoom?.id}
-          currentUserId={currentUserId}
-          onJoinRoom={(room) => joinRoom(room.id)} //傳入房間id
-          onDeleteRoom={deleteRoom}
-          onToggleFavorite={toggleFavorite} /*  傳入追蹤函式 */
-          createRoom={createRoom}
-        />
+          <RoomList
+            rooms={filteredRooms} /* 傳入過濾後的資料庫清單 */
+            activeTab={activeTab} /*  頁籤狀態 */
+            onTabChange={setActiveTab} /* 頁籤切換事件 */
+            currentRoomId={currentRoom?.id}
+            currentUserId={currentUserId}
+            onJoinRoom={(room) => joinRoom(room.id)} //傳入房間id
+            onDeleteRoom={deleteRoom}
+            onToggleFavorite={toggleFavorite} /*  傳入追蹤函式 */
+            createRoom={createRoom}
+            classroom={hasRoomId ? "hidden" : ""}
+          />
+        
 
         {/* 右側：控制台 & 聊天室 */}
-        <div className="flex flex-1 flex-col gap-2 md:gap-4 shrink-0">
-          {/* <CreateRoomModal onCreateRoom={createRoom} /> */}
+        <div
+          className={`${hasRoomId ? "" : "hidden"} sm:flex flex-1 flex-col gap-2 h-screen sm:h-full md:gap-4 shrink-0`}
+        >
           <ChatWindow
             currentRoom={currentRoom}
             messages={messages}

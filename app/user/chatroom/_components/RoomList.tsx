@@ -19,6 +19,7 @@ interface RoomListProps {
     imageUrl?: string,
     password?: string
   ) =>Promise<{ success: boolean; message?: string }>
+  classroom?:string
 }
 
 /* 預設圖庫備用網址 */
@@ -34,12 +35,13 @@ export default function RoomList({
   onDeleteRoom,
   onToggleFavorite,
   createRoom,
+  classroom
 }: RoomListProps) {
   const { showAlert } = useAlert();
   const { showToast,toastComponent } = useToast()
 
   return (
-    <div className="sm:w-750 flex flex-[1.4] flex-col border-gray-600 bg-slate-50/50 p-2.5 md:p-5 min-h-0">
+    <div className={`${classroom} w-full sm:w-750 sm:flex flex-[1.4] flex-col border-gray-600 bg-slate-50/50 p-2.5 md:p-5 min-h-0`}>
       {toastComponent}
       {/* 大廳 Header */}
       <div className="mb-2 md:mb-4 flex items-center justify-between gap-1">
@@ -90,7 +92,7 @@ export default function RoomList({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
             {rooms.map((room) => {
               const isSelected = currentRoomId === room.id;
               const isOwner = currentUserId === room.createdBy;
@@ -143,12 +145,6 @@ export default function RoomList({
                       <button
                         type="button"
                         onClick={(e) => {
-                          // e.stopPropagation();
-                          // if (
-                          //   confirm("確定要刪除這個房間嗎？此動作無法復原！")
-                          // ) {
-                          //   onDeleteRoom(room.id, e);
-                          // }
                           showAlert(
                             "confirm",
                             "注意!",

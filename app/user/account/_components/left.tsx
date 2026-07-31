@@ -35,8 +35,7 @@ export default function Left() {
     <>
       {/* 
         ==================================================
-        1. 手機版：固定於底部 (fixed bottom-0) 橫向滑動選單 
-        - md:hidden 代表中大螢幕以上隱藏
+        手機版
         ==================================================
       */}
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#FCF9F6] border-t-2 border-black shadow-[0px_-2px_0px_0px_rgba(0,0,0,1)] md:hidden">
@@ -61,8 +60,7 @@ export default function Left() {
 
       {/* 
         ==================================================
-        2. 電腦版：保持原有的側邊欄風格
-        - hidden md:flex 代表小螢幕隱藏，中大螢幕顯示
+        電腦版
         ==================================================
       */}
       <div className="hidden md:flex w-95 h-170 bg-[#FCF9F6] border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex-col items-center">

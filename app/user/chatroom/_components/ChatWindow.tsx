@@ -120,9 +120,9 @@ export default function ChatWindow({
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm h-full relative">
+    <div className="flex flex-1 flex-col h-screen sm:h-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm relative">
       {/* Header */}
-      <div className="flex items-center justify-between border-b px-4 py-3 bg-slate-50/50 flex-shrink-0">
+      <div className="flex items-center justify-between border-b px-4 py-3 bg-slate-50/50 shrink-0">
         <div>
           <h3 className="font-bold text-sm text-slate-800">
             {currentRoom.name}
@@ -141,7 +141,7 @@ export default function ChatWindow({
         <div
           ref={chatContainerRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto p-4 space-y-2.5"
+          className=" flex-1 overflow-y-auto p-4 space-y-2.5"
         >
           {messages.map((msg, idx) => {
             const isMe = msg.senderId === currentUserId;
