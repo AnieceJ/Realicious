@@ -88,11 +88,17 @@ export default function TutorialSpotlight({
     };
   }, [targetRef]);
 
-  // 收攏進場:量到位置後跑一次,把 introP 從 0 緩動到 1。
-  // reduce 時不跑動畫(進度改由 render 的 p 推導成 1),effect 什麼都不做。
+  // 收攏進場:量到位置後「只跑一次」,把 introP 從 0 緩動到 1。
+  // ★ 這裡故意依賴 hasSpot(布林)而不是 spot(物件)——這是修 bug 的關鍵:
+  //   measure() 會在 rAF / ResizeObserver / scroll 時重複呼叫 setSpot,
+  //   每次都產生「新的 spot 物件」。若依賴 spot,這個 effect 會一直重跑,
+  //   而重跑的 cleanup 會 cancelAnimationFrame 把正在播的進場動畫砍掉,
+  //   introStarted 又擋住重啟 → 動畫卡在 introP≈0 → 黑幕/氣泡都不出現,
+  //   只剩右上角跳過鈕。改依賴 hasSpot(只會 false→true 一次)就穩了。
+  const hasSpot = spot !== null;
   useEffect(() => {
     if (reduce) return;
-    if (!spot || introStarted.current) return;
+    if (!hasSpot || introStarted.current) return;
     introStarted.current = true;
 
     const dur = 700;
@@ -106,10 +112,9 @@ export default function TutorialSpotlight({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [spot, reduce]);
+  }, [hasSpot, reduce]);
 
-  // 還沒量到 → 先不畫
-  if (!spot) return null;
+if (!spot) return null;   // ← 量不到目標位置，整個聚光燈就不畫
 
   const { cx, cy, r: targetR, vw, vh } = spot;
 
