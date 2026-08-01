@@ -36,8 +36,8 @@ function useIsClient() {
   );
 }
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
 
 export default function Chatroom() {
   const [isOpening, setIsOpening] = useState<boolean>(false);

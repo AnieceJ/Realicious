@@ -22,8 +22,10 @@ interface AccountInfo {
 }
 
 export default function Password() {
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
+
   const { showAlert, closeAlert } = useAlert();
   const router = useRouter();
   const searchParams = useSearchParams();

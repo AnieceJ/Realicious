@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { User, Bookmark, Users } from "lucide-react"; // 可選：若有使用 lucide-react
 
-const API_BASE = "http://localhost:3001";
-const API_URL =
-	process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
+
 const FALLBACK_IMAGE = `/user/chatroom/apple.png`; // 設定聊天室預設預覽圖
 
 export interface PopularRoom {

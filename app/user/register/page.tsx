@@ -19,8 +19,10 @@ import { useAlert } from "../context/alert";
 import PasswordToggleIcon from "../_components/PasswordToggleIcon";
 
 export default function Register() {
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
+
   const { showAlert, closeAlert } = useAlert();
   const { setUser } = useUser();
 

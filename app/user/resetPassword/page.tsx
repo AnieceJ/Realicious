@@ -21,8 +21,9 @@ export default function ForgetPassword() {
   const token = searchParams.get("token");
   const email = searchParams.get("email");
 
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
+
   const [submit, setSubmit] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordCheck, setShowPasswordCheck] = useState(false);
