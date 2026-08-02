@@ -440,3 +440,28 @@
 .article-editor .ck-dropdown__panel {
 	z-index: 21 !important;
 }
+
+/* 手機版重新排版 */
+@media (max-width: 430px) {
+	.hero-copy {
+		justify-content: space-between;
+		padding: 32px 0 40px;
+	}
+
+	.hero-title {
+		margin-top: 0;
+	}
+
+	.hero-bottom {
+		width: 65%;
+	}
+
+	:root {
+		--orbit-radius: 250px;
+		--plate-size: 250px;
+	}
+
+	.orbit {
+		right: calc(var(--orbit-diameter) / -2 + 25px);
+	}
+}

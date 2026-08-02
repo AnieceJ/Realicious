@@ -146,7 +146,11 @@ export default function ArticleEditPage() {
 				);
 			} else {
 				const newId = data.articleId ?? data.article?.id ?? data.id;
-				router.push(newId ? `/article/${newId}` : "/article/manage");
+				router.push(
+					newId
+						? `/article/${newId}?from=my-article&returnTo=${encodeURIComponent("/user/account/article")}`
+						: "/user/account/article",
+				);
 			}
 		} catch (error) {
 			setErrorMessage(
