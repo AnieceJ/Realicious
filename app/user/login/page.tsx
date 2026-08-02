@@ -127,27 +127,27 @@ export default function Login() {
     <Container>
       <div className="bg-[#FCF9F6] flex justify-center items-center border-3 sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         {/* 廣告 */}
-        <div className="w-0 h-0 sm:w-150 sm:h-180 flex justify-center items-center">
-          <Image
-            className=" object-contain object-bottom h-170"
+        <div className="w-0 h-0 lg:w-150 lg:h-180 flex justify-center items-center overflow-hidden">
+          {/* <Image
+            className=" object-contain object-bottom h-180"
             src={loginAd}
             alt="廣告"
             width={600}
             height={720}
             priority
-          />
-          {/* <Banner/> */}
+          /> */}
+          <Banner/>
         </div>
 
-        <div className="w-110 h-180 bg-[#FCF9F6] flex flex-col items-center">
-          <h1 className="text-[24px] my-5">登入</h1>
+        <div className="w-110 h-screen sm:h-180 bg-[#FCF9F6] flex flex-col items-center">
+          <h1 className={`font-bold text-[26px] my-8`}>登入</h1>
 
           <form
             onSubmit={handleSubmit(onSubmit, onError)}
             className="flex flex-col items-center mb-4"
           >
             <div className="flex flex-col items-start mb-5">
-              <label className="text-5 mb-2" htmlFor="email">
+              <label className="text-[20px] mb-2" htmlFor="email">
                 電子郵件
               </label>
               <input
@@ -190,7 +190,7 @@ export default function Login() {
                 )}
               </div>
             </div>
-            <div className="w-full h-10 flex justify-between">
+            <div className="w-full h-10 flex justify-between mb-4">
               <div className="">
               </div>
               <Link
@@ -211,7 +211,7 @@ export default function Login() {
             </button>
           </form>
 
-          <h2 className="text-[20px] mb-4">--OR--</h2>
+          <h2 className="text-[20px] my-8">--OR--</h2>
           <div className="flex justify-center items-center">
             <Link
               href={`http://localhost:3001/user/api/auth/google?next=${encodeURIComponent(nextPath)}`}

@@ -40,6 +40,9 @@ export function useChatroom() {
 
   const socketRef = useRef<Socket | null>(null);
 
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
+
   // 取得網址 Query 參數與 Router
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -49,7 +52,7 @@ export function useChatroom() {
   const fetchRooms = async () => {
     const token = Cookies.get("token");
     try {
-      const res = await fetch("http://localhost:3001/user/api/chatrooms", {
+      const res = await fetch(`${API_URL}/chatrooms`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const result = await res.json();
@@ -64,7 +67,7 @@ export function useChatroom() {
     const token = Cookies.get("token");
     if (!token) return;
 
-    socketRef.current = io("http://localhost:3001", { auth: { token } });
+    socketRef.current = io(`${BASE_URL}`, { auth: { token } });
     const socket = socketRef.current;
 
     socket.on("receive_message", (newMessage: Message) => {
@@ -185,7 +188,7 @@ export function useChatroom() {
     password?: string
   ) => {
     const token = Cookies.get("token");
-    const res = await fetch("http://localhost:3001/user/api/chatrooms", {
+    const res = await fetch(`${API_URL}/chatrooms`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -211,7 +214,7 @@ export function useChatroom() {
 
   const deleteRoom = async (roomId: number) => {
     const token = Cookies.get("token");
-    const res = await fetch(`http://localhost:3001/user/api/chatrooms/${roomId}`, {
+    const res = await fetch(`${API_URL}/chatrooms/${roomId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -230,7 +233,7 @@ export function useChatroom() {
     const token = Cookies.get("token");
     try {
       const res = await fetch(
-        `http://localhost:3001/user/api/chatrooms/${roomId}/favorite`,
+        `${API_URL}/chatrooms/${roomId}/favorite`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },

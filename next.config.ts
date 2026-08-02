@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+
 const nextConfig: NextConfig = {
   devIndicators: false,
   /* config options here */
@@ -7,7 +9,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:3001/api/:path*",
+        destination: `${API_URL}/api/:path*`,
       },
     ];
   },
@@ -22,6 +24,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  allowedDevOrigins: ["192.168.1.136",], 
+
+  
 };
 
 export default nextConfig;

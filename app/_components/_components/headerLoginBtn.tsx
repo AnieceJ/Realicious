@@ -26,8 +26,8 @@ export default function HeaderLoginBtn({
 		<div className={`text-black ${className}`}>
 			{user ? (
 				<div className="flex gap-x-2 items-center justify-end">
-					<UserSidebar />
 					<ChatroomSidebar />
+					<UserSidebar />
 				</div>
 			) : (
 				<div className="flex gap-x-2 items-center justify-end text-white font-medium ">

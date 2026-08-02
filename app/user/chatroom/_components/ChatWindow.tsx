@@ -120,9 +120,9 @@ export default function ChatWindow({
   };
 
   return (
-    <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm h-full relative">
+    <div className="flex flex-1 flex-col h-dvh sm:h-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm relative">
       {/* Header */}
-      <div className="flex items-center justify-between border-b px-4 py-3 bg-slate-50/50 flex-shrink-0">
+      <div className="flex items-center justify-between border-b px-4 py-3 bg-slate-50/50 shrink-0">
         <div>
           <h3 className="font-bold text-sm text-slate-800">
             {currentRoom.name}
@@ -137,11 +137,11 @@ export default function ChatWindow({
       </div>
 
       {/* Messages 容器 */}
-      <div className="flex-1 relative overflow-hidden flex flex-col">
+      <div className="flex-1 h-dvh relative min-h-0 overflow-hidden flex flex-col">
         <div
           ref={chatContainerRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto p-4 space-y-2.5"
+          className=" flex-1 overflow-y-auto p-4 space-y-2.5"
         >
           {messages.map((msg, idx) => {
             const isMe = msg.senderId === currentUserId;
@@ -201,16 +201,17 @@ export default function ChatWindow({
 
       {/* Input */}
       <form
+        className="border-t p-2 fixed sm:relative flex w-full bottom-0 gap-2 bg-white shrink-0"
         onSubmit={handleSubmit}
-        className="border-t p-2 flex gap-2 flex-shrink-0 bg-white"
       >
-        <input
+          <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="輸入訊息..."
-          className="flex-1 border rounded px-2 py-1 focus:outline-none"
+          className="flex-1 w-full border rounded px-2 py-1 focus:outline-none"
         />
+      
         <button
           type="submit"
           className="bg-[#FFD45C] hover:bg-[#fbc632] w-15 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"

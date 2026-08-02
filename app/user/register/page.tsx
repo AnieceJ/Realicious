@@ -19,8 +19,10 @@ import { useAlert } from "../context/alert";
 import PasswordToggleIcon from "../_components/PasswordToggleIcon";
 
 export default function Register() {
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
+
   const { showAlert, closeAlert } = useAlert();
   const { setUser } = useUser();
 
@@ -128,7 +130,7 @@ export default function Register() {
     <Container>
       <div className="bg-[#FCF9F6] flex justify-center items-center border-3 sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         <div className="w-107.5 h-180 bg-[#FCF9F6] flex flex-col items-center">
-          <h1 className="text-[24px] my-5">註冊</h1>
+          <h1 className="text-[26px] text-bold my-5">註冊</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col items-center mb-5"
@@ -238,9 +240,9 @@ export default function Register() {
             </div>
           </form>
         </div>
-        <div className="w-0 h-0 sm:w-150 sm:h-180 flex justify-center items-center">
+        <div className="w-0 h-0 lg:w-150 lg:h-180 flex justify-center items-center">
           <Image
-            className="object-contain object-bottom h-170"
+            className="object-contain object-bottom h-180 border-black border-l-2 border-dashed"
             src={registerAd}
             alt="廣告"
             width={600}
