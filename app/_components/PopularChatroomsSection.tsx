@@ -71,7 +71,7 @@ export default function PopularChatroomsSection() {
 				</div>
 
 				{/* Card Grid */}
-				<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+				<div className="grid grid-cols-2 gap-4 sm:gap-8 xl:grid-cols-4">
 					{loading || rooms.length === 0
 						? // Skeleton 載入骨架屏
 							Array.from({ length: 4 }).map((_, index) => (
@@ -117,7 +117,7 @@ export default function PopularChatroomsSection() {
 											<p className="text-sm text-slate-500 font-medium">
 												聊天室 #{room.id}
 											</p>
-											<h3 className="font-bold text-lg text-slate-900 line-clamp-2 group-hover:text-[#BB0015] transition-colors">
+											<h3 className="font-bold sm:text-lg text-slate-900 line-clamp-2 group-hover:text-[#BB0015] transition-colors">
 												{room.name}
 											</h3>
 										</div>
@@ -126,10 +126,10 @@ export default function PopularChatroomsSection() {
 									{/* 底部數據：收藏數 & 成員數 */}
 									<div className="px-5 pb-5 pt-2 flex items-center justify-between border-t border-slate-100 text-sm text-slate-600">
 										<div className="flex items-center gap-1">
-											<span className="text-[#BB0015] font-black text-lg">
+											<span className="text-[#BB0015] font-black text-lg flex items-center justify-center">
 												❤️ {room.favoriteCount || 0}
 											</span>
-											<span className="text-xs text-slate-400 ml-0.5">
+											<span className="flex items-center justify-center text-xs text-slate-400 ml-0.5">
 												人收藏
 											</span>
 										</div>

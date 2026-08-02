@@ -13,7 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Cookies from "js-cookie";
 import PageHeader from "@/app/_components/PageHeader";
 import { AiFillSafetyCertificate } from "react-icons/ai";
-
+import PasswordToggleIcon from "../../_components/PasswordToggleIcon";
 
 interface AccountInfo {
   email: string;
@@ -22,9 +22,12 @@ interface AccountInfo {
 }
 
 export default function Password() {
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+  const API_URL = `${BASE_URL}/user/api`;
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-const API_URL = `${BASE_URL}/user/api`;
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
 
   const { showAlert, closeAlert } = useAlert();
   const router = useRouter();
@@ -188,7 +191,7 @@ const API_URL = `${BASE_URL}/user/api`;
       <Left />
 
       {/* 主要內容區塊 */}
-      <div className="w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
+      <div className="w-full sm:w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
         {/* <h2 className="text-2xl font-bold mb-6 text-gray-800">
           帳號與安全設定
         </h2> */}
@@ -265,12 +268,12 @@ const API_URL = `${BASE_URL}/user/api`;
               <form onSubmit={handlePasswordSubmit} className="space-y-4">
                 {/* 僅在已有密碼時顯示舊密碼欄位 */}
                 {accountInfo.hasPassword && (
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       舊密碼
                     </label>
                     <input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       required
                       value={passwords.oldPassword}
                       onChange={(e) =>
@@ -279,16 +282,21 @@ const API_URL = `${BASE_URL}/user/api`;
                           oldPassword: e.target.value,
                         })
                       }
-                      className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border p-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <PasswordToggleIcon
+                      show={showPassword}
+                      onToggle={() => setShowPassword((prev) => !prev)}
+                      className="mt-6"
                     />
                   </div>
                 )}
-                <div>
+                <div className="relative">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     {accountInfo.hasPassword ? "新密碼" : "設定密碼"}
                   </label>
                   <input
-                    type="password"
+                    type={showPassword1 ? "text" : "password"}
                     required
                     value={passwords.newPassword}
                     onChange={(e) =>
@@ -297,15 +305,20 @@ const API_URL = `${BASE_URL}/user/api`;
                         newPassword: e.target.value,
                       })
                     }
-                    className="w-full border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border p-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                  <PasswordToggleIcon
+                      show={showPassword1}
+                      onToggle={() => setShowPassword1((prev) => !prev)}
+                      className="mt-6"
+                    />
                 </div>
-                <div>
+                <div className="relative">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     確認密碼
                   </label>
                   <input
-                    type="password"
+                    type={showPassword2 ? "text" : "password"}
                     required
                     value={passwords.confirmPassword}
                     onChange={(e) =>
@@ -314,14 +327,19 @@ const API_URL = `${BASE_URL}/user/api`;
                         confirmPassword: e.target.value,
                       })
                     }
-                    className="w-full border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border p-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                  <PasswordToggleIcon
+                      show={showPassword2}
+                      onToggle={() => setShowPassword2((prev) => !prev)}
+                      className="mt-6"
+                    />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     type="button"
                     onClick={() => setIsPasswordModalOpen(false)}
-                    // className=" px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md" 
+                    // className=" px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
                     className={`${button_cancel}`}
                   >
                     取消

@@ -79,9 +79,9 @@ export default function UserSidebar() {
                       unoptimized
                     />
                   </div>
-                  <div>
-                    <p>你好 {user?.nick_name || "訪客"}</p>
-                    <p>{user?.account || ""}</p>
+                  <div className="ml-2">
+                    <p className="mb-2">你好 {user?.nick_name || "訪客"}</p>
+                    <p className="text-[14px]">{user?.account || ""}</p>
                   </div>
                 </div>
 
