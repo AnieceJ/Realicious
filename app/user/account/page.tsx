@@ -45,8 +45,8 @@ const defaultValues: FullProfile = {
   birthday: "",
 };
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
 
 export default function ProfileForm() {
   const { user, setUser } = useUser();
@@ -175,7 +175,7 @@ export default function ProfileForm() {
   return (
     <Container className="bg-white flex-col sm:flex-row overflow-hidden">
       <Left></Left>
-      <div className="w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
+      <div className="w-full sm:w-[70%] h-180 p-4 overflow-y-auto no-scrollbar">
         <div className="relative flex justify-between">
           <div>
             <PageHeader

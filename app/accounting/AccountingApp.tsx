@@ -1,5 +1,8 @@
 "use client";
 
+import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import { getChickTalk } from "./chickTalk";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -9,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BudgetCalendar from "./BudgetCalendar";
+import SpendingPie from "./SpendingPie";
 import ChickGround, { groundClearance } from "./pixel/ChickGround";
 import AmbientBackground from "./pixel/AmbientBackground";
 import CoinBurst, { useCountUp } from "./pixel/CoinBurst";
@@ -71,6 +75,31 @@ const toKey = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
     d.getDate(),
   ).padStart(2, "0")}`;
+
+/* ============================================================
+   每月預算：存在瀏覽器 localStorage（不動後端 / 不動 DB）。
+   一個 key 存全部月份：realicious:budgets = {"2026-07":600,"2026-08":400}
+   ‧ 某個月有設定 → 用它；沒有 → 用後端傳來的 daily_budget 當預設值。
+   ‧ 改某個月的預算，只寫那個月 → 其他月份不受影響（＝只影響單月）。
+   （這是過渡做法：只存在這台瀏覽器。之後要做成後端版可再升級。） */
+const BUDGETS_LS_KEY = "realicious:budgets";
+function loadMonthBudgets(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(BUDGETS_LS_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, number>) : {};
+  } catch {
+    return {};
+  }
+}
+function saveMonthBudgets(map: Record<string, number>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(BUDGETS_LS_KEY, JSON.stringify(map));
+  } catch {
+    // localStorage 滿了或被禁用就算了，不影響主要功能
+  }
+}
 const keyToDate = (k: string) => {
   const [y, m, d] = k.split("-").map(Number);
   return new Date(y, m - 1, d);
@@ -162,7 +191,8 @@ let hp = HP_MAX;
 
 export default function AccountingApp({ pixel }: { pixel: string }) {
   const [txs, setTxs] = useState<Tx[]>([]);
-  const [budget, setBudget] = useState(500);
+  const [defaultBudget, setDefaultBudget] = useState(500); // 後端來的每日預算，當「預設值」
+  const [monthBudgets, setMonthBudgets] = useState<Record<string, number>>({}); // 每月覆寫（localStorage）
   const [petName, setPetName] = useState("米粒");
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState("米粒");
@@ -175,6 +205,30 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [calMonth, setCalMonth] = useState(new Date());
   const [loaded, setLoaded] = useState(false);
   const [selected, setSelected] = useState<Date>(new Date());
+
+  // 登入判斷：沒有 token 就踢去登入頁
+  // authOk: null=還在確認 / false=沒登入（先顯示提示燈箱再跳轉）/ true=放行
+  const router = useRouter();
+  const [authOk, setAuthOk] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    // Cookies.get 要在瀏覽器才讀得到（SSR 沒有 document），所以判斷放在 effect 裡。
+    if (!Cookies.get("token")) {
+      // 未登入：先讓畫面顯示「請先登入」的燈箱，停 1.5 秒讓使用者看清楚，
+      // 再導去登入頁 —— 不然畫面「啪」一下跳走，使用者根本不知道發生什麼事。
+      // 兩個 setState/導頁都包進 setTimeout callback，避開 React 19 同步 setState 警告。
+      const show = setTimeout(() => setAuthOk(false), 0);
+      const go = setTimeout(() => router.replace("/user/login"), 1500);
+      return () => {
+        clearTimeout(show);
+        clearTimeout(go);
+      };
+    }
+    // 有 token → 放行。用 setTimeout(…, 0) 讓 setState 下一輪才跑，
+    // 避開「effect 裡同步 setState 會連鎖 render」的警告，跟「久違回歸」那個 effect 同招。
+    const id = setTimeout(() => setAuthOk(true), 0);
+    return () => clearTimeout(id);
+  }, [router]);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const [burst, setBurst] = useState(0); // 每 +1 噴一次金幣
@@ -190,6 +244,19 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [pokeCount, setPokeCount] = useState(0);
   const [talk, setTalk] = useState<{ text: string; sub?: string } | null>(null);
 
+  // 完成提示 toast：操作成功後從畫面上方掉下來一條，2.2 秒自動消失。
+  // 做法跟小雞的 talk 氣泡同一套：state 存內容，計時器自動清掉。
+  // id 每次遞增 → 就算連續兩次同一句話，key 也會變 → 動畫會重播。
+  const [toast, setToast] = useState<{ id: number; msg: string } | null>(null);
+  const toastId = useRef(0);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showToast = (msg: string) => {
+    toastId.current += 1;
+    setToast({ id: toastId.current, msg });
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 2200);
+  };
+
   // 表單
   const [fType, setFType] = useState<"expense" | "income">("expense");
   const [fCat, setFCat] = useState("餐飲");
@@ -204,8 +271,9 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
       try {
         const [t, b, p] = await Promise.all([fetchTxs(), fetchBudget(), fetchPet()]);
         setTxs(t);
-        setBudget(b.budget);
+        setDefaultBudget(b.budget);
         setBudgetInput(String(b.budget));
+        setMonthBudgets(loadMonthBudgets()); // 讀出本機存的每月預算
         setJunkMode(b.junkMode);
         setPetName(p.petName);
         setNameInput(p.petName);
@@ -242,6 +310,13 @@ useEffect(() => {
   return () => clearTimeout(id);
 }, [talk]);
 
+// 元件卸載時，把還在跑的 toast 計時器收乾淨
+useEffect(() => {
+  return () => {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+  };
+}, []);
+
   // 換頭飾（擇一，再點同一個 = 脫下）
   const toggleHead = async (item: "bow" | "cap" | "crown") => {
     const next = equippedHead === item ? null : item;
@@ -249,6 +324,7 @@ useEffect(() => {
     setEquippedHead(next); // 先改畫面
     try {
       await savePet({ equippedHead: next });
+      showToast(next ? "幫小雞換好頭飾了" : "脫下頭飾了");
     } catch (e) {
       console.error("[lia] 換頭飾失敗", e);
       setEquippedHead(prev); // 失敗回復
@@ -262,6 +338,7 @@ useEffect(() => {
     setEquippedNeck(next);
     try {
       await savePet({ equippedNeck: next });
+      showToast(next ? "戴上圍巾了" : "脫下圍巾了");
     } catch (e) {
       console.error("[lia] 換圍巾失敗", e);
       setEquippedNeck(prev);
@@ -279,8 +356,12 @@ const saveName = async () => {
     setEditingName(false);
     try {
       await savePet({ petName: n });
+      showToast(`已改名為「${n}」`);
     } catch (e) {
-        console.error("[lia] 改名失敗", e);
+        // 名字被後端擋下來是「預期中的正常結果」（不是程式壞掉），
+        // 所以用 console.warn 而不是 console.error —— 後者會讓 Next.js 跳出
+        // 嚇人的紅色錯誤浮層。使用者的提示已經由下面的小雞對話泡泡負責。
+        console.warn("[lia] 改名被擋下或失敗：", e);
         setPetName(petName);
         setNameInput(petName);
         setTalk({ text: e instanceof Error ? e.message : "改名失敗了" });
@@ -309,6 +390,12 @@ const saveName = async () => {
   const monthIncome = monthTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
   const monthExpense = monthTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
   const balance = monthIncome - monthExpense;
+
+  // 「本日預算」看的是選到那一天所屬的月份。
+  // 那個月有自己設定就用它，否則用後端預設值 → 改某月不影響別月。
+  const budgetMonthKey = toKey(selected).slice(0, 7);
+  const budget = monthBudgets[budgetMonthKey] ?? defaultBudget;
+
   const pct = budget > 0 ? Math.min(100, (spent / budget) * 100) : 0;
   const over = spent > budget;
   const pokeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -343,15 +430,18 @@ const saveName = async () => {
   );
 
   const overDays = useMemo(() => {
+    // 每一天用「它自己那個月」的預算來判斷超支（沒設定就用預設值）
+    const budgetOfDay = (dayKey: string) =>
+      monthBudgets[dayKey.slice(0, 7)] ?? defaultBudget;
     const sum = new Map<string, number>();
     for (const t of txs) {
       if (t.type !== "expense") continue;
       sum.set(t.date, (sum.get(t.date) ?? 0) + t.amount);
     }
     return [...sum.entries()]
-      .filter(([, total]) => total > budget)
+      .filter(([key, total]) => total > budgetOfDay(key))
       .map(([key]) => keyToDate(key));
-  }, [txs, budget]);
+  }, [txs, monthBudgets, defaultBudget]);
 
   const catsOfType = Object.keys(CATS).filter((k) => CATS[k].type === fType);
 
@@ -381,6 +471,9 @@ const addTx = async () => {
       return;
     }
 
+    // editingId 這時還是原本的值（下面才 setEditingId(null)），可以用來判斷是新增還是編輯
+    showToast(editingId ? "已更新這筆記錄" : "已記帳，餵飽小雞了");
+
     setFAmt("");
     setFNote("");
     setShowAdd(false);
@@ -399,6 +492,7 @@ const addTx = async () => {
     setTxs((p) => p.filter((t) => t.id !== id)); // 先在畫面上拿掉，不要等
     try {
       await deleteTx(id);
+      showToast("已刪除這筆記錄");
     } catch (e) {
       console.error("[lia] 刪除失敗", e);
       setTxs(backup); // 失敗就放回去
@@ -415,6 +509,25 @@ const addTx = async () => {
     setSelected(keyToDate(tx.date));
     setShowAdd(true);
   };
+  // 還在確認登入 → 先不畫，避免閃一下
+  if (authOk === null) return null;
+
+  // 未登入 → 顯示提示燈箱；上面的 effect 會在 1.5 秒後把人導到登入頁。
+  // 規格跟其他 modal 一致：黑幕 + FCF9F6 卡片 + lightbox-pop 進場動畫（fx.css 已有）。
+  if (authOk === false) {
+    return (
+      <div className="fixed inset-0 z-[80] bg-black/60 grid place-items-center p-4">
+        <div className="lightbox-pop bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-6 w-full max-w-[320px] text-center">
+          <div className="text-[16px] font-black mb-2">還沒登入喔</div>
+          <p className="text-[12px] font-bold text-black/60 leading-relaxed">
+            記帳小雞要登入才能陪你，
+            <br />
+            正在帶你去登入頁…
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -428,6 +541,25 @@ const addTx = async () => {
         danger={1 - pet.hp / HP_MAX}
       />
       <CoinBurst fire={burst} originRef={stageRef} />
+
+      {/* ============ 完成提示 toast ============
+           操作成功後從上方掉下來一條，2.2 秒自動消失。
+           ★ 用 createPortal 掛到 document.body：因為頁面有些祖先元素帶 transform，
+             會讓 position:fixed「相對那個祖先」而不是視窗 → toast 置中會歪掉。
+             掛到 body 底下就脫離那些容器，fixed 乖乖相對視窗，置中永遠準。
+           toast-drop 動畫在 fx.css；key={toast.id} → 每次都重播進場。 */}
+      {toast &&
+        createPortal(
+          <div
+            key={toast.id}
+            role="status"
+            aria-live="polite"
+            className="toast-drop fixed top-14 inset-x-0 mx-auto w-fit z-[80] flex items-center gap-2 whitespace-nowrap bg-[#FFD45C] border-[3px] border-black shadow-[0_4px_0_#000] px-4 py-2.5 text-[13px] font-black"
+          >
+            <FontAwesomeIcon icon={faCheck} /> {toast.msg}
+          </div>,
+          document.body,
+        )}
 
 {onboarding.type === "tutorial" && !showAdd && !tutorialSkipped && (
   <TutorialSpotlight
@@ -515,7 +647,18 @@ const addTx = async () => {
         <section className={`lg:col-span-5 ${CARD} p-5`} aria-label="消費日曆">
           <BudgetCalendar
             selected={selected}
-            onSelect={(d) => d && setSelected(d)}
+            onSelect={(d) => {
+              if (!d) return;
+              setSelected(d);
+              // 若點到的是「外月」日期（例：畫面在 8 月，點了上排的 7/31），
+              // 月曆跟著跳到那個月 → 「看的月份」永遠等於「選到的月份」，不會對不上。
+              if (
+                d.getMonth() !== calMonth.getMonth() ||
+                d.getFullYear() !== calMonth.getFullYear()
+              ) {
+                setCalMonth(d);
+              }
+            }}
             spendDays={spendDays}
             incomeDays={incomeDays}
             month={calMonth}
@@ -573,7 +716,10 @@ const addTx = async () => {
               / ${budget.toLocaleString()}
             </span>
             <button
-              onClick={() => setShowBudget(true)}
+              onClick={() => {
+                setBudgetInput(String(budget)); // 預填這個月目前的預算
+                setShowBudget(true);
+              }}
               className="text-[12px] font-bold text-[#BB0015] underline underline-offset-2"
             >
               <FontAwesomeIcon icon={faPen} /> 設定
@@ -606,6 +752,10 @@ const addTx = async () => {
           )}
         </div>
 
+        {/* 本月分類圓餅圖（甜甜圈）。放在「本月結餘」上面：先給視覺總覽、再給精確數字。
+            monthTxs 已依 calMonth 過濾，跟本月結餘同一個月。 */}
+        <SpendingPie txs={monthTxs} />
+
         {/* 本月結餘 */}
         <div className="border-[3px] border-black bg-white p-3.5 mb-4">
           <div className="flex justify-between items-center">
@@ -623,7 +773,7 @@ const addTx = async () => {
             <span>支出 ${monthExpense.toLocaleString()}</span>
           </div>
         </div>
-        
+
         {/* 選到的日期 */}
         <div className="flex justify-between items-center mb-3 text-[13px] font-bold">
               <span>
@@ -656,7 +806,7 @@ const addTx = async () => {
                   {tx.category}
                 </span>
                 <span
-                  className={`${pixel} text-[12px] w-[86px] text-right shrink-0 ${
+                  className={`${pixel} text-[12px] min-w-[70px] text-right shrink-0 whitespace-nowrap ${
                     tx.type === "income" ? "text-black" : "text-[#BB0015]"
                   }`}
                 >
@@ -723,7 +873,7 @@ const addTx = async () => {
             >
               {catsOfType.map((k) => (
                 <option key={k} value={k}>
-                  <FontAwesomeIcon icon={CATS[k].icon} /> {k}
+                  {k}
                 </option>
               ))}
             </select>
@@ -781,7 +931,12 @@ const addTx = async () => {
             className="bg-[#FCF9F6] border-[3px] border-black shadow-[0_4px_0_#000] p-6 w-full max-w-[320px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-[16px] font-black mb-4">設定每日預算</h3>
+            <h3 className="text-[16px] font-black mb-1">
+              設定每日預算
+            </h3>
+            <p className="text-[11px] font-bold text-black/50 mb-4">
+              只會套用到 {budgetMonthKey} 這個月，其他月份不受影響
+            </p>
             <label className="block text-[12px] font-bold mb-1.5">金額 ($)</label>
             <input
               type="number"
@@ -801,10 +956,11 @@ const addTx = async () => {
                 onClick={() => {
               const n = Number(budgetInput);
                 if (n > 0) {
-                  setBudget(n);
-                  saveBudget({ budget: n }).catch((e) =>
-                    console.error("[lia] 預算儲存失敗", e),
-                  );
+                  // 只改「這個月」（budgetMonthKey），其他月份不動 → 只影響單月
+                  const next = { ...monthBudgets, [budgetMonthKey]: n };
+                  setMonthBudgets(next);
+                  saveMonthBudgets(next); // 寫進 localStorage
+                  showToast("這個月的預算已更新");
                 }
                   setShowBudget(false);
                   setJunkDismissed(false);
@@ -1020,4 +1176,3 @@ function Bar({
     </div>
   );
 }
-

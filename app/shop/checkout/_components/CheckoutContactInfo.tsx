@@ -5,8 +5,8 @@ import Cookies from "js-cookie";
 import { Check, Pencil } from "lucide-react";
 import type { OrderContact } from "@/lib/shop/orders";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
 
 interface FullProfile {
   first_name?: string;

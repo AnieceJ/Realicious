@@ -79,9 +79,9 @@ export default function UserSidebar() {
                       unoptimized
                     />
                   </div>
-                  <div>
-                    <p>你好 {user?.nick_name || "訪客"}</p>
-                    <p>{user?.account || ""}</p>
+                  <div className="ml-2">
+                    <p className="mb-2">你好 {user?.nick_name || "訪客"}</p>
+                    <p className="text-[14px]">{user?.account || ""}</p>
                   </div>
                 </div>
 
@@ -101,22 +101,6 @@ export default function UserSidebar() {
                   >
                     <AiFillSafetyCertificate />
                     <span className="ml-4">帳戶安全</span>
-                  </Link>
-                  <Link
-                    onClick={() => setIsOpening(false)}
-                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
-                    href={`/user/account/article`}
-                  >
-                    <FaBook />
-                    <span className="ml-4">我的文章</span>
-                  </Link>
-                  <Link
-                    onClick={() => setIsOpening(false)}
-                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
-                    href={`/user/account/saved-articles`}
-                  >
-                    <FaBookmark />
-                    <span className="ml-4">文章收藏</span>
                   </Link>
                   <Link
                     onClick={() => setIsOpening(false)}
@@ -141,6 +125,22 @@ export default function UserSidebar() {
                   >
                     <FaHeart />
                     <span className="ml-4">我的收藏</span>
+                  </Link>
+                   <Link
+                    onClick={() => setIsOpening(false)}
+                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
+                    href={`/user/account/article`}
+                  >
+                    <FaBook />
+                    <span className="ml-4">我的文章</span>
+                  </Link>
+                  <Link
+                    onClick={() => setIsOpening(false)}
+                    className="w-full h-12.5 text-left pl-8 cursor-pointer hover:bg-[#FBDF58] flex items-center"
+                    href={`/user/account/saved-articles`}
+                  >
+                    <FaBookmark />
+                    <span className="ml-4">文章收藏</span>
                   </Link>
                   <button
                     onClick={() => {

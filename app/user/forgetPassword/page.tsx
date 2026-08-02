@@ -18,8 +18,10 @@ import {
 import { FaUnlockKeyhole } from "react-icons/fa6";
 
 export default function ForgetPassword() {
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/user/api";
+
+  const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = `${BASE_URL}/user/api`;
+
   const router = useRouter();
   const { showAlert, closeAlert } = useAlert();
 
