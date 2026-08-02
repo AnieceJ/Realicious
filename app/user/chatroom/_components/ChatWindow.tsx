@@ -122,7 +122,7 @@ export default function ChatWindow({
   return (
     <div className="flex flex-1 flex-col h-dvh sm:h-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm relative">
       {/* Header */}
-      <div className="flex items-center justify-between border-b px-4 py-3 bg-slate-50/50 shrink-0">
+      <div className="fixed w-full sm:relative z-10 flex items-center justify-between border-b px-4 py-3 bg-white shrink-0">
         <div>
           <h3 className="font-bold text-sm text-slate-800">
             {currentRoom.name}
@@ -137,7 +137,7 @@ export default function ChatWindow({
       </div>
 
       {/* Messages 容器 */}
-      <div className="flex-1 h-dvh relative min-h-0 overflow-hidden flex flex-col">
+      <div className="flex-1 h-dvh relative min-h-0 overflow-hidden overflow-y-auto flex flex-col">
         <div
           ref={chatContainerRef}
           onScroll={handleScroll}
@@ -201,7 +201,7 @@ export default function ChatWindow({
 
       {/* Input */}
       <form
-        className="border-t p-2 fixed sm:relative flex w-full bottom-0 gap-2 bg-white shrink-0"
+        className="border-t p-2 relative flex w-full bottom-0 gap-2 bg-white shrink-0"
         onSubmit={handleSubmit}
       >
           <input
