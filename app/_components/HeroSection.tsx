@@ -6,48 +6,52 @@ import Link from "next/link";
 export default function Hero() {
 	return (
 		<section className="relative overflow-hidden bg-page-red">
-			{/* Hero 容器：满版宽度，flex 布局 */}
-			<div className="relative w-full h-190 flex items-center">
-				{/* 内层容器：限制文字内容在 1280px，左侧对齐 */}
-				<div className="mx-auto max-w-7xl w-full px-5 h-full flex items-center z-20">
-					{/* 左側文字內容區域 - 占據約 40-50% 寬度 */}
-					<div className="w-full md:w-1/2 lg:w-5/12 shrink-0">
-						<p className="font-pixel mb-4 tracking-0.45em font-bold text-yellow-300 text-sm md:text-xl">
-							REALICIOUS
-						</p>
+			<div className="relative flex h-190 w-full items-center md:h-190">
+				{/* 內容 */}
+				<div className="relative z-20 mx-auto flex h-full w-full max-w-7xl items-center px-5">
+					<div className="hero-copy flex h-full w-full flex-col justify-center md:w-1/2 lg:w-5/12">
+						{/* 上半部 */}
+						<div className="hero-title">
+							<p className="font-pixel mb-4 text-sm font-bold tracking-[0.45em] text-yellow-300 md:text-xl">
+								REALICIOUS
+							</p>
 
-						<h1 className="font-pixel text-4xl md:text-3xl lg:text-6xl font-black leading-tight text-white">
-							Taste More.
-							<br />
-							Spend Less.
-						</h1>
+							<h1 className="font-pixel text-4xl font-black leading-tight text-white md:text-5xl lg:text-6xl">
+								Taste More.
+								<br />
+								Spend Less.
+							</h1>
+						</div>
 
-						<p className="mt-8 text-base md:text-lg lg:text-xl leading-9 text-white/90">
-							探索真實食記、收藏優惠商品，
-							<br />
-							用記帳小雞管理你的每一餐。
-						</p>
+						{/* 下半部 */}
+						<div className="hero-bottom mt-8">
+							<p className="text-base leading-9 text-white/90 md:text-lg lg:text-xl">
+								探索真實食記、收藏優惠商品，
+								<br />
+								用記帳小雞管理你的每一餐。
+							</p>
 
-						<div className="mt-12 flex gap-3 md:gap-5 flex-wrap">
-							<Link
-								href="/article"
-								className="bg-white px-6 md:px-8 py-3 md:py-4 font-bold border-2 border-black text-page-red shadow-[4px_4px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] transition-all text-sm md:text-base"
-							>
-								開始探索
-							</Link>
+							<div className="mt-10 flex flex-wrap gap-3 md:gap-5">
+								<Link
+									href="/article"
+									className="border-2 border-black bg-white px-6 py-3 text-sm font-bold text-page-red shadow-[4px_4px_0px_0px_#000] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] md:px-8 md:py-4 md:text-base"
+								>
+									開始探索
+								</Link>
 
-							<Link
-								href="/shop"
-								className="bg-yellow-300 px-6 md:px-8 py-3 md:py-4 font-bold border-2 border-black text-black shadow-[4px_4px_0px_0px_#000] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] transition-all text-sm md:text-base"
-							>
-								前往商城
-							</Link>
+								<Link
+									href="/shop"
+									className="border-2 border-black bg-yellow-300 px-6 py-3 text-sm font-bold text-black shadow-[4px_4px_0px_0px_#000] transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_0px_#000] md:px-8 md:py-4 md:text-base"
+								>
+									前往商城
+								</Link>
+							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* Orbit 照片轉動區域 - 絕對定位，超出 hero 被裁切 */}
-				<div className="absolute inset-0 pointer-events-none overflow-hidden">
+				{/* Orbit */}
+				<div className="pointer-events-none absolute inset-0 overflow-hidden">
 					<div className="orbit">
 						<div className="orbit-inner">
 							<div className="plate plate-1">
@@ -58,7 +62,7 @@ export default function Hero() {
 										fill
 										priority
 										className="object-cover"
-										sizes="(max-width: 1024px) 320px, 600px"
+										sizes="(max-width:1024px) 320px,600px"
 									/>
 								</div>
 							</div>
@@ -71,7 +75,7 @@ export default function Hero() {
 										fill
 										priority
 										className="object-cover"
-										sizes="(max-width: 1024px) 320px, 600px"
+										sizes="(max-width:1024px) 320px,600px"
 									/>
 								</div>
 							</div>
@@ -84,7 +88,7 @@ export default function Hero() {
 										fill
 										priority
 										className="object-cover"
-										sizes="(max-width: 1024px) 320px, 600px"
+										sizes="(max-width:1024px) 320px,600px"
 									/>
 								</div>
 							</div>

@@ -75,6 +75,12 @@ export default function CustomEditor({
 							title: "Heading 2",
 							class: "ck-heading_heading2",
 						},
+						{
+							model: "heading3",
+							view: "h3",
+							title: "Heading 3",
+							class: "ck-heading_heading3",
+						},
 					],
 				},
 				link: {
@@ -92,7 +98,6 @@ export default function CustomEditor({
 					],
 				},
 				toolbar: {
-					// 窄螢幕時將按鈕換行，避免 CKEditor 的預設群組工具列撐出容器。
 					shouldNotGroupWhenFull: true,
 					items: [
 						"heading",
