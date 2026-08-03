@@ -567,7 +567,7 @@ const addTx = async () => {
       />
       <CoinBurst fire={burst} originRef={stageRef} />
 
-      <LoadingTransition />
+      {/* <LoadingTransition /> */}
 
 
       {/* ============ 完成提示 toast ============
