@@ -116,7 +116,7 @@ export default function UserSidebar() {
                     href={`/user/account/tickets`}
                   >
                     <FaTicketAlt />
-                    <span className="ml-4">我的票券</span>
+                    <span className="ml-4">票券中心</span>
                   </Link>
                   <Link
                     onClick={() => setIsOpening(false)}
@@ -124,7 +124,7 @@ export default function UserSidebar() {
                     href={`/user/account/favorites`}
                   >
                     <FaHeart />
-                    <span className="ml-4">我的收藏</span>
+                    <span className="ml-4">商品收藏</span>
                   </Link>
                    <Link
                     onClick={() => setIsOpening(false)}
