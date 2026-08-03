@@ -39,11 +39,11 @@ export default function SortDropdown({ value, onSort }: ProductSortProps) {
   };
 
   return (
-    <div ref={dropdownRef} className="relative inline-block text-left">
+    <div ref={dropdownRef} className="relative w-full text-left sm:w-44">
       {/* 排序主按鈕 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-44 px-4 py-2.5 whitespace-nowrap
+        className="flex w-full items-center justify-between px-4 py-2.5 whitespace-nowrap
                   bg-white text-[#3D2419] font-bold text-base
                   border-[3px] border-[#3D2419]
                   shadow-[4px_4px_0px_0px_#3D2419] 
@@ -64,7 +64,7 @@ export default function SortDropdown({ value, onSort }: ProductSortProps) {
       {/* 下拉選單本體：利用 isOpen 狀態控制顯示 */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-3 w-48 bg-white 
+          className="absolute left-0 right-0 mt-3 w-full bg-white sm:left-auto sm:w-48
                     border-[3px] border-[#3D2419] 
                     shadow-[6px_6px_0px_0px_#3D2419] z-50 
                     overflow-hidden animate-fadeIn"

@@ -301,18 +301,16 @@ export default function CheckoutContactInfo({
                 autoComplete="tel"
                 maxLength={16}
                 required
-                placeholder={getPlaceholder("phone", "手機號碼，例如 0912345678")}
+                placeholder={getPlaceholder("phone", "手機號碼")}
                 value={contact.phone}
                 onChange={(event) => handleChange("phone", event.target.value)}
                 onBlur={() => handleBlur("phone")}
                 aria-invalid={showError("phone")}
-                aria-describedby="checkout-contact-phone-error checkout-contact-phone-hint"
+                aria-describedby={showError("phone") ? "checkout-contact-phone-error" : undefined}
                 className={inputClassName("phone")}
               />
-              {showError("phone") ? (
+              {showError("phone") && (
                 <p id="checkout-contact-phone-error" className="mt-1 text-xs font-bold text-[#BB0015]">{errors.phone}</p>
-              ) : (
-                <p id="checkout-contact-phone-hint" className="mt-1 text-xs font-normal text-[#3D2419]/55">接受 0912345678 或 +886912345678</p>
               )}
             </label>
 

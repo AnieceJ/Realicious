@@ -64,7 +64,7 @@ export default function CartPage() {
   return (
     <div className="relative min-h-screen scroll-smooth">
       {confirmComponent}
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4">
         <div className="mb-6 pt-4">
           <Breadcrumbs items={[
             { label: "首頁", href: "/" },
