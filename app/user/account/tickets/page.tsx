@@ -51,7 +51,7 @@ export default function AccountTickets() {
     <Container className="shop-theme min-h-[calc(100dvh-5rem)] flex-col items-stretch overflow-visible bg-white md:flex-row md:overflow-hidden">
       <Left />
       <div className="no-scrollbar w-full min-w-0 px-4 pb-28 pt-4 md:h-[720px] md:flex-1 md:overflow-y-auto md:pb-4">
-        <PageHeader icon={<TicketIcon className="h-5 w-5" />} title="我的票券" />
+        <PageHeader icon={<TicketIcon className="h-5 w-5" />} title="票券中心" />
 
         {/* 篩選標籤 */}
         <div className="mb-6 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
