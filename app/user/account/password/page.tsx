@@ -249,7 +249,7 @@ export default function Password() {
             </div>
             <button
               onClick={handleToggleGoogleLink}
-              className={`-translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 ${
+              className={`text-sm -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 ${
                 accountInfo.isGoogleLinked ? button_cancel : button_submit
               }`}
             >

@@ -39,11 +39,17 @@ const API_URL = `${BASE_URL}/user/api`;
     handleSubmit,
     trigger,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(registerSchema),
     defaultValues: { account: "", password: "", verification: "", check: "" },
   });
+  const testA = () => {
+    setValue("account", "hua870320@gmail.com", { shouldValidate: true });
+    setValue("password", "qwe123", { shouldValidate: true });
+    setValue("check", "qwe123", { shouldValidate: true });
+  };
 
   // 處理email是否重複，是就發送驗證碼
 
@@ -130,7 +136,7 @@ const API_URL = `${BASE_URL}/user/api`;
     <Container>
       <div className="bg-[#FCF9F6] flex justify-center items-center border-3 sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         <div className="w-107.5 h-180 bg-[#FCF9F6] flex flex-col items-center">
-          <h1 className="text-[26px] text-bold my-5">註冊</h1>
+          <h1 onClick={testA} className="text-[26px] text-bold my-5">註冊</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="flex flex-col items-center mb-5"
