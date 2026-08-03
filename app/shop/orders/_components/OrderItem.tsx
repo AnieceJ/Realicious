@@ -5,6 +5,10 @@ import type { Order, OrderItem as OrderDetailItem } from "@/lib/shop/orders";
 import { getOrderDetail } from "@/lib/shop/orders";
 import PaymentMethodDialog from "../../_components/PaymentMethodDialog";
 
+function getOrderNumber(orderId: number) {
+  return `ORD-${String(orderId).padStart(6, "0")}`;
+}
+
 export default function OrderItem({ order }: { order: Order }) {
   const [expanded, setExpanded] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
@@ -19,6 +23,7 @@ export default function OrderItem({ order }: { order: Order }) {
   }, [expanded, order.id, items.length]);
 
   const date = new Date(order.created_at).toLocaleDateString("zh-TW");
+  const orderNumber = getOrderNumber(order.id);
 
   return (
     <div className="w-full mb-6">
@@ -26,7 +31,7 @@ export default function OrderItem({ order }: { order: Order }) {
         <div className="flex w-full flex-col items-stretch gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex w-full shrink-0 flex-col items-start gap-1.5 text-left xl:w-48">
             <div className="text-sm font-black tracking-wide">
-              ORDER ID: <span className="text-[#8C5230]">#{order.id}</span>
+              訂單編號：<span className="text-[#8C5230]">{orderNumber}</span>
             </div>
             <div className="text-xs text-[#3D2419]/50 font-medium">{date}</div>
             <div className={`mt-2 flex max-w-full items-center justify-center border-[3px] border-[#3D2419] px-3 py-1 text-xs font-black shadow-[2px_2px_0px_0px_#3D2419] sm:text-sm ${
@@ -46,10 +51,7 @@ export default function OrderItem({ order }: { order: Order }) {
 
           <div className="flex w-full min-w-0 flex-col items-stretch gap-4 text-left xl:flex-1 xl:flex-row xl:items-center xl:justify-end xl:gap-6 xl:pl-6 xl:text-right">
             <div className="flex min-w-0 flex-col items-start xl:items-end">
-              <h4 className="break-words text-lg font-black text-[#3D2419]">
-                訂單 #{order.id}
-              </h4>
-              <div className="text-lg font-black text-[#8C5230] mt-1">
+              <div className="text-lg font-black text-[#8C5230]">
                 總計金額：${Number(order.total_price).toLocaleString()}
               </div>
             </div>
