@@ -39,7 +39,7 @@ export default function AccountFavorites() {
   };
 
   return (
-    <Container className="shop-theme bg-white flex-col sm:flex-row overflow-hidden">
+    <Container className="shop-theme min-h-[calc(100dvh-5rem)] flex-col items-stretch overflow-visible bg-white md:flex-row md:overflow-hidden">
       {toastComponent}
       {pendingRemoval && (
         <ConfirmRemoveFavoriteDialog
@@ -49,13 +49,13 @@ export default function AccountFavorites() {
         />
       )}
       <Left />
-      <div className="w-full sm:w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
+      <div className="no-scrollbar w-full min-w-0 px-4 pb-28 pt-4 md:h-[720px] md:flex-1 md:overflow-y-auto md:pb-4">
         <PageHeader icon={<Heart className="h-5 w-5" />} title="我的收藏" />
 
         {favorites.length === 0 ? (
           <p className="text-center py-10 text-gray-500">尚未收藏任何商品</p>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {favorites.map((fav) => (
               <div key={fav.id} className="relative border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] bg-white overflow-hidden group">
                 <Link href={`/shop/products/${fav.product_id}`} className="block h-40 overflow-hidden">

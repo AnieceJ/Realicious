@@ -33,18 +33,18 @@ export default function AccountOrders() {
   }, [orders, activeFilter]);
 
   return (
-    <Container className="shop-theme bg-white flex-col sm:flex-row overflow-hidden">
+    <Container className="shop-theme min-h-[calc(100dvh-5rem)] flex-col items-stretch overflow-visible bg-white md:flex-row md:overflow-hidden">
       <Left />
-      <div className="w-full sm:w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
+      <div className="no-scrollbar w-full min-w-0 px-4 pb-28 pt-4 md:h-[720px] md:flex-1 md:overflow-y-auto md:pb-4">
         <PageHeader icon={<ClipboardList className="h-5 w-5" />} title="訂單紀錄" />
 
         {/* 篩選標籤 */}
-        <div className="flex flex-row gap-3 mb-6">
+        <div className="mb-6 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
           {FILTERS.map((f) => (
             <button
               key={f.key}
               onClick={() => setActiveFilter(f.key)}
-              className={`px-5 py-2 font-bold text-sm border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-all ${
+              className={`min-w-0 px-2 py-2 text-xs font-bold border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] cursor-pointer transition-all sm:px-5 sm:text-sm ${
                 activeFilter === f.key
                   ? "bg-[#89502E] text-white"
                   : "bg-[#FCF9F6] text-[#3D2419] hover:bg-[#FBDF58]"
