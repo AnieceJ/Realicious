@@ -128,14 +128,6 @@ export default function Login() {
       <div className="bg-[#FCF9F6] flex justify-center items-center border-3 sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         {/* 廣告 */}
         <div className="w-0 h-0 lg:w-150 lg:h-180 flex justify-center items-center overflow-hidden">
-          {/* <Image
-            className=" object-contain object-bottom h-180"
-            src={loginAd}
-            alt="廣告"
-            width={600}
-            height={720}
-            priority
-          /> */}
           <Banner/>
         </div>
 
@@ -194,7 +186,7 @@ export default function Login() {
               <div className="">
               </div>
               <Link
-                className=" text-[16px] text-center h-6 align-middle w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
+                className=" text-[16px] text-center h-6 align-middle w-28 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
               href={`/user/forgetPassword`}
               >
                 忘記密碼

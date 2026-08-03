@@ -50,7 +50,7 @@ export default function AccountFavorites() {
       )}
       <Left />
       <div className="no-scrollbar w-full min-w-0 px-4 pb-28 pt-4 md:h-[720px] md:flex-1 md:overflow-y-auto md:pb-4">
-        <PageHeader icon={<Heart className="h-5 w-5" />} title="我的收藏" />
+        <PageHeader icon={<Heart className="h-5 w-5" />} title="商品收藏" />
 
         {favorites.length === 0 ? (
           <p className="text-center py-10 text-gray-500">尚未收藏任何商品</p>

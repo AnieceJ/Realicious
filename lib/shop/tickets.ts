@@ -19,6 +19,17 @@ export type Ticket = {
   product_img: string | null;
 };
 
+export function isTicketExpired(ticket: Ticket, now = Date.now()) {
+  if (ticket.status === 3) return true;
+  return ticket.status === 1 && Boolean(
+    ticket.expires_at && new Date(ticket.expires_at).getTime() < now,
+  );
+}
+
+export function isTicketUsable(ticket: Ticket, now = Date.now()) {
+  return ticket.status === 1 && !isTicketExpired(ticket, now);
+}
+
 export async function getTickets(userId: number) {
   const res = await fetch(`${API_BASE}/tickets?user_id=${userId}`);
   return res.json();

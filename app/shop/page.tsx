@@ -115,15 +115,17 @@ export default function ShopPage() {
   }, [loadMore]);
 
   return (
-    <div className="relative min-h-screen p-4">
+    <div className="relative min-h-screen px-3 py-4 sm:p-4">
       <div className="max-w-7xl mx-auto">
         {/* 頂層：麵包屑 + 搜尋 + 排序 + 篩選 */}
-        <div className="flex flex-wrap items-center gap-3 mb-4">
-          <Breadcrumbs items={[{ label: "首頁", href: "/" }, { label: "商品列表" }]} />
-          <div className="flex-1 min-w-[200px]">
-            <Searchbar value={keyword} onSearch={(kw) => setKeyword(kw)} />
+        <div className="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center">
+          <div className="hidden shrink-0 lg:block">
+            <Breadcrumbs items={[{ label: "首頁", href: "/" }, { label: "商品列表" }]} />
           </div>
-          <Sort value={sortId} onSort={setSortId} />
+          <div className="grid min-w-0 flex-1 grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_11rem]">
+            <Searchbar value={keyword} onSearch={(kw) => setKeyword(kw)} />
+            <Sort value={sortId} onSort={setSortId} />
+          </div>
         </div>
 
         {/* 標籤 + 價格列 */}

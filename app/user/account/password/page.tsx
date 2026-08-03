@@ -187,7 +187,7 @@ export default function Password() {
   if (loading) return <div className="p-6">帳號資料載入中...</div>;
 
   return (
-    <Container className="bg-white flex-col sm:flex-row overflow-hidden">
+    <Container className="bg-white h-dvh sm:h-full flex-col sm:flex-row overflow-hidden">
       <Left />
 
       {/* 主要內容區塊 */}

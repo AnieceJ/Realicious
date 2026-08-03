@@ -18,8 +18,8 @@ export default function Left() {
     { name: "個人資料", path: "/user/account", icon: FaUser },
     { name: "帳戶安全", path: "/user/account/password", icon: AiFillSafetyCertificate },
     { name: "訂單紀錄", path: "/user/account/orders", icon: FaClipboardList },
-    { name: "我的票券", path: "/user/account/tickets", icon: FaTicketAlt },
-    { name: "我的收藏", path: "/user/account/favorites", icon: FaHeart },
+    { name: "票券中心", path: "/user/account/tickets", icon: FaTicketAlt },
+    { name: "商品收藏", path: "/user/account/favorites", icon: FaHeart },
     { name: "我的文章", path: "/user/account/article", icon: FaBook },
     { name: "文章收藏", path: "/user/account/saved-articles", icon: FaBookmark },
   ];

@@ -69,12 +69,12 @@ export default function FeaturedProductSection({
   return (
     <>
       {toastComponent}
-      <div className="flex flex-row w-full h-72 bg-black border-[.1875rem] border-[#3D2419] shadow-[.25rem_.25rem_0rem_0rem_#3D2419] select-none overflow-hidden"
+      <div className="flex h-auto w-full select-none flex-col overflow-hidden border-[.1875rem] border-[#3D2419] bg-black shadow-[.25rem_.25rem_0rem_0rem_#3D2419] sm:h-80 sm:flex-row lg:h-72"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
         {/* 左側：圖片輪播 */}
-        <div className="relative h-full w-1/2 overflow-hidden border-[5px] border-black group">
+        <div className="group relative h-52 w-full overflow-hidden border-4 border-black sm:h-full sm:w-1/2 sm:border-[5px]">
           {/* 圖層容器 */}
           <div className="flex h-full transition-transform duration-400 ease-in-out"
             style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -93,12 +93,12 @@ export default function FeaturedProductSection({
           </div>
 
           {/* 左右箭頭 */}
-          <div className="absolute left-0 top-0 bottom-0 w-16 z-30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute bottom-0 left-0 top-0 z-30 flex w-14 items-center justify-center opacity-100 transition-opacity sm:w-16 sm:opacity-0 sm:group-hover:opacity-100">
             <button onClick={(e) => { e.stopPropagation(); handlePrev(); }}
               className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl border-[.125rem] border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] hover:bg-[#ffbe94] active:translate-x-[.125rem] active:translate-y-[.125rem] active:shadow-none transition-all cursor-pointer"
             >◀</button>
           </div>
-          <div className="absolute right-0 top-0 bottom-0 w-16 z-20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute bottom-0 right-0 top-0 z-20 flex w-14 items-center justify-center opacity-100 transition-opacity sm:w-16 sm:opacity-0 sm:group-hover:opacity-100">
             <button onClick={(e) => { e.stopPropagation(); handleNext(); }}
               className="w-10 h-10 flex items-center justify-center bg-[#FFD3B6] text-[#3D2419] font-black text-xl border-[.125rem] border-[#3D2419] shadow-[.125rem_.125rem_0rem_0rem_#3D2419] hover:bg-[#ffbe94] active:translate-x-[.125rem] active:translate-y-[.125rem] active:shadow-none transition-all cursor-pointer"
             >▶</button>
@@ -115,17 +115,17 @@ export default function FeaturedProductSection({
         </div>
 
         {/* 右側：商品資訊 */}
-        <div className="flex w-1/2 flex-col justify-center bg-black px-6 py-4">
+        <div className="flex min-h-52 w-full flex-col justify-center bg-black px-4 py-4 sm:h-full sm:min-h-0 sm:w-1/2 sm:px-5 lg:px-6">
           <span className="mb-3 inline-block w-fit border border-white bg-[#BB0015] px-2 py-0.5 text-xs text-white">
             {soldOut ? "暫時售完" : "今日主打"}
           </span>
-          <h3 className="mb-2 text-xl font-black text-white">
+          <h3 className="mb-2 line-clamp-2 text-lg font-black text-white sm:text-xl">
             {currentProduct.name}
           </h3>
           <p className="mb-4 line-clamp-2 text-sm font-medium text-white/75">
             限時特惠主打商品！【{currentProduct.name}】現正熱賣中。
           </p>
-          <div className="flex items-center gap-2 mt-auto">
+          <div className="mt-auto flex flex-wrap items-center gap-2">
             <span className="inline-flex h-9 items-center bg-[#FFF0B8] px-3 text-base font-black text-[#BB0015]">
               ${currentProduct.price}
             </span>
