@@ -6,6 +6,7 @@ import {
   isTicketUsable,
   type Ticket,
 } from "@/lib/shop/tickets";
+import { formatOrderNumber } from "@/lib/shop/order-number";
 
 const TYPE_LABEL: Record<string, string> = {
   product: "商品兌換",
@@ -18,10 +19,6 @@ const FALLBACK_IMAGE = `${API_BASE}/images/optimized/吃到飽.webp`;
 
 function getImageUrl(imagePath: string) {
   return imagePath.startsWith("http") ? imagePath : `${API_BASE}${imagePath}`;
-}
-
-function getOrderNumber(orderId: number) {
-  return `ORD-${String(orderId).padStart(6, "0")}`;
 }
 
 export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRefresh?: () => void }) {
@@ -66,7 +63,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
                   <div className="whitespace-nowrap text-sm font-black">
                     {ticket.order_id ? (
                       <>
-                        訂單編號：<span className="text-[#8C5230]">{getOrderNumber(ticket.order_id)}</span>
+                        訂單編號：<span className="text-[#8C5230]">{formatOrderNumber(ticket.order_id)}</span>
                       </>
                     ) : (
                       <>
@@ -131,7 +128,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
               {ticket.product_name || ticket.name}
             </h3>
             <p className="text-xs text-gray-500 text-center mb-4">
-              {TYPE_LABEL[ticket.type]} · {ticket.order_id ? getOrderNumber(ticket.order_id) : "活動贈送"}
+              {TYPE_LABEL[ticket.type]} · {ticket.order_id ? formatOrderNumber(ticket.order_id) : "活動贈送"}
             </p>
             <div className="flex justify-center mb-4">
               <div className="border-[3px] border-[#3D2419] p-2 sm:p-3">
