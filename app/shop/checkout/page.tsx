@@ -15,6 +15,7 @@ import {
 } from "@/lib/shop/orders";
 import { useUser } from "@/app/context/user";
 import PaymentMethodDialog from "../_components/PaymentMethodDialog";
+import { useToast } from "@/app/context/toast";
 
 const EMPTY: CartItem[] = [];
 let cached = EMPTY;
@@ -52,6 +53,7 @@ function getServerSnapshot() {
 export default function CheckoutPage() {
   const router = useRouter();
   const { user, loading } = useUser();
+  const { showToast } = useToast();
   const items = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const [showPayment, setShowPayment] = useState(false);
   const [contact, setContact] = useState<OrderContact>({
@@ -63,6 +65,7 @@ export default function CheckoutPage() {
     address: "",
   });
   const [contactValidationRequest, setContactValidationRequest] = useState(0);
+  const [contactIsEditing, setContactIsEditing] = useState(false);
 
   useEffect(() => {
     if (!loading && !user?.id) {
@@ -71,6 +74,12 @@ export default function CheckoutPage() {
   }, [loading, router, user?.id]);
 
   const createPendingOrder = async (): Promise<number | null> => {
+    if (contactIsEditing) {
+      showToast("請先完成聯絡資訊修改");
+      setShowPayment(false);
+      return null;
+    }
+
     if (Object.keys(validateOrderContact(contact)).length > 0) {
       setContactValidationRequest((value) => value + 1);
       setShowPayment(false);
@@ -87,6 +96,16 @@ export default function CheckoutPage() {
   };
 
   const handleCheckout = () => {
+    if (contactIsEditing) {
+      showToast("請先完成聯絡資訊修改");
+      requestAnimationFrame(() => {
+        document
+          .getElementById("checkout-contact-info")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      return;
+    }
+
     if (Object.keys(validateOrderContact(contact)).length > 0) {
       setContactValidationRequest((value) => value + 1);
       requestAnimationFrame(() => {
@@ -144,6 +163,7 @@ export default function CheckoutPage() {
               <CheckoutContactInfo
                 defaultEmail={user?.account}
                 onContactChange={setContact}
+                onEditingChange={setContactIsEditing}
                 validationRequest={contactValidationRequest}
               />
             </div>
@@ -152,7 +172,11 @@ export default function CheckoutPage() {
             </div>
           </div>
           <div className="w-full self-start lg:sticky lg:top-[76px] lg:w-[40%]">
-            <CheckoutSummary items={items} onCheckout={handleCheckout} />
+            <CheckoutSummary
+              items={items}
+              onCheckout={handleCheckout}
+              contactIsEditing={contactIsEditing}
+            />
           </div>
         </div>
       </div>

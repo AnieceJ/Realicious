@@ -3,11 +3,20 @@ import React, { useEffect, useState } from "react";
 import type { CartItem } from "@/lib/shop/cart";
 import TicketPolicyDialog from "./TicketPolicyDialog";
 
-export default function CheckoutSummary({ items, onCheckout }: { items: CartItem[]; onCheckout: () => void }) {
+export default function CheckoutSummary({
+  items,
+  onCheckout,
+  contactIsEditing = false,
+}: {
+  items: CartItem[];
+  onCheckout: () => void;
+  contactIsEditing?: boolean;
+}) {
   const [agreed, setAgreed] = useState(false);
   const [hint, setHint] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
   const subtotal = (items || []).reduce((sum, item) => sum + item.price * item.qty, 0);
+  const canCheckout = agreed && !contactIsEditing;
 
   useEffect(() => {
     if (hint) {
@@ -82,12 +91,12 @@ export default function CheckoutSummary({ items, onCheckout }: { items: CartItem
         </div>
         <div
           onClick={handleCheckout}
-          className={`flex items-center justify-center w-full px-4 py-2.5 mt-8 bg-[#89502E] text-[#FFFFFF] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] transition-all ${agreed ? "cursor-pointer hover:bg-[#a06040] active:translate-x-[2px] active:translate-y-[2px]" : "opacity-50 cursor-not-allowed"}`}
+          className={`flex items-center justify-center w-full px-4 py-2.5 mt-8 bg-[#89502E] text-[#FFFFFF] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] transition-all ${canCheckout ? "cursor-pointer hover:bg-[#a06040] active:translate-x-[2px] active:translate-y-[2px]" : "opacity-50 cursor-not-allowed"}`}
         >
           <span className="text-2xl sm:text-3xl">確認結帳</span>
         </div>
-        <div className={`flex justify-center transition-opacity ${agreed ? "opacity-100" : "opacity-40"}`}>
-          <span>*點擊後將開始進行支付</span>
+        <div className={`flex justify-center text-center transition-opacity ${canCheckout ? "opacity-100" : "opacity-50"}`}>
+          <span>{contactIsEditing ? "*請先完成聯絡資訊修改" : "*點擊後將開始進行支付"}</span>
         </div>
       </div>
       {showPolicy && (

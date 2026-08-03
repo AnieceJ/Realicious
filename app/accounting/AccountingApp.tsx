@@ -1,6 +1,5 @@
 "use client";
 
-import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import { getChickTalk } from "./chickTalk";
@@ -30,6 +29,7 @@ import {
 } from "./api";
 import { getOnboardingState } from "./onboarding";
 import TutorialSpotlight from "./pixel/TutorialSpotlight";
+import { useToast } from "@/app/context/toast";
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
    白 #FFFFFF ｜ 卡片/次要 #FCF9F6 ｜ 輸入框 #E3E3E3
@@ -201,6 +201,7 @@ let hp = HP_MAX;
 }
 
 export default function AccountingApp({ pixel }: { pixel: string }) {
+  const { showToast } = useToast();
   const [txs, setTxs] = useState<Tx[]>([]);
   const [defaultBudget, setDefaultBudget] = useState(500); // 後端來的每日預算，當「預設值」
   const [monthBudgets, setMonthBudgets] = useState<Record<string, number>>({}); // 每月覆寫（localStorage）
@@ -255,19 +256,6 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
   const [pokeCount, setPokeCount] = useState(0);
   const [talk, setTalk] = useState<{ text: string; sub?: string } | null>(null);
 
-  // 完成提示 toast：操作成功後從畫面上方掉下來一條，2.2 秒自動消失。
-  // 做法跟小雞的 talk 氣泡同一套：state 存內容，計時器自動清掉。
-  // id 每次遞增 → 就算連續兩次同一句話，key 也會變 → 動畫會重播。
-  const [toast, setToast] = useState<{ id: number; msg: string } | null>(null);
-  const toastId = useRef(0);
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const showToast = (msg: string) => {
-    toastId.current += 1;
-    setToast({ id: toastId.current, msg });
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 2200);
-  };
-
   // 表單
   const [fType, setFType] = useState<"expense" | "income">("expense");
   const [fCat, setFCat] = useState("餐飲");
@@ -320,13 +308,6 @@ useEffect(() => {
   const id = setTimeout(() => setTalk(null), 3500);
   return () => clearTimeout(id);
 }, [talk]);
-
-// 元件卸載時，把還在跑的 toast 計時器收乾淨
-useEffect(() => {
-  return () => {
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-  };
-}, []);
 
   // 換頭飾（擇一，再點同一個 = 脫下）
   const toggleHead = async (item: "bow" | "cap" | "crown") => {
@@ -563,25 +544,6 @@ const addTx = async () => {
         danger={1 - pet.hp / HP_MAX}
       />
       <CoinBurst fire={burst} originRef={stageRef} />
-
-      {/* ============ 完成提示 toast ============
-           操作成功後從上方掉下來一條，2.2 秒自動消失。
-           ★ 用 createPortal 掛到 document.body：因為頁面有些祖先元素帶 transform，
-             會讓 position:fixed「相對那個祖先」而不是視窗 → toast 置中會歪掉。
-             掛到 body 底下就脫離那些容器，fixed 乖乖相對視窗，置中永遠準。
-           toast-drop 動畫在 fx.css；key={toast.id} → 每次都重播進場。 */}
-      {toast &&
-        createPortal(
-          <div
-            key={toast.id}
-            role="status"
-            aria-live="polite"
-            className="toast-drop fixed top-14 inset-x-0 mx-auto w-fit z-[80] flex items-center gap-2 whitespace-nowrap bg-[#FFD45C] border-[3px] border-black shadow-[0_4px_0_#000] px-4 py-2.5 text-[13px] font-black"
-          >
-            <FontAwesomeIcon icon={faCheck} /> {toast.msg}
-          </div>,
-          document.body,
-        )}
 
 {onboarding.type === "tutorial" && !showAdd && !tutorialSkipped && (
   <TutorialSpotlight

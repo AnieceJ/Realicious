@@ -7,7 +7,7 @@ import { useToast } from "./Toast";
 export default function Favorite({ productId, initialFavorited = false }: { productId: number; initialFavorited?: boolean }) {
   const { user } = useUser();
   const [favorited, setFavorited] = useState(initialFavorited);
-  const { toastComponent, showToast } = useToast();
+  const { showToast } = useToast();
 
   const toggle = async () => {
     if (!user?.id) {
@@ -15,18 +15,31 @@ export default function Favorite({ productId, initialFavorited = false }: { prod
       return;
     }
     const userId = Number(user.id);
-    if (favorited) {
-      await removeFavorite(userId, productId);
-      setFavorited(false);
-    } else {
-      await addFavorite(userId, productId);
-      setFavorited(true);
+    try {
+      if (favorited) {
+        const result = await removeFavorite(userId, productId);
+        if (!result.success) {
+          showToast(result.message || "取消收藏失敗，請稍後再試");
+          return;
+        }
+        setFavorited(false);
+        showToast("已從商品收藏移除");
+      } else {
+        const result = await addFavorite(userId, productId);
+        if (!result.success) {
+          showToast(result.message || "加入收藏失敗，請稍後再試");
+          return;
+        }
+        setFavorited(true);
+        showToast("已加入商品收藏");
+      }
+    } catch {
+      showToast("收藏操作失敗，請稍後再試");
     }
   };
 
   return (
     <>
-      {toastComponent}
       <button
         type="button"
         onClick={toggle}

@@ -15,7 +15,7 @@ export default function AccountFavorites() {
   const { user } = useUser();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [pendingRemoval, setPendingRemoval] = useState<Favorite | null>(null);
-  const { toastComponent, showToast } = useToast();
+  const { showToast } = useToast();
 
   const fetchFavorites = () => {
     if (!user?.id) return;
@@ -40,7 +40,6 @@ export default function AccountFavorites() {
 
   return (
     <Container className="shop-theme min-h-[calc(100dvh-5rem)] flex-col items-stretch overflow-visible bg-white md:flex-row md:overflow-hidden">
-      {toastComponent}
       {pendingRemoval && (
         <ConfirmRemoveFavoriteDialog
           productName={pendingRemoval.product_name}

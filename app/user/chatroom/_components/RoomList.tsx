@@ -38,11 +38,10 @@ export default function RoomList({
   classroom
 }: RoomListProps) {
   const { showAlert } = useAlert();
-  const { showToast,toastComponent } = useToast()
+  const { showToast } = useToast()
 
   return (
     <div className={`${classroom} w-full sm:w-750 sm:flex flex-[1.4] flex-col border-gray-600 bg-white/0 sm:bg-slate-50/50 p-2.5 md:p-5 min-h-0`}>
-      {toastComponent}
       {/* 大廳 Header */}
       <div className="mb-2 md:mb-4 flex items-center justify-between gap-1">
         <div>

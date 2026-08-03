@@ -82,7 +82,7 @@ export default function SavedArticlesPage() {
 		string | null
 	>(null);
 	const [reloadKey, setReloadKey] = React.useState(0);
-	const { toastComponent, showToast } = useToast();
+	const { showToast } = useToast();
 
 	const filteredArticles = React.useMemo(() => {
 		const normalizedKeyword = keyword.trim().toLowerCase();
@@ -200,7 +200,6 @@ export default function SavedArticlesPage() {
 
 	return (
 		<>
-			{toastComponent}
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
 				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">

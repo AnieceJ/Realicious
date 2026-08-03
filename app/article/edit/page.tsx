@@ -24,7 +24,7 @@ interface CategoriesResponse {
 export default function ArticleEditPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const { toastComponent, showToast } = useToast();
+	const { showToast } = useToast();
 
 	const articleId = searchParams.get("id");
 	const isEditMode = Boolean(articleId);
@@ -169,7 +169,6 @@ export default function ArticleEditPage() {
 
 	return (
 		<main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">
-			{toastComponent}
 			<AmbientBackground />
 
 			<div className="relative border-4 border-black bg-white shadow-[6px_6px_0px_-1px_#000]">

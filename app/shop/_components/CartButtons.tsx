@@ -8,12 +8,11 @@ type CartButtonsProps = {
 };
 
 export default function CartButtons({ product, qty }: CartButtonsProps) {
-  const { toastComponent, showToast } = useToast();
+  const { showToast } = useToast();
   const soldOut = product.stock_qty <= 0;
 
   return (
     <>
-      {toastComponent}
       <button
         type="button"
         disabled={soldOut}

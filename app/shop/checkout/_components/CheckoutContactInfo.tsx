@@ -6,6 +6,7 @@ import { Check, Pencil } from "lucide-react";
 import { cities, districts } from "use-tw-zipcode";
 import {
   formatOrderAddress,
+  normalizeTaiwanMobile,
   type OrderContact,
   validateOrderContact,
 } from "@/lib/shop/orders";
@@ -70,10 +71,12 @@ function fillBlankFieldsFromProfile(
 export default function CheckoutContactInfo({
   defaultEmail = "",
   onContactChange,
+  onEditingChange,
   validationRequest = 0,
 }: {
   defaultEmail?: string;
   onContactChange?: (contact: OrderContact) => void;
+  onEditingChange?: (isEditing: boolean) => void;
   validationRequest?: number;
 }) {
   const initialContact: OrderContact = {
@@ -103,6 +106,10 @@ export default function CheckoutContactInfo({
   }, [contact, onContactChange]);
 
   useEffect(() => {
+    onEditingChange?.(isEditing);
+  }, [isEditing, onEditingChange]);
+
+  useEffect(() => {
     const fetchProfile = async () => {
       const token = Cookies.get("token");
       if (!token) return;
@@ -121,7 +128,9 @@ export default function CheckoutContactInfo({
         const nextProfileContact: OrderContact = {
           name: profileName,
           email: profile.email || profile.account || defaultEmail,
-          phone: profile.phone || "",
+          phone: normalizeTaiwanMobile(profile.phone || "")
+            .replace(/\D/g, "")
+            .slice(0, 10),
           city: profile.city || "",
           district: profile.district || "",
           address: profile.address || "",
@@ -144,6 +153,10 @@ export default function CheckoutContactInfo({
       ...currentContact,
       [field]: value,
     }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    handleChange("phone", value.replace(/\D/g, "").slice(0, 10));
   };
 
   const handleCityChange = (value: string) => {
@@ -297,13 +310,14 @@ export default function CheckoutContactInfo({
               <input
                 id="checkout-contact-phone"
                 type="tel"
-                inputMode="tel"
+                inputMode="numeric"
                 autoComplete="tel"
-                maxLength={16}
+                maxLength={10}
+                pattern="[0-9]*"
                 required
                 placeholder={getPlaceholder("phone", "手機號碼")}
                 value={contact.phone}
-                onChange={(event) => handleChange("phone", event.target.value)}
+                onChange={(event) => handlePhoneChange(event.target.value)}
                 onBlur={() => handleBlur("phone")}
                 aria-invalid={showError("phone")}
                 aria-describedby={showError("phone") ? "checkout-contact-phone-error" : undefined}
@@ -377,11 +391,17 @@ export default function CheckoutContactInfo({
                 onChange={(event) => handleChange("address", event.target.value)}
                 onBlur={() => handleBlur("address")}
                 aria-invalid={showError("address")}
-                aria-describedby="checkout-contact-address-error"
+                aria-describedby={showError("address")
+                  ? "checkout-contact-address-error"
+                  : "checkout-contact-address-hint"}
                 className={inputClassName("address")}
               />
-              {showError("address") && (
+              {showError("address") ? (
                 <p id="checkout-contact-address-error" className="mt-1 text-xs font-bold text-[#BB0015]">{errors.address}</p>
+              ) : (
+                <p id="checkout-contact-address-hint" className="mt-1 text-xs font-normal text-[#3D2419]/55">
+                  請填寫路名、巷弄、門牌或樓層，至少 5 個字元
+                </p>
               )}
             </label>
           </div>

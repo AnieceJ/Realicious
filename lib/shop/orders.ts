@@ -15,7 +15,7 @@ export type OrderContactErrors = Partial<Record<keyof OrderContact, string>>;
 
 const NAME_PATTERN = /^[\p{L}\p{M}][\p{L}\p{M} .·・'’\-]*$/u;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const TAIWAN_MOBILE_PATTERN = /^(?:09\d{8}|\+8869\d{8})$/;
+const TAIWAN_MOBILE_PATTERN = /^09\d{8}$/;
 
 export function normalizeTaiwanMobile(phone: string) {
   const compactPhone = phone.trim().replace(/[\s-]/g, "");
@@ -48,16 +48,22 @@ export function validateOrderContact(contact: OrderContact): OrderContactErrors 
   if (!phone) {
     errors.phone = "請填寫手機號碼";
   } else if (!TAIWAN_MOBILE_PATTERN.test(phone)) {
-    errors.phone = "請輸入 09 開頭的 10 碼手機號碼，或 +886 格式";
+    errors.phone = "請輸入 09 開頭的 10 碼手機號碼";
   }
 
   if (!contact.city.trim()) errors.city = "請選擇縣市";
   if (!contact.district.trim()) errors.district = "請選擇鄉鎮區";
 
   const address = contact.address.trim();
+  const addressLength = Array.from(address).length;
+  const containsLetter = /\p{L}/u.test(address);
   if (!address) {
     errors.address = "請填寫詳細地址";
-  } else if (address.length > 100) {
+  } else if (addressLength < 5) {
+    errors.address = "詳細地址至少需要 5 個字元";
+  } else if (!containsLetter) {
+    errors.address = "詳細地址需包含路名或地名，不能只有數字";
+  } else if (addressLength > 100) {
     errors.address = "詳細地址請勿超過 100 個字元";
   }
 
