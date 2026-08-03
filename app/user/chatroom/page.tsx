@@ -46,7 +46,7 @@ export default function Chatroom() {
   return (
     <Container className=" py-0 sm:py-2 md:py-6 overflow-x-auto">
       <div
-        className={` bg-white/50 flex flex-col w-screen sm:flex-row h-dvh sm: sm:min-w-[640px] xl:h-[600px] 2xl:h-[750px] gap-2 md:gap-6 border-3 border-gray-500`}
+        className={`bg-white/0 sm:bg-white/50 flex flex-col w-screen sm:flex-row h-dvh sm: sm:min-w-[640px] xl:h-[600px] 2xl:h-[750px] gap-2 md:gap-6 sm:border-3 sm:border-gray-500`}
       >
         {/* 左側：大廳 */}
           <RoomList
