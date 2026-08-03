@@ -21,7 +21,7 @@ export default function PasswordToggleIcon({
     <button
       type="button" // ⚠️ 必須寫 type="button"，防止觸發 form submit
       onClick={onToggle}
-      className={`absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 transition-colors ${className}`}
+      className={`cursor-pointer absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 transition-colors ${className}`}
       aria-label={show ? "隱藏密碼" : "顯示密碼"}
       tabIndex={-1} // 選擇性加入：避免使用者按 Tab 鍵切換焦點時一直對到眼睛按鈕
     >
