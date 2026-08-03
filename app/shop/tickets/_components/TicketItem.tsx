@@ -45,10 +45,10 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
   return (
     <>
       <div className="w-full mb-6">
-        <div className="flex flex-col w-full p-5 bg-[#FCF9F6] text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] select-none">
-          <div className="flex flex-row items-center justify-between w-full">
-            <div className="flex w-56 shrink-0 flex-col items-start gap-1.5 text-left">
-              <div className="flex items-center gap-2">
+        <div className="flex w-full select-none flex-col border-[3px] border-[#3D2419] bg-[#FCF9F6] p-3 text-base font-bold text-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] sm:p-5">
+          <div className="flex w-full flex-col items-stretch gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex w-full shrink-0 flex-col items-start gap-1.5 text-left xl:w-56">
+              <div className="flex min-w-0 items-center gap-2">
                 <img
                   src={ticket.product_img ? getImageUrl(ticket.product_img) : FALLBACK_IMAGE}
                   alt={ticket.product_name || ticket.name}
@@ -58,7 +58,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
                     event.currentTarget.src = FALLBACK_IMAGE;
                   }}
                 />
-                <div>
+                <div className="min-w-0">
                   <div className="whitespace-nowrap text-sm font-black">
                     {ticket.order_id ? (
                       <>
@@ -91,9 +91,9 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
               </div>
             </div>
 
-            <div className="flex-1 flex flex-row items-center justify-end gap-6 text-right pl-6">
-              <div className="flex flex-col items-end">
-                <h4 className="text-lg font-black text-[#3D2419]">
+            <div className="flex w-full min-w-0 flex-col items-stretch gap-4 text-left xl:flex-1 xl:flex-row xl:items-center xl:justify-end xl:gap-6 xl:pl-6 xl:text-right">
+              <div className="flex min-w-0 flex-col items-start xl:items-end">
+                <h4 className="break-words text-lg font-black text-[#3D2419]">
                   {ticket.product_name || ticket.name}
                 </h4>
                 {ticket.product_price && (
@@ -106,7 +106,7 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
               <button
                 onClick={() => setShowQR(true)}
                 disabled={!isUsable}
-                className={`px-4 py-2.5 font-black text-sm flex items-center gap-2 transition-all ${
+                className={`flex w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-black transition-all xl:w-auto ${
                   isUsable
                     ? "bg-[#FFD45C] border-[3px] border-[#3D2419] shadow-[3px_3px_0px_0px_#3D2419] hover:bg-[#FFE37A] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer text-[#3D2419]"
                     : "bg-gray-200 border-[3px] border-gray-400 text-gray-400 cursor-not-allowed"
@@ -121,8 +121,8 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
 
       {/* QR Code 燈箱 */}
       {showQR && ticket.redeem_code && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowQR(false)}>
-          <div className="bg-white border-[3px] border-[#3D2419] shadow-[6px_6px_0px_0px_#3D2419] px-8 py-6 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-2 sm:p-4" onClick={() => setShowQR(false)}>
+          <div className="max-h-[calc(100dvh-1rem)] w-full max-w-sm overflow-y-auto border-[3px] border-[#3D2419] bg-white px-4 py-4 shadow-[6px_6px_0px_0px_#3D2419] sm:max-h-[calc(100dvh-2rem)] sm:px-8 sm:py-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-xl font-bold text-[#3D2419] text-center mb-2">
               {ticket.product_name || ticket.name}
             </h3>
@@ -130,8 +130,8 @@ export default function TicketItem({ ticket, onRefresh }: { ticket: Ticket; onRe
               {TYPE_LABEL[ticket.type]} · {ticket.order_id ? getOrderNumber(ticket.order_id) : "活動贈送"}
             </p>
             <div className="flex justify-center mb-4">
-              <div className="border-[3px] border-[#3D2419] p-3">
-                <QRCodeSVG value={ticket.redeem_code} size={200} />
+              <div className="border-[3px] border-[#3D2419] p-2 sm:p-3">
+                <QRCodeSVG value={ticket.redeem_code} size={200} className="h-40 w-40 sm:h-[200px] sm:w-[200px]" />
               </div>
             </div>
             <p className="text-xs text-gray-400 text-center break-all mb-3 select-all">
