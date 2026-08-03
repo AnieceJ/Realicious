@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "ckeditor5/ckeditor5.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -301,6 +302,48 @@
 	font-weight: bold !important;
 }
 
+/* Force code block appearance in article view to match editor (light gray background) */
+.article-content .ck-code-block,
+.article-content pre,
+.article-content pre code,
+.article-content .code-block {
+	background: #f3f4f6 !important; /* light gray similar to editor */
+	color: #111827 !important; /* dark text for readability */
+	padding: 1rem !important;
+	border-radius: 0.375rem !important;
+	overflow: auto !important;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace !important;
+}
+
+.article-content pre code {
+	background: transparent !important;
+}
+
+/* Minimal table styles for published articles (restores grid lines without broad overrides) */
+.article-content table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0 0 1rem;
+}
+
+.article-content th,
+.article-content td {
+	border: 1px solid #000;
+	padding: 0.5rem 0.75rem;
+	text-align: left;
+	vertical-align: top;
+}
+
+.article-content thead th {
+	background: #f3f4f6;
+	font-weight: 700;
+}
+
+/* Small screens: allow table horizontal scroll when needed */
+.article-content .table-responsive {
+	overflow-x: auto;
+}
+
 /* Hero carousel orbit — centered at hero right-middle (right edge vertical center) */
 
 /* core orbit variables (defaults for desktop) */
@@ -416,6 +459,8 @@
 	}
 }
 
+.hero-copy { z-index: 40; }
+
 /* Responsive — smaller orbit and plates for <=1024px */
 @media (max-width: 1024px) {
 	:root {
@@ -442,7 +487,7 @@
 }
 
 /* 手機版重新排版 */
-@media (max-width: 430px) {
+@media (max-width: 640px) {
 	.hero-copy {
 		justify-content: space-between;
 		padding: 32px 0 40px;

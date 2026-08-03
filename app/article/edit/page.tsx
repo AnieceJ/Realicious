@@ -63,10 +63,9 @@ export default function ArticleEditPage() {
 					);
 
 					if (currentArticle) {
-						// 🎯 關鍵：將舊資料塞入 state，表單就會自動帶入既有內容！
 						setTitle(currentArticle.title || "");
 						setContent(currentArticle.content || "");
-						// 注意：如果後端分類回傳是 BigInt/Number，這裡要記得轉字串配合 select 元件
+
 						if (currentArticle.subCategoryId) {
 							setSubCategoryId(currentArticle.subCategoryId.toString());
 						} else {
@@ -139,7 +138,6 @@ export default function ArticleEditPage() {
 			showToast(isEditMode ? "修改成功！" : "發布成功！");
 			await new Promise((resolve) => setTimeout(resolve, 1000));
 
-			// 成功後的路由跳轉
 			if (isEditMode) {
 				router.replace(
 					`/article/${articleId}?from=my-article&returnTo=${encodeURIComponent("/article/manage")}`,
