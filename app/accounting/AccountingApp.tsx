@@ -30,6 +30,8 @@ import {
 } from "./api";
 import { getOnboardingState } from "./onboarding";
 import TutorialSpotlight from "./pixel/TutorialSpotlight";
+import WalkingChick from "./pixel/WalkingChick";
+import LoadingTransition from "./pixel/LoadingTransition";
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
    白 #FFFFFF ｜ 卡片/次要 #FCF9F6 ｜ 輸入框 #E3E3E3
@@ -230,6 +232,7 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
       // 兩個 setState/導頁都包進 setTimeout callback，避開 React 19 同步 setState 警告。
       const show = setTimeout(() => setAuthOk(false), 0);
       const go = setTimeout(() => router.replace("/user/login"), 1500);
+      
       return () => {
         clearTimeout(show);
         clearTimeout(go);
@@ -563,6 +566,9 @@ const addTx = async () => {
         danger={1 - pet.hp / HP_MAX}
       />
       <CoinBurst fire={burst} originRef={stageRef} />
+
+      <LoadingTransition />
+
 
       {/* ============ 完成提示 toast ============
            操作成功後從上方掉下來一條，2.2 秒自動消失。
