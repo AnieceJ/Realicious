@@ -208,7 +208,7 @@ export default function AvatarUploader({
         <button
           type="button"
           onClick={handleOpenModal}
-          className="absolute bottom-0 right-0 z-10 flex -translate-x-1 translate-y-1 items-center justify-center rounded-full border border-white bg-blue-600 p-2 text-white shadow-md transition transform hover:bg-blue-700"
+          className="cursor-pointer absolute bottom-0 right-0 z-10 flex -translate-x-1 translate-y-1 items-center justify-center rounded-full border border-white bg-blue-600 p-2 text-white shadow-md transition transform hover:bg-blue-700"
           title="修改大頭貼"
         >
           <IoMdPhotos size={18} />

@@ -48,7 +48,7 @@ export default function CustomModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={handleOverlayClick}
     >
       {/* 阻止點擊內容區域時觸發關閉 */}

@@ -182,7 +182,7 @@ export default function CreateRoomModal({
                     placeholder="請輸入房間密碼..."
                     value={newRoomPassword}
                     onChange={(e) => setNewRoomPassword(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="w-full border border-slate-200 px-3 py-2 text-xs focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   />
                 </div>
               )}
@@ -198,7 +198,7 @@ export default function CreateRoomModal({
                       key={cover.id}
                       type="button"
                       onClick={() => setSelectedImage(cover.url)}
-                      className={`group relative aspect-video overflow-hidden rounded border-2 transition-all ${
+                      className={`cursor-pointer group relative aspect-video overflow-hidden rounded border-2 transition-all ${
                         selectedImage === cover.url
                           ? "border-indigo-600 ring-2 ring-indigo-500/20"
                           : "border-transparent opacity-70 hover:opacity-100"

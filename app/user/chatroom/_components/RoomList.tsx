@@ -58,7 +58,7 @@ export default function RoomList({
           <button
             type="button"
             onClick={() => onTabChange("all")}
-            className={` px-2 md:px-3 py-1 font-medium transition-all ${
+            className={`cursor-pointer px-2 md:px-3 py-1 font-medium transition-all ${
               activeTab === "all"
                 ? "bg-white text-slate-800 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"
@@ -69,7 +69,7 @@ export default function RoomList({
           <button
             type="button"
             onClick={() =>{ onTabChange("favorites")}}
-            className={`mr-3 px-2 md:px-3 py-1 font-medium transition-all ${
+            className={`cursor-pointer mr-3 px-2 md:px-3 py-1 font-medium transition-all ${
               activeTab === "favorites"
                 ? "bg-white text-slate-800 shadow-sm"
                 : "text-slate-500 hover:text-slate-700"

@@ -1,6 +1,14 @@
-"use client";
+import type { Metadata } from "next";
 import "./user.css";
 import AmbientBackground from "@/components/AmbientBackground";
+
+export const metadata: Metadata = {
+	title: {
+		default: "會員中心",
+		template: "%s | Realicious",
+	},
+	description: "管理會員帳戶與設定",
+};
 
 export default function UserLayout({
 	children,

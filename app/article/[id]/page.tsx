@@ -353,7 +353,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 											<hr className="border-black border" />
 										</div>
 										<div
-											className="pt-4 article-content first-letter:mr-2 first-letter:text-5xl first-letter:font-bold first-letter:text-red-500"
+											className="pt-4 article-content ck-content first-letter:mr-2 first-letter:text-5xl first-letter:font-bold first-letter:text-red-500"
 											dangerouslySetInnerHTML={{ __html: page.content }}
 										/>
 										<div className="p-4 mt-6 flex items-center justify-between h-15 bg-article-gray border-black border shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] relative">
@@ -414,7 +414,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 																	<div className="flex-1">
 																		<div className="flex justify-between items-center">
 																			<div className="text-sm font-semibold">
-																				{`${comment.nick_name} (${comment.author})`}
+																				{comment.nick_name}
 																			</div>
 																			<div className="text-sm text-gray-500">
 																				{comment.created_at}

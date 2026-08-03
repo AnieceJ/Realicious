@@ -303,7 +303,7 @@ export default function OnboardingForm() {
                 <button
                   type="button"
                   onClick={() => handleSkip("step2")}
-                  className="text-sm text-gray-400 hover:text-gray-600 transition"
+                  className="cursor-pointer text-sm text-gray-400 hover:text-gray-600 transition"
                 >
                   跳過，填下一步
                 </button>
@@ -412,7 +412,7 @@ export default function OnboardingForm() {
                 <button
                   type="button"
                   onClick={() => setStep(1)} // 允許走回上一步，體驗更好
-                  className="text-sm text-gray-500 hover:text-gray-700 transition"
+                  className=" cursor-pointer text-sm text-gray-500 hover:text-gray-700 transition"
                 >
                   返回上一步
                 </button>
@@ -420,7 +420,7 @@ export default function OnboardingForm() {
                   <button
                     type="button"
                     onClick={() => handleSkip("home")}
-                    className="text-sm text-gray-400 hover:text-gray-600 transition"
+                    className="cursor-pointer text-sm text-gray-400 hover:text-gray-600 transition"
                   >
                     跳過，進入首頁
                   </button>

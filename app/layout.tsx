@@ -19,6 +19,16 @@ const pixelify = Pixelify_Sans({
 	variable: "--font-pixel",
 });
 
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+	title: {
+		default: "Realicious",
+		template: "%s | Realicious",
+	},
+	description: "美食交流、優惠探索，讓記帳小雞陪你度過美好時光。",
+};
+
 export default async function RootLayout({
 	children,
 }: {
