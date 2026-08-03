@@ -28,7 +28,7 @@ export default function Footer() {
 							Contact Us
 						</h3>
 						<div className="mt-2 space-y-1 text-xs">
-							<p>Email：contact@realicious.com</p>
+							<p>Email：realicious2026@gmail.com</p>
 							<p>電話：(02) 6631-6588</p>
 							<p>地址：台北市復興南路一段390號2樓</p>
 						</div>
@@ -52,7 +52,7 @@ export default function Footer() {
 								/>
 							</a>
 							<a
-								href="https://zh.wikipedia.org/zh-tw/%E6%9D%B0%E5%85%8B%C2%B7%E5%A4%9A%E8%A5%BF"
+								href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnrHq0J2JvulRp4mpBrBzW0kiFFy8dTas9Zm9Hc0OkuMhRsQ7w3Rzi--U&s=10"
 								target="_blank"
 								rel="noopener noreferrer"
 								aria-label="X"
@@ -63,7 +63,7 @@ export default function Footer() {
 								/>
 							</a>
 							<a
-								href="https://zh.wikipedia.org/zh-hant/%E9%A9%AC%E5%85%8B%C2%B7%E6%89%8E%E5%85%8B%E4%BC%AF%E6%A0%BC"
+								href="https://memeprod.ap-south-1.linodeobjects.com/user-template/0561d9e8e54e0c8872811993944bdb95.png"
 								target="_blank"
 								rel="noopener noreferrer"
 								aria-label="Facebook"
@@ -74,7 +74,7 @@ export default function Footer() {
 								/>
 							</a>
 							<a
-								href="https://youtu.be/_dUp68-pPeU?si=yzZVHRfUJuLSqhsz"
+								href="https://youtu.be/dQw4w9WgXcQ?si=c8CUhuHZn8wxbrRn"
 								target="_blank"
 								rel="noopener noreferrer"
 								aria-label="Youtube"
