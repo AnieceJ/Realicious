@@ -61,8 +61,10 @@ export default function ChatWindow({
 
   // 切換房間時：重置狀態並標記為「準備第一次載入」
   useEffect(() => {
-    const effect =async()=>{await setUnreadCount(0);}
-    effect()
+    const effect = async () => {
+      await setUnreadCount(0);
+    };
+    effect();
     isNearBottomRef.current = true;
     prevMessagesLengthRef.current = messages.length;
     isFirstLoadRef.current = true;
@@ -135,8 +137,10 @@ export default function ChatWindow({
           離開 🚪
         </button>
       </div>
+      <div className="w-full h-14 sm:hidden"></div>
 
       {/* Messages 容器 */}
+
       <div className="flex-1 h-dvh relative min-h-0 overflow-hidden overflow-y-auto flex flex-col">
         <div
           ref={chatContainerRef}
@@ -201,17 +205,17 @@ export default function ChatWindow({
 
       {/* Input */}
       <form
-        className="border-t p-2 relative flex w-full bottom-0 gap-2 bg-white shrink-0"
+        className="border-t p-2 relative flex w-full h-15 justify-center items-center bottom-0 gap-2 bg-white shrink-0"
         onSubmit={handleSubmit}
       >
-          <input
+        <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="輸入訊息..."
           className="flex-1 w-full border rounded px-2 py-1 focus:outline-none"
         />
-      
+
         <button
           type="submit"
           className="bg-[#FFD45C] hover:bg-[#fbc632] w-15 h-8 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] cursor-pointer hover:shadow-[0px_0px_0px_0px_rgba(0,0,0,1)] -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0"

@@ -59,6 +59,17 @@ const OUTFIT_NAMES = ["蝴蝶結", "圍巾", "鴨舌帽", "王冠"];
 const SPRITE = 128;
 const GROUND_H = 44;
 
+// 單筆金額 / 每日預算的上限（一千萬）。
+// 資料庫 INT 上限約 21 億，超過會存不了；設一千萬遠低於它、又夠日常記帳用，
+// 從輸入就夾住，就不會產生爆表數字（存不了）或超長數字（跑版）。
+const MAX_AMOUNT = 10_000_000;
+// 把使用者打的字轉成「只留數字、去開頭0、夾在上限內」的字串
+const clampAmountInput = (raw: string) => {
+  const digits = raw.replace(/[^0-9]/g, "").replace(/^0+/, "");
+  if (digits === "") return "";
+  return String(Math.min(Number(digits), MAX_AMOUNT));
+};
+
 const CATS: Record<string, { icon: typeof faBurger; type: "income" | "expense" }> = {
   餐飲: { icon: faBurger, type: "expense" },
   飲品: { icon: faMugHot, type: "expense" },
@@ -448,6 +459,11 @@ const saveName = async () => {
 const addTx = async () => {
     const amt = Number(fAmt);
     if (!amt || amt <= 0) return;
+    if (amt > MAX_AMOUNT) {
+      // 保險：正常從輸入就夾住了，這裡擋住其他途徑塞進來的爆表數字
+      showToast(`金額上限為 $${MAX_AMOUNT.toLocaleString()}`);
+      return;
+    }
 
     const payload = {
       date: selKey,
@@ -484,6 +500,12 @@ const addTx = async () => {
       setBurst((n) => n + 1);
       setJustFed(true);
       setTimeout(() => setJustFed(false), 1300);
+    }
+
+    // 復活小提醒：小雞現在是幽靈，卻記了「未來日期」的帳 → 這筆不會幫忙復活，
+    // 講一句讓使用者知道規則（modal 這時已關，小雞露出來，泡泡看得到）。
+    if (!pet.alive && selKey > toKey(new Date())) {
+      setTalk({ text: "記未來的帳不會幫我復活喔，要記今天或補記過去的！" });
     }
   };
 
@@ -623,7 +645,7 @@ const addTx = async () => {
               }`}
             >
               {!pet.alive
-                ? `${petName}變成幽靈了！連續記帳 ${REVIVE_DAYS} 天可復活`
+                ? `${petName}變成幽靈了！連續記帳 ${REVIVE_DAYS} 天可復活（記今天或補記過去的才算，記未來的不算喔）`
                 : junkMode
                   ? `預算超支，${petName}正陪你一起吃土…`
                   : pet.loggedToday
@@ -662,7 +684,20 @@ const addTx = async () => {
             spendDays={spendDays}
             incomeDays={incomeDays}
             month={calMonth}
-            onMonthChange={setCalMonth}
+            onMonthChange={(m) => {
+              setCalMonth(m);
+              // 跳月時，把「選中日期」也移到該月，下面的明細/預算/圓餅圖才會跟著同步，
+              // 不會停在好幾個月前的舊日期。
+              //   ‧ 跳到「今天所在的月份」→ 選今天（最貼近使用者當下）
+              //   ‧ 跳到其他月份 → 選那個月的 1 號
+              const today = new Date();
+              const isThisMonth =
+                m.getFullYear() === today.getFullYear() &&
+                m.getMonth() === today.getMonth();
+              setSelected(
+                isThisMonth ? today : new Date(m.getFullYear(), m.getMonth(), 1),
+              );
+            }}
             overDays={overDays}
           />
           <div className="flex gap-3 mt-3 pt-3 border-t-2 border-dashed border-black/20 text-[11px] font-bold text-black/60">
@@ -882,13 +917,16 @@ const addTx = async () => {
             <input
               type="text"
               inputMode="numeric"
-              value={fAmt}
-              onChange={(e) => setFAmt(e.target.value.replace(/[^0-9]/g, "").replace(/^0+/, ""))}
+              value={fAmt ? Number(fAmt).toLocaleString() : ""}
+              onChange={(e) => setFAmt(clampAmountInput(e.target.value))}
               onKeyDown={(e) => e.key === "Enter" && addTx()}
               placeholder="0"
               autoFocus
-              className={`${FIELD} ${pixel} mb-4`}
+              className={`${FIELD} ${pixel} mb-1`}
             />
+            <p className="text-[10px] font-bold text-black/40 mb-4">
+              上限 ${MAX_AMOUNT.toLocaleString()}
+            </p>
 
             <label className="block text-[12px] font-bold mb-1.5">備註（選填）</label>
             <input
@@ -939,12 +977,16 @@ const addTx = async () => {
             </p>
             <label className="block text-[12px] font-bold mb-1.5">金額 ($)</label>
             <input
-              type="number"
-              value={budgetInput}
-              onChange={(e) => setBudgetInput(e.target.value)}
+              type="text"
+              inputMode="numeric"
+              value={budgetInput ? Number(budgetInput).toLocaleString() : ""}
+              onChange={(e) => setBudgetInput(clampAmountInput(e.target.value))}
               autoFocus
-              className={`${FIELD} ${pixel} mb-5`}
+              className={`${FIELD} ${pixel} mb-1`}
             />
+            <p className="text-[10px] font-bold text-black/40 mb-5">
+              上限 ${MAX_AMOUNT.toLocaleString()}
+            </p>
             <div className="flex gap-2.5">
               <button
                 onClick={() => setShowBudget(false)}

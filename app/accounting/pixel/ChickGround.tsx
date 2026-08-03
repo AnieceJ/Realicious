@@ -123,7 +123,11 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
   function onPointerDown(e: ReactPointerEvent) {
     // 不管什麼狀態,先記下起點。戳 / 拖的判定都靠它。
     pointerStart.current = { x: e.clientX, y: e.clientY, moved: false, active: true };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    // ★ capture 要抓在 currentTarget（掛事件的小雞容器，穩定不變），
+    //   不是 e.target（按下當下指標下的子元素，例如衣服圖層/SVG）——
+    //   子元素在拖曳中會被 React 換掉，capture 就失效 → 滑出視窗放不開 → 卡住。
+    //   這也是「穿衣服更容易卡」的原因（衣服圖層當 target 更不穩）。
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 
     // 幽靈:抓不住,但戳一下會嚇一跳(虛體被戳到)。
     //   台詞照樣在「放開」時透過 onPoke 觸發,這裡只管驚訝動畫。
@@ -263,7 +267,9 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
         className="absolute pointer-events-auto touch-none"
         style={{
           bottom: spriteBottom,
-          left: `${x}%`,
+          // 用 clamp 夾住水平位置：中心離左右邊至少「半個身體 + 8px」。
+          // 窄螢幕（手機）時自動往內縮，不會被切掉；寬螢幕維持原本的 x%。
+          left: `clamp(${sprite / 2 + 8}px, ${x}%, calc(100% - ${sprite / 2 + 8}px))`,
           transform: "translateX(-50%)",
           // 幽靈:一般游標(抓不住,只能戳)。健康:可抓的手。
           cursor: dead ? "pointer" : !canGrab ? "pointer" : grabbed ? "grabbing" : "grab",
@@ -333,8 +339,10 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
           </div>
         )}
 
-        {/* 狀態氣泡:被拎起來時不顯示(她正忙著被玩) */}
-        {!grabbed && (dead || mood === "junk") && (
+        {/* 狀態氣泡:被拎起來時不顯示(她正忙著被玩)。
+            另外:正在講話(talk)時也先讓位，避免跟戳一下的台詞泡泡疊在一起。
+            台詞約 3.5 秒後消失，狀態泡泡就自己回來。 */}
+        {!grabbed && !talk && (dead || mood === "junk") && (
           <div
             className={`absolute left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-black px-2.5 py-1 border-2 border-black ${
               dead ? "bg-white text-black" : "bg-[#BB0015] text-white"
