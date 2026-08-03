@@ -20,7 +20,7 @@ export default function ProductCard({
 }) {
   const { user } = useUser();
   const [showCart, setShowCart] = useState(false);
-  const { toastComponent, showToast } = useToast();
+  const { showToast } = useToast();
   const favorited = favoritedProductIds.includes(product.id);
   const soldOut = product.stock_qty <= 0;
 
@@ -31,18 +31,31 @@ export default function ProductCard({
       return;
     }
     const userId = Number(user.id);
-    if (favorited) {
-      const result = await removeFavorite(userId, product.id);
-      if (result.success) onFavoriteChange(product.id, false);
-    } else {
-      const result = await addFavorite(userId, product.id);
-      if (result.success) onFavoriteChange(product.id, true);
+    try {
+      if (favorited) {
+        const result = await removeFavorite(userId, product.id);
+        if (result.success) {
+          onFavoriteChange(product.id, false);
+          showToast("已從商品收藏移除");
+        } else {
+          showToast(result.message || "取消收藏失敗，請稍後再試");
+        }
+      } else {
+        const result = await addFavorite(userId, product.id);
+        if (result.success) {
+          onFavoriteChange(product.id, true);
+          showToast("已加入商品收藏");
+        } else {
+          showToast(result.message || "加入收藏失敗，請稍後再試");
+        }
+      }
+    } catch {
+      showToast("收藏操作失敗，請稍後再試");
     }
   };
 
   return (
     <>
-      {toastComponent}
     <div className="relative block w-full h-80 overflow-hidden border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] group cursor-pointer"
       onMouseEnter={() => setShowCart(true)}
       onMouseLeave={() => setShowCart(false)}

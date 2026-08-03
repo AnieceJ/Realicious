@@ -8,7 +8,6 @@ import ArticleThumbnail from "@/components/article-thumbnail";
 import { Button } from "@/components/ui/button";
 import { getArticleSummary } from "@/lib/article-preview";
 import SearchBar from "./_components/search_bar";
-import { useToast } from "./_components/article_toast";
 import Link from "next/link";
 import AmbientBackground from "@/components/AmbientBackground";
 
@@ -56,7 +55,6 @@ interface ArticlesResponse {
 }
 
 export default function ArticlePage() {
-	const { toastComponent } = useToast();
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [articles, setArticles] = React.useState<Article[]>([]);
 	const [loading, setLoading] = React.useState(true);
@@ -144,7 +142,6 @@ export default function ArticlePage() {
 
 	return (
 		<>
-			{toastComponent}
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
 				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">

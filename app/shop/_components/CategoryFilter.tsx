@@ -98,66 +98,74 @@ export default function CategoryFilter({
   ];
 
   return (
-    <div className="flex flex-col gap-3 w-full px-4 py-3 bg-white text-[#3D2419] font-bold text-base border-[3px] border-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419]">
-      <div className="flex items-center flex-wrap gap-x-3 gap-y-2">
-      {/* 全部商品（重置） */}
-      <button
-        onClick={onReset}
-        className="px-3 py-1 text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors bg-[#ffffff] text-[#3D2419] hover:bg-[#ffbe94]"
-      >
-        全部商品
-      </button>
+    <div className="flex w-full flex-col gap-4 border-[3px] border-[#3D2419] bg-white px-3 py-3 text-base font-bold text-[#3D2419] shadow-[4px_4px_0px_0px_#3D2419] sm:px-4">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm font-bold text-[#3D2419]/60">快速篩選</span>
+          <button
+            type="button"
+            onClick={onReset}
+            className="shrink-0 border-2 border-[#3D2419] bg-white px-3 py-1 text-xs text-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] transition-colors hover:bg-[#ffbe94] cursor-pointer"
+          >
+            全部商品
+          </button>
+        </div>
 
-      <span className="w-px h-5 bg-[#3D2419]/20 shrink-0" />
-
-      {/* Demo 商品的快速導覽；未使用資料庫標籤。 */}
-      <span className="text-sm font-bold text-[#3D2419]/60 shrink-0">快速篩選：</span>
-      {tags.map((tag) => (
-        <button key={tag.label}
-          className={`px-3 py-1 text-sm border-[3px] border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors
-            ${activeKeyword === tag.keyword ? "bg-[#3D2419] text-white" : "bg-[#FFD3B6] text-[#3D2419] hover:bg-[#ffbe94]"}`}
-          onClick={() => onTagChange(activeKeyword === tag.keyword ? "" : tag.keyword)}
-        >
-          {tag.label}
-        </button>
-      ))}
+        {/* Demo 商品的快速導覽；未使用資料庫標籤。 */}
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          {tags.map((tag) => (
+            <button
+              key={tag.label}
+              type="button"
+              className={`w-full border-[3px] border-[#3D2419] px-2 py-1.5 text-sm shadow-[2px_2px_0px_0px_#3D2419] transition-colors cursor-pointer ${
+                activeKeyword === tag.keyword
+                  ? "bg-[#3D2419] text-white"
+                  : "bg-[#FFD3B6] text-[#3D2419] hover:bg-[#ffbe94]"
+              }`}
+              onClick={() => onTagChange(activeKeyword === tag.keyword ? "" : tag.keyword)}
+            >
+              {tag.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="flex items-center flex-wrap gap-x-3 gap-y-2 pt-3 border-t-2 border-dashed border-[#3D2419]/20">
+      <div className="flex flex-col gap-2 border-t-2 border-dashed border-[#3D2419]/20 pt-3">
         {/* 價格快捷篩選 */}
-        <span className="text-sm font-bold text-[#3D2419]/60 shrink-0">價格：</span>
-        <div className="flex items-center flex-wrap gap-2">
-        {pricePresets.map((preset) => {
-          const isActive = minPrice === preset.min && maxPrice === preset.max;
-          return (
-            <button
-              key={preset.label}
-              type="button"
-              onClick={() => onPriceChange(preset.min, preset.max)}
-              className={`px-2.5 py-1 text-xs border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors ${
-                isActive ? "bg-[#3D2419] text-white" : "bg-white hover:bg-[#FBDF58]"
-              }`}
-            >
-              {preset.label}
-            </button>
-          );
-        })}
-        <button
-          type="button"
-          onClick={() => setIsCustomPriceOpen((value) => !value)}
-          className={`px-2.5 py-1 text-xs border-2 border-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] cursor-pointer transition-colors ${
-            isCustomPriceOpen ? "bg-[#FFD3B6]" : "bg-white hover:bg-[#FBDF58]"
-          }`}
-        >
-          自訂價格 {isCustomPriceOpen ? "▴" : "▾"}
-        </button>
+        <span className="text-sm font-bold text-[#3D2419]/60">價格範圍</span>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:flex-wrap">
+          {pricePresets.map((preset) => {
+            const isActive = minPrice === preset.min && maxPrice === preset.max;
+            return (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => onPriceChange(preset.min, preset.max)}
+                className={`w-full border-2 border-[#3D2419] px-2.5 py-1.5 text-xs shadow-[2px_2px_0px_0px_#3D2419] transition-colors cursor-pointer lg:w-auto ${
+                  isActive ? "bg-[#3D2419] text-white" : "bg-white hover:bg-[#FBDF58]"
+                }`}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            onClick={() => setIsCustomPriceOpen((value) => !value)}
+            aria-expanded={isCustomPriceOpen}
+            className={`w-full border-2 border-[#3D2419] px-2.5 py-1.5 text-xs shadow-[2px_2px_0px_0px_#3D2419] transition-colors cursor-pointer lg:w-auto ${
+              isCustomPriceOpen ? "bg-[#FFD3B6]" : "bg-white hover:bg-[#FBDF58]"
+            }`}
+          >
+            自訂價格 {isCustomPriceOpen ? "▴" : "▾"}
+          </button>
         </div>
 
         {isCustomPriceOpen && (
-          <div className="w-full mt-1 pt-3 border-t-2 border-dashed border-[#3D2419]/20">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <label className="flex items-center gap-1 text-xs text-[#3D2419]/80">
-                最低 $
+          <div className="mt-1 w-full border-t-2 border-dashed border-[#3D2419]/20 pt-3">
+            <div className="mb-3 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-2 lg:max-w-lg">
+              <label className="flex min-w-0 flex-col gap-1 text-xs text-[#3D2419]/80">
+                <span>最低金額</span>
                 <input
                   type="number"
                   min="0"
@@ -167,12 +175,12 @@ export default function CategoryFilter({
                   onChange={(e) => handlePriceInput("min", e.target.value)}
                   onBlur={applyInput}
                   onKeyDown={(e) => e.key === "Enter" && applyInput()}
-                  className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
+                  className="h-9 w-full border-[2px] border-[#3D2419] bg-white px-2 text-center text-sm outline-none focus:ring-2 focus:ring-[#FBDF58]"
                 />
               </label>
-              <span className="text-sm text-[#3D2419]/60">～</span>
-              <label className="flex items-center gap-1 text-xs text-[#3D2419]/80">
-                最高 $
+              <span className="pb-2 text-sm text-[#3D2419]/60">～</span>
+              <label className="flex min-w-0 flex-col gap-1 text-xs text-[#3D2419]/80">
+                <span>最高金額</span>
                 <input
                   type="number"
                   min="0"
@@ -182,15 +190,15 @@ export default function CategoryFilter({
                   onChange={(e) => handlePriceInput("max", e.target.value)}
                   onBlur={applyInput}
                   onKeyDown={(e) => e.key === "Enter" && applyInput()}
-                  className="w-20 h-8 px-1 text-xs text-center bg-white border-[2px] border-[#3D2419] outline-none"
+                  className="h-9 w-full border-[2px] border-[#3D2419] bg-white px-2 text-center text-sm outline-none focus:ring-2 focus:ring-[#FBDF58]"
                 />
               </label>
-              <span className="text-xs text-[#3D2419]/50">
+              <span className="col-span-3 text-xs font-normal text-[#3D2419]/50">
                 輸入後即時篩選，可輸入 $0～${priceMax.toLocaleString()}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 w-full max-w-lg">
+            <div className="hidden w-full max-w-lg items-center gap-2 lg:flex">
               <span className="text-xs text-[#3D2419]/80 w-10 text-right">${slideMin}</span>
               <div className="relative flex-1 h-6">
                 <div className="absolute top-1/2 -translate-y-1/2 w-full h-2 bg-[#3D2419]/20" />

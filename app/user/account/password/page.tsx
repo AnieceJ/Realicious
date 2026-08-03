@@ -187,7 +187,7 @@ export default function Password() {
   if (loading) return <div className="p-6">帳號資料載入中...</div>;
 
   return (
-    <Container className="bg-white flex-col sm:flex-row overflow-hidden">
+    <Container className="bg-white h-dvh sm:h-full flex-col sm:flex-row overflow-hidden">
       <Left />
 
       {/* 主要內容區塊 */}
@@ -249,7 +249,7 @@ export default function Password() {
             </div>
             <button
               onClick={handleToggleGoogleLink}
-              className={`-translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 ${
+              className={`text-sm -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0 ${
                 accountInfo.isGoogleLinked ? button_cancel : button_submit
               }`}
             >

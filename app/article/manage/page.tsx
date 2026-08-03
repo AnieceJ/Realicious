@@ -37,6 +37,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsis, faBookmark } from "@fortawesome/free-solid-svg-icons";
 import Cookies from "js-cookie";
+import { useConfirm } from "@/app/_components/ConfirmModal";
 
 interface SubCategory {
 	id: number;
@@ -66,7 +67,8 @@ interface UserArticlesResponse {
 export default function ArticleManagePage() {
 	const router = useRouter();
 	const pathname = usePathname();
-	const { toastComponent, showToast } = useToast();
+	const { showToast } = useToast();
+	const { confirmComponent, showConfirm } = useConfirm();
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [userArticles, setUserArticles] = React.useState<UserArticle[]>([]);
 	const [loading, setLoading] = React.useState(true);
@@ -134,7 +136,10 @@ export default function ArticleManagePage() {
 
 	// 刪除文章
 	const handleDeleteArticle = async (articleId: string) => {
-		const isConfirm = window.confirm("確定要刪除嗎？");
+		const isConfirm = await showConfirm("刪除後將無法復原，確定要刪除這篇文章嗎？", {
+			title: "刪除文章？",
+			confirmLabel: "確認刪除",
+		});
 		if (!isConfirm) return;
 		try {
 			const token = Cookies.get("token");
@@ -195,7 +200,7 @@ export default function ArticleManagePage() {
 
 	return (
 		<>
-			{toastComponent}
+			{confirmComponent}
 			<div className="min-h-screen">
 				<div className="max-w-7xl mx-auto w-full py-4">
 					<div className="relative border-2 border-black">

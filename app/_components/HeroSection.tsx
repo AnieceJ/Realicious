@@ -12,7 +12,7 @@ export default function Hero() {
 					<div className="hero-copy flex h-full w-full flex-col justify-center md:w-1/2 lg:w-5/12">
 						{/* 上半部 */}
 						<div className="hero-title">
-							<p className="font-pixel mb-4 text-sm font-bold tracking-[0.45em] text-yellow-300 md:text-xl">
+							<p className="font-pixel mb-4 text-sm font-bold tracking-[0.30em] text-yellow-300 md:text-xl">
 								REALICIOUS
 							</p>
 
@@ -26,9 +26,9 @@ export default function Hero() {
 						{/* 下半部 */}
 						<div className="hero-bottom mt-8">
 							<p className="text-base leading-9 text-white/90 md:text-lg lg:text-xl">
-								探索真實食記、收藏優惠商品，
+								美食交流、優惠探索，
 								<br />
-								用記帳小雞管理你的每一餐。
+								讓記帳小雞陪你記錄每一餐。
 							</p>
 
 							<div className="mt-10 flex flex-wrap gap-3 md:gap-5">

@@ -82,7 +82,7 @@ export default function SavedArticlesPage() {
 		string | null
 	>(null);
 	const [reloadKey, setReloadKey] = React.useState(0);
-	const { toastComponent, showToast } = useToast();
+	const { showToast } = useToast();
 
 	const filteredArticles = React.useMemo(() => {
 		const normalizedKeyword = keyword.trim().toLowerCase();
@@ -200,7 +200,6 @@ export default function SavedArticlesPage() {
 
 	return (
 		<>
-			{toastComponent}
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
 				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
@@ -387,12 +386,14 @@ export default function SavedArticlesPage() {
 														</p>
 
 														<div className="mt-auto flex items-center justify-between gap-3">
-															<div className="flex min-w-0 items-center gap-1 text-xs text-gray-500 sm:text-sm">
+															<div className="hidden sm:flex min-w-0 items-center gap-1 text-xs text-gray-500 sm:text-sm">
 																<FontAwesomeIcon
 																	icon={faBookmark}
-																	className="shrink-0"
+																	className=" sm:inline shrink-0"
 																/>
-																<span>收藏於 {article.savedAt}</span>
+																<span className=" sm:inline">
+																	收藏於 {article.savedAt}
+																</span>
 															</div>
 
 															<div className="flex shrink-0 items-center gap-2">

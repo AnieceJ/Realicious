@@ -70,11 +70,22 @@ export default function Login() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { account: "", password: "" },
   });
+
+  const testA = () => {
+    setValue("account", "hua870320@gmail.com", { shouldValidate: true });
+    setValue("password", "qwe123", { shouldValidate: true });
+  };
+
+  const testB = () => {
+    setValue("account", "111@gmail.com", { shouldValidate: true });
+    setValue("password", "qwe123", { shouldValidate: true });
+  };
 
   // 表單送出
   const onSubmit = async (data: LoginInput) => {
@@ -83,8 +94,7 @@ export default function Login() {
     setLoginError(false);
     setSubmit(true);
 
-    const account = data.account;
-    const password = data.password;
+    const { account, password } = data;
 
     // 1. 第一時間立刻跳出「進行中」彈窗
     showAlert("loading", "登入中...", "請稍候...");
@@ -128,19 +138,11 @@ export default function Login() {
       <div className="bg-[#FCF9F6] flex justify-center items-center border-3 sm:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
         {/* 廣告 */}
         <div className="w-0 h-0 lg:w-150 lg:h-180 flex justify-center items-center overflow-hidden">
-          {/* <Image
-            className=" object-contain object-bottom h-180"
-            src={loginAd}
-            alt="廣告"
-            width={600}
-            height={720}
-            priority
-          /> */}
           <Banner/>
         </div>
 
         <div className="w-110 h-screen sm:h-180 bg-[#FCF9F6] flex flex-col items-center">
-          <h1 className={`font-bold text-[26px] my-8`}>登入</h1>
+          <h1 onClick={testA} className={`font-bold text-[26px] my-8`}>登入</h1>
 
           <form
             onSubmit={handleSubmit(onSubmit, onError)}
@@ -194,7 +196,7 @@ export default function Login() {
               <div className="">
               </div>
               <Link
-                className=" text-[16px] text-center h-6 align-middle w-20 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
+                className=" text-[16px] text-center h-6 align-middle w-28 text-blue-600 hover:bg-blue-100 active:bg-blue-800 active:text-white"
               href={`/user/forgetPassword`}
               >
                 忘記密碼
@@ -211,7 +213,7 @@ export default function Login() {
             </button>
           </form>
 
-          <h2 className="text-[20px] my-8">--OR--</h2>
+          <h2 onClick={testB} className="text-[20px] my-8">--OR--</h2>
           <div className="flex justify-center items-center">
             <Link
               href={`http://localhost:3001/user/api/auth/google?next=${encodeURIComponent(nextPath)}`}

@@ -55,7 +55,7 @@ export default function UserSidebar() {
         createPortal(
           <>
             <div
-              className={`fixed z-50 top-0 right-0 w-90 bg-[#FCF9F6] h-full shadow-2xl ${
+              className={`fixed z-50 top-0 right-0 w-80 sm:w-90 bg-[#FCF9F6] h-full shadow-2xl ${
                 isOpening ? "translate-x-0" : "translate-x-full"
               } transition-transform duration-300 ease-in-out`}
             >
@@ -80,8 +80,8 @@ export default function UserSidebar() {
                     />
                   </div>
                   <div className="ml-2">
-                    <p className="mb-2">你好 {user?.nick_name || "訪客"}</p>
-                    <p className="text-[14px]">{user?.account || ""}</p>
+                    <p className="mb-2 text-bold text-xl">{user?.nick_name || "訪客"}</p>
+                    <p className="hidden sm:block text-[14px]">{user?.account || ""}</p>
                   </div>
                 </div>
 
@@ -116,7 +116,7 @@ export default function UserSidebar() {
                     href={`/user/account/tickets`}
                   >
                     <FaTicketAlt />
-                    <span className="ml-4">我的票券</span>
+                    <span className="ml-4">票券中心</span>
                   </Link>
                   <Link
                     onClick={() => setIsOpening(false)}
@@ -124,7 +124,7 @@ export default function UserSidebar() {
                     href={`/user/account/favorites`}
                   >
                     <FaHeart />
-                    <span className="ml-4">我的收藏</span>
+                    <span className="ml-4">商品收藏</span>
                   </Link>
                    <Link
                     onClick={() => setIsOpening(false)}
