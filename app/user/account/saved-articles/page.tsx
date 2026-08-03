@@ -387,12 +387,14 @@ export default function SavedArticlesPage() {
 														</p>
 
 														<div className="mt-auto flex items-center justify-between gap-3">
-															<div className="flex min-w-0 items-center gap-1 text-xs text-gray-500 sm:text-sm">
+															<div className="hidden sm:flex min-w-0 items-center gap-1 text-xs text-gray-500 sm:text-sm">
 																<FontAwesomeIcon
 																	icon={faBookmark}
-																	className="shrink-0"
+																	className=" sm:inline shrink-0"
 																/>
-																<span>收藏於 {article.savedAt}</span>
+																<span className=" sm:inline">
+																	收藏於 {article.savedAt}
+																</span>
 															</div>
 
 															<div className="flex shrink-0 items-center gap-2">

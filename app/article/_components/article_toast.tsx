@@ -32,7 +32,7 @@ export default function Toast({
 	}, [onClose]);
 	return (
 		<div
-			className={`fixed top-12 left-1/2 -translate-x-1/2 z-50
+			className={`fixed top-20 left-1/2 -translate-x-1/2 z-50
   bg-[#3D2419]/85 text-white
   px-5 py-2 text-sm font-bold
   whitespace-nowrap border-2 border-white
