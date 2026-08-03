@@ -67,7 +67,7 @@ interface UserArticlesResponse {
 export default function ArticleManagePage() {
 	const router = useRouter();
 	const pathname = usePathname();
-	const { toastComponent, showToast } = useToast();
+	const { showToast } = useToast();
 	const { confirmComponent, showConfirm } = useConfirm();
 	const [categories, setCategories] = React.useState<Category[]>([]);
 	const [userArticles, setUserArticles] = React.useState<UserArticle[]>([]);
@@ -200,7 +200,6 @@ export default function ArticleManagePage() {
 
 	return (
 		<>
-			{toastComponent}
 			{confirmComponent}
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />

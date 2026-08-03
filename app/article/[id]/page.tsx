@@ -103,7 +103,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 	const [savingArticle, setSavingArticle] = React.useState(false);
 	const [comments, setComments] = React.useState<Comment[]>([]);
 	const hasToken = Boolean(Cookies.get("token"));
-	const { toastComponent, showToast } = useToast();
+	const { showToast } = useToast();
 	// 留言送出
 	const [inputText, setInputText] = React.useState("");
 	const [submitting, setSubmitting] = React.useState(false);
@@ -274,7 +274,6 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 
 	return (
 		<>
-			{toastComponent}
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
 				<div className="relative z-10 max-w-7xl mx-auto w-full p-3">
