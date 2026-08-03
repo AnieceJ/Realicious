@@ -70,11 +70,22 @@ export default function Login() {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: { account: "", password: "" },
   });
+
+  const testA = () => {
+    setValue("account", "hua870320@gmail.com", { shouldValidate: true });
+    setValue("password", "qwe123", { shouldValidate: true });
+  };
+
+  const testB = () => {
+    setValue("account", "111@gmail.com", { shouldValidate: true });
+    setValue("password", "qwe123", { shouldValidate: true });
+  };
 
   // 表單送出
   const onSubmit = async (data: LoginInput) => {
@@ -83,8 +94,7 @@ export default function Login() {
     setLoginError(false);
     setSubmit(true);
 
-    const account = data.account;
-    const password = data.password;
+    const { account, password } = data;
 
     // 1. 第一時間立刻跳出「進行中」彈窗
     showAlert("loading", "登入中...", "請稍候...");
@@ -132,7 +142,7 @@ export default function Login() {
         </div>
 
         <div className="w-110 h-screen sm:h-180 bg-[#FCF9F6] flex flex-col items-center">
-          <h1 className={`font-bold text-[26px] my-8`}>登入</h1>
+          <h1 onClick={testA} className={`font-bold text-[26px] my-8`}>登入</h1>
 
           <form
             onSubmit={handleSubmit(onSubmit, onError)}
@@ -203,7 +213,7 @@ export default function Login() {
             </button>
           </form>
 
-          <h2 className="text-[20px] my-8">--OR--</h2>
+          <h2 onClick={testB} className="text-[20px] my-8">--OR--</h2>
           <div className="flex justify-center items-center">
             <Link
               href={`http://localhost:3001/user/api/auth/google?next=${encodeURIComponent(nextPath)}`}

@@ -190,6 +190,19 @@ export default function OnboardingForm() {
       showAlert("error", "儲存失敗", result.message);
     }
   };
+  const testA = ()=>{
+    setFormData({
+  avatar: "",
+  first_name: "呈華",
+  last_name: "許",
+  nick_name: "阿華",
+  city: "台北市",
+  district: "大安區",
+  address: "復興南路一段390號2樓",
+  phone: "0912345678",
+  birthday: "1990/01/01",
+});
+  }
 
   if (loading)
     return <div className="p-6 text-center">正在準備您的專屬迎新頁面...</div>;
@@ -217,7 +230,7 @@ export default function OnboardingForm() {
         {step === 1 && (
           <div>
             <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">歡迎加入</h2>
+              <h2 onClick={testA} className="text-2xl font-bold text-gray-800">歡迎加入</h2>
               <p className="text-sm text-gray-500 mt-1">
                 讓我們簡單認識一下你，設定個漂亮的檔案吧！
               </p>
@@ -258,7 +271,7 @@ export default function OnboardingForm() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700">
-                    姓名
+                    名字
                   </label>
                   <input
                     type="text"
