@@ -35,11 +35,16 @@ const API_URL = `${BASE_URL}/user/api`;
     handleSubmit,
     trigger,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(forgetPasswordSchema),
     defaultValues: { email: "", code: "" },
   });
+
+const testA = () => {
+    setValue("email", "hua870320@gmail.com", { shouldValidate: true });
+  };
 
   const scene = "forgot-password";
 
@@ -127,7 +132,7 @@ const API_URL = `${BASE_URL}/user/api`;
   return (
     <Container>
       <div className="w-110 h-180 bg-[#FCF9F6] sm:border-2 flex flex-col items-center sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <h1 className="flex items-center justify-center text-[24px] my-10">
+        <h1 onClick={testA} className="flex items-center justify-center text-[24px] my-10">
           <FaUnlockKeyhole className="mr-2" />
           忘記密碼
         </h1>
