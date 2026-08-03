@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { ConfirmModal } from "@/app/_components/ConfirmModal";
 
 // 定義彈窗支援的狀態型別
 export type ModalType = "loading" | "success" | "error" | "confirm";
@@ -23,6 +24,20 @@ export default function CustomModal({
   onConfirm,
 }: CustomModalProps) {
   if (!isOpen) return null;
+
+  if (type === "confirm") {
+    return (
+      <ConfirmModal
+        title={title}
+        message={message}
+        onCancel={onClose}
+        onConfirm={() => {
+          if (onConfirm) onConfirm();
+          onClose();
+        }}
+      />
+    );
+  }
 
   // 點擊灰色背景時的處理：如果是 loading 狀態，不允許透過點擊背景關閉
   const handleOverlayClick = () => {
@@ -56,12 +71,6 @@ export default function CustomModal({
               ✕
             </div>
           )}
-          {type === "confirm" && (
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 text-yellow-500 text-2xl">
-              !
-            </div>
-          )}
-
           {/* 標題與內文 */}
           <h3 className="text-lg font-bold text-gray-900">{title}</h3>
           {message && <p className="mt-2 text-sm text-gray-500">{message}</p>}
@@ -69,25 +78,7 @@ export default function CustomModal({
 
         {/* 按鈕區域：根據不同狀態顯示不同按鈕 */}
         <div className="mt-6 flex justify-center gap-3">
-          {type === "confirm" ? (
-            <>
-              <button
-                onClick={onClose}
-                className="flex-1 border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                取消
-              </button>
-              <button
-                onClick={() => {
-                  if (onConfirm) onConfirm();
-                  onClose();
-                }}
-                className="flex-1 bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
-              >
-                確定
-              </button>
-            </>
-          ) : type === "error" ? (
+          {type === "error" ? (
             <button
               onClick={onClose}
               className="w-full bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
