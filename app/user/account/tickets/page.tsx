@@ -4,7 +4,12 @@ import { Ticket as TicketIcon } from "lucide-react";
 import Container from "../../_components/container";
 import Left from "../_components/left";
 import TicketItem from "@/app/shop/tickets/_components/TicketItem";
-import { getTickets, type Ticket } from "@/lib/shop/tickets";
+import {
+  getTickets,
+  isTicketExpired,
+  isTicketUsable,
+  type Ticket,
+} from "@/lib/shop/tickets";
 import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
 import "@/app/shop/shop-theme.css";
@@ -16,23 +21,20 @@ const FILTERS = [
   { key: "2", label: "已使用" },
 ] as const;
 
-function isPromotionExpired(ticket: Ticket, now: number) {
-  return ticket.status === 1 && Boolean(
-    ticket.expires_at && new Date(ticket.expires_at).getTime() < now,
-  );
-}
-
 export default function AccountTickets() {
   const { user } = useUser();
   const userId = user?.id;
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [activeFilter, setActiveFilter] = useState("all");
-  const [now] = useState(() => Date.now());
+  const [now, setNow] = useState(() => Date.now());
 
   const fetchTickets = useCallback(() => {
     if (!userId) return;
     getTickets(Number(userId)).then((res) => {
-      if (res.success) setTickets(res.data);
+      if (res.success) {
+        setTickets(res.data);
+        setNow(Date.now());
+      }
     });
   }, [userId]);
 
@@ -42,8 +44,8 @@ export default function AccountTickets() {
 
   const filteredTickets = useMemo(() => {
     if (activeFilter === "all") return tickets;
-    if (activeFilter === "usable") return tickets.filter((ticket) => ticket.status === 1 && !isPromotionExpired(ticket, now));
-    if (activeFilter === "expired") return tickets.filter((ticket) => isPromotionExpired(ticket, now) || ticket.status === 3);
+    if (activeFilter === "usable") return tickets.filter((ticket) => isTicketUsable(ticket, now));
+    if (activeFilter === "expired") return tickets.filter((ticket) => isTicketExpired(ticket, now));
     return tickets.filter((t) => String(t.status) === activeFilter);
   }, [tickets, activeFilter, now]);
 
