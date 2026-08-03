@@ -8,7 +8,11 @@ import CheckoutOrderList from "./_components/CheckoutOrderList";
 import CheckoutSummary from "./_components/CheckoutSummary";
 import type { CartItem } from "@/lib/shop/cart";
 import { getCheckoutItems } from "@/lib/shop/checkout";
-import { createOrder, type OrderContact } from "@/lib/shop/orders";
+import {
+  createOrder,
+  type OrderContact,
+  validateOrderContact,
+} from "@/lib/shop/orders";
 import { useUser } from "@/app/context/user";
 import PaymentMethodDialog from "../_components/PaymentMethodDialog";
 
@@ -54,8 +58,11 @@ export default function CheckoutPage() {
     name: "",
     email: "",
     phone: "",
+    city: "",
+    district: "",
     address: "",
   });
+  const [contactValidationRequest, setContactValidationRequest] = useState(0);
 
   useEffect(() => {
     if (!loading && !user?.id) {
@@ -64,6 +71,12 @@ export default function CheckoutPage() {
   }, [loading, router, user?.id]);
 
   const createPendingOrder = async (): Promise<number | null> => {
+    if (Object.keys(validateOrderContact(contact)).length > 0) {
+      setContactValidationRequest((value) => value + 1);
+      setShowPayment(false);
+      return null;
+    }
+
     const order = await createOrder(items, contact);
     if (!order.success) {
       alert(order.error || "訂單建立失敗");
@@ -71,6 +84,20 @@ export default function CheckoutPage() {
     }
 
     return order.orderId;
+  };
+
+  const handleCheckout = () => {
+    if (Object.keys(validateOrderContact(contact)).length > 0) {
+      setContactValidationRequest((value) => value + 1);
+      requestAnimationFrame(() => {
+        document
+          .getElementById("checkout-contact-info")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      return;
+    }
+
+    setShowPayment(true);
   };
 
   if (loading || !user?.id) {
@@ -117,6 +144,7 @@ export default function CheckoutPage() {
               <CheckoutContactInfo
                 defaultEmail={user?.account}
                 onContactChange={setContact}
+                validationRequest={contactValidationRequest}
               />
             </div>
             <div className="mb-6">
@@ -124,7 +152,7 @@ export default function CheckoutPage() {
             </div>
           </div>
           <div className="w-full self-start lg:sticky lg:top-[76px] lg:w-[40%]">
-            <CheckoutSummary items={items} onCheckout={() => setShowPayment(true)} />
+            <CheckoutSummary items={items} onCheckout={handleCheckout} />
           </div>
         </div>
       </div>
