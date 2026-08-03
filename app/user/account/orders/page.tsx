@@ -35,7 +35,7 @@ export default function AccountOrders() {
   return (
     <Container className="shop-theme bg-white flex-col sm:flex-row overflow-hidden">
       <Left />
-      <div className="w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
+      <div className="w-full sm:w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
         <PageHeader icon={<ClipboardList className="h-5 w-5" />} title="訂單紀錄" />
 
         {/* 篩選標籤 */}

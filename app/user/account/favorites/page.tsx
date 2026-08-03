@@ -49,7 +49,7 @@ export default function AccountFavorites() {
         />
       )}
       <Left />
-      <div className="w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
+      <div className="w-full sm:w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
         <PageHeader icon={<Heart className="h-5 w-5" />} title="我的收藏" />
 
         {favorites.length === 0 ? (

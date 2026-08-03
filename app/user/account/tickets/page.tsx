@@ -50,11 +50,11 @@ export default function AccountTickets() {
   return (
     <Container className="shop-theme bg-white flex-col sm:flex-row overflow-hidden">
       <Left />
-      <div className="w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
+      <div className="w-full sm:w-[70%] h-[720px] p-4 overflow-y-auto no-scrollbar">
         <PageHeader icon={<TicketIcon className="h-5 w-5" />} title="我的票券" />
 
         {/* 篩選標籤 */}
-        <div className="flex flex-row gap-3 mb-6">
+        <div className="flex sm:flex-row gap-3 mb-6">
           {FILTERS.map((f) => (
             <button
               key={f.key}
