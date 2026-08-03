@@ -21,7 +21,7 @@ export default function FeaturedProductSection({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const { toastComponent, showToast } = useToast();
+  const { showToast } = useToast();
 
   const featuredList = products.slice(0, 3);
 
@@ -49,12 +49,26 @@ export default function FeaturedProductSection({
       return;
     }
     const userId = Number(user.id);
-    if (favorited) {
-      const result = await removeFavorite(userId, currentProduct.id);
-      if (result.success) onFavoriteChange(currentProduct.id, false);
-    } else {
-      const result = await addFavorite(userId, currentProduct.id);
-      if (result.success) onFavoriteChange(currentProduct.id, true);
+    try {
+      if (favorited) {
+        const result = await removeFavorite(userId, currentProduct.id);
+        if (result.success) {
+          onFavoriteChange(currentProduct.id, false);
+          showToast("已從商品收藏移除");
+        } else {
+          showToast(result.message || "取消收藏失敗，請稍後再試");
+        }
+      } else {
+        const result = await addFavorite(userId, currentProduct.id);
+        if (result.success) {
+          onFavoriteChange(currentProduct.id, true);
+          showToast("已加入商品收藏");
+        } else {
+          showToast(result.message || "加入收藏失敗，請稍後再試");
+        }
+      }
+    } catch {
+      showToast("收藏操作失敗，請稍後再試");
     }
   };
 
@@ -68,7 +82,6 @@ export default function FeaturedProductSection({
 
   return (
     <>
-      {toastComponent}
       <div className="flex h-auto w-full select-none flex-col overflow-hidden border-[.1875rem] border-[#3D2419] bg-black shadow-[.25rem_.25rem_0rem_0rem_#3D2419] sm:h-80 sm:flex-row lg:h-72"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}

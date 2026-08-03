@@ -12,7 +12,7 @@ export default function ShopFavorites() {
   const { user } = useUser();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [pendingRemoval, setPendingRemoval] = useState<Favorite | null>(null);
-  const { toastComponent, showToast } = useToast();
+  const { showToast } = useToast();
 
   const fetchFavorites = () => {
     if (!user?.id) return;
@@ -37,7 +37,6 @@ export default function ShopFavorites() {
 
   return (
     <div className="relative min-h-screen p-4">
-      {toastComponent}
       {pendingRemoval && (
         <ConfirmRemoveFavoriteDialog
           productName={pendingRemoval.product_name}
