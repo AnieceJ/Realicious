@@ -88,7 +88,7 @@ export default function SpendingPie({ txs }: { txs: Tx[] }) {
               onClick={() => setMode(m)}
               className={`px-2.5 py-1 text-[11px] font-black border-2 border-black transition-colors ${
                 mode === m ? "bg-[#FFD45C]" : "bg-white hover:bg-[#F3F3F3]"
-              }`}
+              } cursor-pointer`}
             >
               {m === "expense" ? "支出" : "收入"}
             </button>
