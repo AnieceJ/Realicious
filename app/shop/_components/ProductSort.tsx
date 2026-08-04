@@ -13,7 +13,6 @@ type ProductSortProps = {
 
 const sortOptions: SortOption[] = [
   { id: "", label: "預設排序" },
-  { id: "popular", label: "銷量／熱門商品" },
   { id: "price_low", label: "價格：低 → 高" },
   { id: "price_high", label: "價格：高 → 低" },
 ];
