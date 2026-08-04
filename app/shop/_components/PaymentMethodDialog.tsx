@@ -15,6 +15,7 @@ type PaymentMethodDialogProps = {
 export default function PaymentMethodDialog({ orderId, createOrder, onClose }: PaymentMethodDialogProps) {
   const router = useRouter();
   const [submittingMethod, setSubmittingMethod] = useState<PaymentMethod | null>(null);
+  const [paymentError, setPaymentError] = useState("");
   const isSubmitting = submittingMethod !== null;
 
   // 從綠界按瀏覽器上一頁時，頁面可能由 bfcache 還原，
@@ -28,6 +29,7 @@ export default function PaymentMethodDialog({ orderId, createOrder, onClose }: P
   const handlePayment = async (methodId: PaymentMethod) => {
     if (isSubmitting) return;
 
+    setPaymentError("");
     setSubmittingMethod(methodId);
 
     try {
@@ -46,10 +48,53 @@ export default function PaymentMethodDialog({ orderId, createOrder, onClose }: P
       }
     } catch (error) {
       localStorage.removeItem("realicious-pending-order");
-      alert(error instanceof Error ? error.message : "付款導向失敗，請稍後再試");
+      setPaymentError(
+        error instanceof Error ? error.message : "付款導向失敗，請稍後再試",
+      );
       setSubmittingMethod(null);
     }
   };
+
+  if (paymentError) {
+    const isStockError = paymentError.includes("庫存不足");
+
+    return (
+      <SiteModal
+        title={isStockError ? "商品庫存不足" : "無法進行付款"}
+        maxWidth="md"
+        onClose={onClose}
+      >
+        <div className="flex items-start gap-3 border-y-2 border-black/10 py-4">
+          <div
+            className="grid size-11 shrink-0 place-items-center border-2 border-black bg-[#F8D7DA] text-2xl font-black leading-none"
+            aria-hidden="true"
+          >
+            ×
+          </div>
+          <div className="min-w-0 pt-0.5">
+            <p className="break-words text-sm font-black leading-6 text-[#BB0015]">
+              {paymentError}
+            </p>
+            <p className="mt-2 text-xs font-bold leading-5 text-black/55 sm:text-sm">
+              {isStockError
+                ? "待付款訂單不會保留商品庫存，請返回商城確認目前可購買數量。"
+                : "請稍後重新嘗試，或改用其他付款方式。"}
+            </p>
+          </div>
+        </div>
+
+        <SiteModalActions>
+          <SiteModalButton
+            variant="primary"
+            onClick={onClose}
+            className="mt-5"
+          >
+            {orderId ? "返回訂單紀錄" : "返回結帳頁"}
+          </SiteModalButton>
+        </SiteModalActions>
+      </SiteModal>
+    );
+  }
 
   return (
     <SiteModal

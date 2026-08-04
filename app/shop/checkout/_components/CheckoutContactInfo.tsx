@@ -42,6 +42,18 @@ interface FullProfile {
   phone?: string;
 }
 
+function normalizeProfileCity(value?: string | null) {
+  const normalizedCity = (value || "").trim().replaceAll("臺", "台");
+  return cities.includes(normalizedCity) ? normalizedCity : "";
+}
+
+function normalizeProfileDistrict(city: string, value?: string | null) {
+  const normalizedDistrict = (value || "").trim().replaceAll("臺", "台");
+  return (districts[city] || []).includes(normalizedDistrict)
+    ? normalizedDistrict
+    : "";
+}
+
 function fillBlankFieldsFromProfile(
   contact: OrderContact,
   profileContact: OrderContact,
@@ -125,14 +137,19 @@ export default function CheckoutContactInfo({
         const profileName = `${profile.last_name || ""}${profile.first_name || ""}`.trim()
           || profile.nick_name
           || "";
+        const profileCity = normalizeProfileCity(profile.city);
+        const profileDistrict = normalizeProfileDistrict(
+          profileCity,
+          profile.district,
+        );
         const nextProfileContact: OrderContact = {
           name: profileName,
           email: profile.email || profile.account || defaultEmail,
           phone: normalizeTaiwanMobile(profile.phone || "")
             .replace(/\D/g, "")
             .slice(0, 10),
-          city: profile.city || "",
-          district: profile.district || "",
+          city: profileCity,
+          district: profileDistrict,
           address: profile.address || "",
         };
 
@@ -226,9 +243,14 @@ export default function CheckoutContactInfo({
     (touched[field] || validationRequest > 0) && errors[field],
   );
   const inputClassName = (field: keyof OrderContact) => (
-    `mt-1 w-full border-2 bg-white px-3 py-2 text-sm font-normal outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-[#FBDF58] ${
-      showError(field) ? "border-[#BB0015]" : "border-[#3D2419]"
+    `mt-1 w-full border-2 bg-[#FFFDF7] px-3 py-2 text-sm font-normal text-[#3D2419] shadow-[2px_2px_0px_0px_#3D2419] outline-none transition placeholder:text-gray-400 focus:bg-[#FFF8D9] focus:ring-2 focus:ring-[#FBDF58] ${
+      showError(field)
+        ? "border-[#BB0015] shadow-[2px_2px_0px_0px_#BB0015]"
+        : "border-[#3D2419]"
     }`
+  );
+  const selectClassName = (field: keyof OrderContact) => (
+    `${inputClassName(field)} cursor-pointer appearance-none pr-10 font-bold disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-[#3D2419]/45 disabled:shadow-none`
   );
 
   return (
@@ -333,21 +355,26 @@ export default function CheckoutContactInfo({
               <div className="mt-1 grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <label htmlFor="checkout-contact-city" className="text-xs font-normal">
                   縣市
-                  <select
-                    id="checkout-contact-city"
-                    autoComplete="address-level1"
-                    required
-                    value={contact.city}
-                    onChange={(event) => handleCityChange(event.target.value)}
-                    onBlur={() => handleBlur("city")}
-                    aria-invalid={showError("city")}
-                    className={inputClassName("city")}
-                  >
-                    <option value="">請選擇縣市</option>
-                    {cities.map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      id="checkout-contact-city"
+                      autoComplete="address-level1"
+                      required
+                      value={contact.city}
+                      onChange={(event) => handleCityChange(event.target.value)}
+                      onBlur={() => handleBlur("city")}
+                      aria-invalid={showError("city")}
+                      className={selectClassName("city")}
+                    >
+                      <option value="">請選擇縣市</option>
+                      {cities.map((city) => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
+                    <span className="pointer-events-none absolute inset-y-0 right-3 mt-1 flex items-center text-xs" aria-hidden="true">
+                      ▼
+                    </span>
+                  </div>
                   {showError("city") && (
                     <p className="mt-1 text-xs font-bold text-[#BB0015]">{errors.city}</p>
                   )}
@@ -355,22 +382,27 @@ export default function CheckoutContactInfo({
 
                 <label htmlFor="checkout-contact-district" className="text-xs font-normal">
                   鄉鎮區
-                  <select
-                    id="checkout-contact-district"
-                    autoComplete="address-level2"
-                    required
-                    disabled={!contact.city}
-                    value={contact.district}
-                    onChange={(event) => handleDistrictChange(event.target.value)}
-                    onBlur={() => handleBlur("district")}
-                    aria-invalid={showError("district")}
-                    className={`${inputClassName("district")} disabled:cursor-not-allowed disabled:bg-gray-100`}
-                  >
-                    <option value="">請選擇鄉鎮區</option>
-                    {availableDistricts.map((district) => (
-                      <option key={district} value={district}>{district}</option>
-                    ))}
-                  </select>
+                  <div className="relative">
+                    <select
+                      id="checkout-contact-district"
+                      autoComplete="address-level2"
+                      required
+                      disabled={!contact.city}
+                      value={contact.district}
+                      onChange={(event) => handleDistrictChange(event.target.value)}
+                      onBlur={() => handleBlur("district")}
+                      aria-invalid={showError("district")}
+                      className={selectClassName("district")}
+                    >
+                      <option value="">請選擇鄉鎮區</option>
+                      {availableDistricts.map((district) => (
+                        <option key={district} value={district}>{district}</option>
+                      ))}
+                    </select>
+                    <span className="pointer-events-none absolute inset-y-0 right-3 mt-1 flex items-center text-xs" aria-hidden="true">
+                      ▼
+                    </span>
+                  </div>
                   {showError("district") && (
                     <p className="mt-1 text-xs font-bold text-[#BB0015]">{errors.district}</p>
                   )}
