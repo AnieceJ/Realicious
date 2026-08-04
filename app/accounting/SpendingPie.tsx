@@ -130,12 +130,24 @@ export default function SpendingPie({ txs }: { txs: Tx[] }) {
               </g>
             </svg>
 
-            {/* 甜甜圈中間：本月該類型總額 */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            {/* 甜甜圈中間：本月該類型總額。
+                數字太長（例如一千萬）會撐破中間的洞 → 依字數自動縮小字體、
+                限制寬度、不換行，多長都塞得進去、不破圖。 */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-2">
               <span className="text-[9px] font-bold text-black/50">本月{label}</span>
-              <span className="text-[14px] font-black leading-tight">
-                ${total.toLocaleString()}
-              </span>
+              {(() => {
+                const totalStr = `$${total.toLocaleString()}`;
+                const len = totalStr.length;
+                const fs = len <= 6 ? 15 : len <= 8 ? 12 : len <= 10 ? 10 : 8;
+                return (
+                  <span
+                    className="font-black leading-tight whitespace-nowrap"
+                    style={{ fontSize: fs, maxWidth: 60 }}
+                  >
+                    {totalStr}
+                  </span>
+                );
+              })()}
             </div>
           </div>
 

@@ -202,7 +202,7 @@ export default function SavedArticlesPage() {
 		<>
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
-				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
+				<div className="relative z-10 max-w-7xl mx-auto w-full py-4 px-2">
 					<div className="relative z-10 border-5 border-black bg-[#FDFCF9]">
 						<div
 							className="pointer-events-none absolute inset-0 z-10 opacity-50"

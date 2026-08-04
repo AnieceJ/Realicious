@@ -29,7 +29,10 @@ import {
 } from "./api";
 import { getOnboardingState } from "./onboarding";
 import TutorialSpotlight from "./pixel/TutorialSpotlight";
+import WalkingChick from "./pixel/WalkingChick";
+import LoadingTransition from "./pixel/LoadingTransition";
 import { useToast } from "@/app/context/toast";
+
 /* ============================================================
    設計 TOKEN（來自 Component 規範）
    白 #FFFFFF ｜ 卡片/次要 #FCF9F6 ｜ 輸入框 #E3E3E3
@@ -231,6 +234,7 @@ export default function AccountingApp({ pixel }: { pixel: string }) {
       // 兩個 setState/導頁都包進 setTimeout callback，避開 React 19 同步 setState 警告。
       const show = setTimeout(() => setAuthOk(false), 0);
       const go = setTimeout(() => router.replace("/user/login"), 1500);
+      
       return () => {
         clearTimeout(show);
         clearTimeout(go);
@@ -551,6 +555,8 @@ const addTx = async () => {
     onSkip={() => setTutorialSkipped(true)}
   />
 )}
+
+{/* <LoadingTransition /> */}
 
       <section className={`${CARD} p-4 md:p-5`} aria-label="小雞狀態">
           <div className="flex items-center gap-3 mb-4">
