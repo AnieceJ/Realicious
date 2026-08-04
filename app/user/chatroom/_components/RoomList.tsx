@@ -100,7 +100,7 @@ export default function RoomList({
                 <div
                   key={room.id}
                   onClick={() => {onJoinRoom(room);showToast(`加入房間：${room.name}`)}}
-                  className={`group relative flex flex-col overflow-hidden rounded-lg md:rounded-xl border bg-white cursor-pointer transition-all hover:shadow-md ${
+                  className={`group relative flex flex-col overflow-hidden border bg-white cursor-pointer transition-all hover:shadow-md ${
                     isSelected
                       ? "border-indigo-500 ring-2 ring-indigo-500/20 shadow-md"
                       : "border-slate-200 hover:border-indigo-300"
@@ -118,7 +118,7 @@ export default function RoomList({
                     <button
                       type="button"
                       onClick={(e) =>{onToggleFavorite(room.id, e);showToast(room.isFavorited ? "🤍取消追蹤" : "❤️追蹤房間")}}
-                      className="absolute top-1.5 right-1.5 md:top-2 md:right-2 rounded-full bg-black/40 backdrop-blur-md p-1.5 text-xs transition-transform active:scale-125 hover:bg-black/60"
+                      className="cursor-pointer absolute top-1.5 right-1.5 md:top-2 md:right-2 rounded-full bg-black/40 backdrop-blur-md p-1.5 text-xs transition-transform active:scale-125 hover:bg-black/60"
                       title={room.isFavorited ? "取消追蹤" : "追蹤房間"}
                     >
                       {room.isFavorited ? "❤️" : "🤍"}
@@ -129,7 +129,7 @@ export default function RoomList({
                         🔒
                       </span>
                     )}
-                    <span className="absolute bottom-1.5 right-1.5 md:bottom-2 md:right-2 rounded bg-white/90 backdrop-blur-md px-1.5 py-0.5 text-[9px] md:text-[10px] font-semibold text-slate-700 shadow-sm">
+                    <span className="absolute bottom-1.5 right-1.5 md:bottom-2 md:right-2 bg-white/90 backdrop-blur-md px-1.5 py-0.5 text-[9px] md:text-[10px] font-semibold text-slate-700 shadow-sm">
                       🟢 {room._count?.members || 0} 人
                     </span>
                   </div>
@@ -153,7 +153,7 @@ export default function RoomList({
                             },
                           );
                         }}
-                        className="rounded px-1 text-[10px] md:text-xs font-medium text-red-500 hover:bg-red-50 shrink-0 ml-1"
+                        className="cursor-pointer rounded px-1 text-[10px] md:text-xs font-medium text-red-500 hover:bg-red-50 shrink-0 ml-1"
                       >
                         刪除
                       </button>
