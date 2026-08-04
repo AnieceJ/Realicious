@@ -102,6 +102,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 	const [isSaved, setIsSaved] = React.useState(false);
 	const [savingArticle, setSavingArticle] = React.useState(false);
 	const [comments, setComments] = React.useState<Comment[]>([]);
+	const [isSharing, setIsSharing] = React.useState(false);
 	const hasToken = Boolean(Cookies.get("token"));
 	const { showToast } = useToast();
 	// 留言送出
@@ -162,6 +163,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 
 	const handleShare = async () => {
 		if (!page) return;
+		if (isSharing) return; // prevent concurrent shares
 
 		const shareData = {
 			title: page.title,
@@ -169,10 +171,11 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 			url: `${window.location.origin}/article/${id}`,
 		};
 
+		setIsSharing(true);
 		try {
 			if (navigator.share) {
 				await navigator.share(shareData);
-				showToast("已複製連結");
+				showToast("分享成功");
 			} else if (navigator.clipboard) {
 				await navigator.clipboard.writeText(shareData.url);
 				showToast("已複製連結");
@@ -180,12 +183,20 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 				showToast("此瀏覽器不支援分享功能");
 			}
 		} catch (error) {
-			if (error instanceof DOMException && error.name === "AbortError") {
+			// navigator.share may reject with InvalidStateError if a previous
+			// share operation hasn't completed. Guarding with isSharing prevents
+			// re-entry; still handle and ignore AbortError specifically.
+			if (
+				error instanceof DOMException &&
+				(error.name === "AbortError" || error.name === "InvalidStateError")
+			) {
 				return;
 			}
 
 			console.error("Error sharing article:", error);
 			showToast("分享失敗，請稍後再試");
+		} finally {
+			setIsSharing(false);
 		}
 	};
 
@@ -361,7 +372,8 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 											<div className=" flex gap-2">
 												<button
 													onClick={handleShare}
-													className="w-9 h-9 flex cursor-pointer items-center justify-center gap-2 border-black border-2 bg-white shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] hover:opacity-75 transition-opacity"
+													disabled={isSharing}
+													className="w-9 h-9 flex cursor-pointer items-center justify-center gap-2 border-black border-2 bg-white shadow-[3px_3px_0px_1px_rgba(0,0,0,1)] hover:opacity-75 transition-opacity disabled:cursor-not-allowed disabled:opacity-50"
 													title="複製文章連結"
 													aria-label="複製文章連結"
 												>

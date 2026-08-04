@@ -224,7 +224,7 @@ export default function SavedArticlesPage() {
 										<House size={22} />
 									</Link>
 									<div className="w-full min-w-0">
-										<Menubar className="flex h-auto min-w-0 flex-wrap border-0 bg-black p-0 text-slate-100 md:h-10 md:flex-nowrap">
+										<Menubar className="flex h-auto min-w-0 overflow-x-auto whitespace-nowrap border-0 bg-black p-0 text-slate-100 md:h-10 md:flex-nowrap">
 											<MenubarMenu>
 												<MenubarTrigger
 													onClick={() => {

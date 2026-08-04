@@ -169,7 +169,7 @@ export default function ArticlePage() {
 									>
 										<House size={22} />
 									</Link>
-									<Menubar className="flex h-auto min-w-0 flex-wrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
+									<Menubar className="flex h-auto min-w-0 overflow-x-auto whitespace-nowrap bg-black text-slate-100 border-0 md:h-10 md:flex-nowrap">
 										<MenubarMenu>
 											<MenubarTrigger
 												className={

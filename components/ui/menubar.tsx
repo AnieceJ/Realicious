@@ -59,7 +59,7 @@ function MenubarTrigger({
 		<DropdownMenuTrigger
 			data-slot="menubar-trigger"
 			className={cn(
-				"flex cursor-pointer items-center rounded-none px-2 py-0.75 text-sm font-medium outline-hidden select-none hover:bg-gray-400 aria-expanded:bg-gray-500",
+				"flex cursor-pointer items-center rounded-none px-2 py-0.75 text-sm font-medium outline-hidden select-none whitespace-nowrap hover:bg-gray-400 aria-expanded:bg-gray-500",
 				className,
 			)}
 			{...props}
