@@ -12,6 +12,7 @@ import {
 } from "@/lib/shop/tickets";
 import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
+import AccountEmptyState from "@/app/shop/_components/AccountEmptyState";
 import "@/app/shop/shop-theme.css";
 
 const FILTERS = [
@@ -74,7 +75,17 @@ export default function AccountTickets() {
 
         {/* 票券列表 */}
         {filteredTickets.length === 0 ? (
-          <p className="text-center py-10 text-gray-500">暫無票券</p>
+          <AccountEmptyState
+            icon={<TicketIcon className="size-6" />}
+            title={tickets.length === 0 ? "票券中心目前是空的" : "此分類目前沒有票券"}
+            description={
+              tickets.length === 0
+                ? "餐券付款成功後，電子票券與兌換資訊會自動顯示在這裡。"
+                : "可以切換上方的票券分類，查看其他使用狀態。"
+            }
+            actionHref={tickets.length === 0 ? "/shop" : undefined}
+            actionLabel={tickets.length === 0 ? "前往商城選購" : undefined}
+          />
         ) : (
           filteredTickets.map((ticket) => (
               <TicketItem key={ticket.id} ticket={ticket} onRefresh={fetchTickets} />

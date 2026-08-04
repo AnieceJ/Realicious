@@ -7,6 +7,7 @@ import OrderItem from "@/app/shop/orders/_components/OrderItem";
 import { getOrders, type Order } from "@/lib/shop/orders";
 import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
+import AccountEmptyState from "@/app/shop/_components/AccountEmptyState";
 import "@/app/shop/shop-theme.css";
 
 const FILTERS = [
@@ -57,7 +58,17 @@ export default function AccountOrders() {
 
         {/* 訂單列表 */}
         {filteredOrders.length === 0 ? (
-          <p className="text-center py-10 text-gray-500">尚無訂單</p>
+          <AccountEmptyState
+            icon={<ClipboardList className="size-6" />}
+            title={orders.length === 0 ? "尚未建立任何訂單" : "此分類目前沒有訂單"}
+            description={
+              orders.length === 0
+                ? "完成商城結帳後，付款狀態與訂單明細會顯示在這裡。"
+                : "可以切換上方的訂單分類，查看其他付款狀態。"
+            }
+            actionHref={orders.length === 0 ? "/shop" : undefined}
+            actionLabel={orders.length === 0 ? "前往商城選購" : undefined}
+          />
         ) : (
           filteredOrders.map((order) => (
             <OrderItem key={order.id} order={order} />
