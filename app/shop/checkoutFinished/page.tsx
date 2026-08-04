@@ -8,6 +8,7 @@ import FinishedOrderList from "./_components/FinishedOrderList";
 import FinishedAction from "./_components/FinishedAction";
 import { getLastOrder, type CartItem } from "@/lib/shop/cart";
 import { completeCheckoutSession } from "@/lib/shop/checkout";
+import { formatOrderNumber } from "@/lib/shop/order-number";
 
 export default function CheckoutFinishedPage() {
   const searchParams = useSearchParams();
@@ -99,7 +100,7 @@ export default function CheckoutFinishedPage() {
       </div>
       <div className="flex flex-col items-center justify-center">
         <div className="w-[60%]">
-          <FinishedOrderList items={items} orderId={`ORD-${orderId}`} />
+          <FinishedOrderList items={items} orderId={formatOrderNumber(orderId)} />
         </div>
       </div>
       <div className="flex flex-col items-center justify-center">

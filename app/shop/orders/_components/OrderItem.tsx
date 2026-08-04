@@ -4,10 +4,7 @@ import Link from "next/link";
 import type { Order, OrderItem as OrderDetailItem } from "@/lib/shop/orders";
 import { getOrderDetail } from "@/lib/shop/orders";
 import PaymentMethodDialog from "../../_components/PaymentMethodDialog";
-
-function getOrderNumber(orderId: number) {
-  return `ORD-${String(orderId).padStart(6, "0")}`;
-}
+import { formatOrderNumber } from "@/lib/shop/order-number";
 
 export default function OrderItem({ order }: { order: Order }) {
   const [expanded, setExpanded] = useState(false);
@@ -23,7 +20,7 @@ export default function OrderItem({ order }: { order: Order }) {
   }, [expanded, order.id, items.length]);
 
   const date = new Date(order.created_at).toLocaleDateString("zh-TW");
-  const orderNumber = getOrderNumber(order.id);
+  const orderNumber = formatOrderNumber(order.id);
 
   return (
     <div className="w-full mb-6">
