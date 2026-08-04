@@ -209,7 +209,7 @@ if (!spot) return null;   // ← 量不到目標位置，整個聚光燈就不�
         <button
           type="button"
           onClick={onSkip}
-          className="pointer-events-auto absolute top-4 right-4 border-[3px] border-black bg-[#FFD45C] px-4 py-2 text-[13px] font-black shadow-[0_4px_0_#000] hover:-translate-y-0.5 hover:shadow-[0_6px_0_#000] active:translate-y-1 active:shadow-none transition-all"
+          className="pointer-events-auto absolute top-4 right-4 border-[3px] border-black bg-[#FFD45C] px-4 py-2 text-[13px] font-black shadow-[0_4px_0_#000] hover:-translate-y-0.5 hover:shadow-[0_6px_0_#000] active:translate-y-1 active:shadow-none transition-all cursor-pointer"
         >
           跳過教學 ✕
         </button>
