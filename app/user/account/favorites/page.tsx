@@ -9,6 +9,7 @@ import { useUser } from "@/app/context/user";
 import PageHeader from "@/app/_components/PageHeader";
 import { useToast } from "@/app/shop/_components/Toast";
 import ConfirmRemoveFavoriteDialog from "@/app/shop/_components/ConfirmRemoveFavoriteDialog";
+import AccountEmptyState from "@/app/shop/_components/AccountEmptyState";
 import "@/app/shop/shop-theme.css";
 
 export default function AccountFavorites() {
@@ -52,7 +53,13 @@ export default function AccountFavorites() {
         <PageHeader icon={<Heart className="h-5 w-5" />} title="商品收藏" />
 
         {favorites.length === 0 ? (
-          <p className="text-center py-10 text-gray-500">尚未收藏任何商品</p>
+          <AccountEmptyState
+            icon={<Heart className="size-6" />}
+            title="尚未收藏任何商品"
+            description="看到喜歡的餐券時，點擊愛心即可收藏，之後可以從這裡快速找到。"
+            actionHref="/shop"
+            actionLabel="前往商城逛逛"
+          />
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {favorites.map((fav) => (
