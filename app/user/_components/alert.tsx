@@ -1,6 +1,5 @@
 "use client";
 
-import { Check, LoaderCircle, X } from "lucide-react";
 import { ConfirmModal } from "@/app/_components/ConfirmModal";
 import SiteModal, {
   SiteModalActions,
@@ -67,11 +66,11 @@ export default function CustomModal({
           aria-hidden="true"
         >
           {isLoading ? (
-            <LoaderCircle className="size-6 animate-spin stroke-[3]" />
+            <span className="size-6 animate-spin rounded-full border-[3px] border-black border-t-transparent" />
           ) : isSuccess ? (
-            <Check className="size-6 stroke-[3]" />
+            <span className="text-2xl font-black leading-none">✓</span>
           ) : (
-            <X className="size-6 stroke-[3]" />
+            <span className="text-2xl font-black leading-none">×</span>
           )}
         </div>
         <div className="min-w-0 pt-0.5">
