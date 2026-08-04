@@ -136,10 +136,13 @@ export default function ArticleManagePage() {
 
 	// 刪除文章
 	const handleDeleteArticle = async (articleId: string) => {
-		const isConfirm = await showConfirm("刪除後將無法復原，確定要刪除這篇文章嗎？", {
-			title: "刪除文章？",
-			confirmLabel: "確認刪除",
-		});
+		const isConfirm = await showConfirm(
+			"刪除後將無法復原，確定要刪除這篇文章嗎？",
+			{
+				title: "刪除文章？",
+				confirmLabel: "確認刪除",
+			},
+		);
 		if (!isConfirm) return;
 		try {
 			const token = Cookies.get("token");
@@ -203,7 +206,7 @@ export default function ArticleManagePage() {
 			{confirmComponent}
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
-				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
+				<div className="relative z-10 max-w-7xl mx-auto w-full py-4 px-2">
 					<div className="relative z-10 border-5 border-black bg-[#FDFCF9]">
 						<div
 							className="absolute inset-0 z-10 opacity-[0.5] pointer-events-none"

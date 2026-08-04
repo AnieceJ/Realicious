@@ -144,7 +144,7 @@ export default function ArticlePage() {
 		<>
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
-				<div className="relative z-10 max-w-7xl mx-auto w-full py-4">
+				<div className="relative z-10 max-w-7xl mx-auto w-full py-4 px-2">
 					<div className="relative border-5 border-black bg-[#FDFCF9]">
 						<div
 							className="absolute inset-0 opacity-[0.5] pointer-events-none"

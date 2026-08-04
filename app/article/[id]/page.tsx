@@ -276,8 +276,8 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 		<>
 			<div className="relative min-h-screen overflow-hidden">
 				<AmbientBackground />
-				<div className="relative z-10 max-w-7xl mx-auto w-full p-3">
-					<div className="border-black border-2">
+				<div className="relative z-10 max-w-7xl mx-auto w-full px-2 py-4">
+					<div className="border-black border-5">
 						<div className="flex flex-row items-center justify-between gap-4 p-3 bg-black border border-black text-white">
 							<div className="flex items-center gap-2 shrink-0">
 								<button
@@ -292,7 +292,7 @@ export default function ArticlePages({ params }: ArticleDetailPageProps) {
 								</button>
 							</div>
 							<div className="flex items-center justify-end min-w-0 text-right">
-								<span className="truncate">2026 夏季刊//台北美食地圖</span>
+								<span className="truncate">2026 夏季刊 // 台北美食地圖</span>
 							</div>
 						</div>
 						<div className="relative bg-white">
