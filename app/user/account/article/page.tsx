@@ -311,9 +311,10 @@ export default function ArticleManagePage() {
 									</div>
 									<Link
 										href="/article/edit"
-										className="flex w-10 h-10 bg-black items-center justify-center border-white border shrink-0"
+										className="flex items-center gap-2 px-3 py-2 bg-black text-white border-white border shrink-0"
 									>
 										<SquarePen color="#FFFFFF" />
+										<span className="text-sm">新增</span>
 									</Link>
 								</div>
 							</div>
@@ -374,17 +375,20 @@ export default function ArticleManagePage() {
 															</p>
 															<DropdownMenu>
 																<DropdownMenuTrigger
-																	className="flex h-8 w-8 items-center justify-center text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus:outline-none"
+																	className="cursor-pointer flex h-8 w-8 items-center justify-center transition-colors hover:bg-black hover:text-white focus:outline-none"
 																	aria-label={`管理文章：${art.title}`}
 																>
-																	<FontAwesomeIcon icon={faEllipsis} />
+																	<FontAwesomeIcon
+																		className="flex items-center px-1 py-1 shrink-0"
+																		icon={faEllipsis}
+																	/>
 																</DropdownMenuTrigger>
 																<DropdownMenuContent
 																	align="end"
 																	className="min-w-20 text-center"
 																>
 																	<DropdownMenuItem
-																		className="cursor-pointer justify-center"
+																		className="cursor-pointer justify-center hover:bg-black hover:text-white"
 																		onClick={() =>
 																			router.push(`/article/edit?id=${art.id}`)
 																		}
@@ -392,7 +396,7 @@ export default function ArticleManagePage() {
 																		編輯
 																	</DropdownMenuItem>
 																	<DropdownMenuItem
-																		className="cursor-pointer justify-center text-red-600 focus:text-red-600"
+																		className="cursor-pointer justify-center text-red-600 hover:bg-red-700 hover:text-white"
 																		onClick={() => handleDeleteArticle(art.id)}
 																	>
 																		刪除

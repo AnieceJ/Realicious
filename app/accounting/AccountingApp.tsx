@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBurger, faMugHot, faTrainSubway, faBook, faGamepad, faShirt,
   faSackDollar, faGift, faCircleQuestion,faBoxOpen, faCalendarDay, faPen, faXmark, faCheck,
-  faLock, faRibbon, faCrown, faHatCowboy,
+  faLock, faRibbon, faCrown, faHatCowboy,faHandPointer,
 } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BudgetCalendar from "./BudgetCalendar";
@@ -78,7 +78,7 @@ const CATS: Record<string, { icon: typeof faBurger; type: "income" | "expense" }
   飲品: { icon: faMugHot, type: "expense" },
   交通: { icon: faTrainSubway, type: "expense" },
   學習: { icon: faBook, type: "expense" },
-  娛樂: { icon: faGamepad, type: "expense" },
+  娛樂: { icon: faHandPointer, type: "expense" }, 
   服飾: { icon: faShirt, type: "expense" },
   薪資: { icon: faSackDollar, type: "income" },
   其他收入: { icon: faGift, type: "income" },
@@ -576,16 +576,16 @@ const addTx = async () => {
                 autoFocus
                 maxLength={8}
                 aria-label="小雞名字"
-                className="w-[110px] bg-[#E3E3E3] border-2 border-black px-2 py-1 text-[14px] font-black text-center rounded-none focus:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD45C]"
+                className="w-[110px] bg-[#E3E3E3] border-2 border-black px-2 py-1 text-[14px] font-black text-center rounded-none focus:outline-none focus-visible:ring-4 focus-visible:ring-[#FFD45C]cursor-pointer"
               />
             ) : (
               <button
                 onClick={() => setEditingName(true)}
                 title="點一下改名字"
-                className="group flex items-center gap-1.5 px-1"
+                className="group flex items-center gap-1.5 px-1 cursor-pointer"
               >
-                <span className="text-[15px] font-black">{petName}</span>
-                <span className="text-[11px] opacity-30 group-hover:opacity-100">
+                <span className="text-[15px] font-black cursor-pointer">{petName}</span>
+                <span className="text-[11px] opacity-30 group-hover:opacity-100 cursor-pointer">
                 <FontAwesomeIcon icon={faPen} />
                 </span>
               </button>
@@ -624,7 +624,7 @@ const addTx = async () => {
             {/* 衣櫃入口。里程碑改到衣櫃裡呈現（鎖頭 + 解鎖天數）。 */}
             <button
               onClick={() => setShowWardrobe(true)}
-              className={`${BTN} text-[12px] font-black px-3 py-1.5 bg-[#FFD45C]`}
+              className={`${BTN} text-[12px] font-black px-3 py-1.5 bg-[#FFD45C] cursor-pointer`}
             >
               <FontAwesomeIcon icon={faBoxOpen} /> 衣櫃
             </button>
@@ -699,7 +699,7 @@ const addTx = async () => {
               setShowAdd(true);
             }}
             aria-label="新增一筆記錄"
-            className={`${BTN} w-10 h-10 bg-[#FFD45C] grid place-items-center text-[22px] font-black leading-none`}
+            className={`${BTN} w-10 h-10 bg-[#FFD45C] grid place-items-center text-[22px] font-black leading-none cursor-pointer`}
           >
             ＋
           </button>
@@ -723,7 +723,7 @@ const addTx = async () => {
                 setBudgetInput(String(budget)); // 預填這個月目前的預算
                 setShowBudget(true);
               }}
-              className="text-[12px] font-bold text-[#BB0015] underline underline-offset-2"
+              className="text-[12px] font-bold text-[#BB0015] underline underline-offset-2 cursor-pointer"
             >
               <FontAwesomeIcon icon={faPen} /> 設定
             </button>
@@ -747,7 +747,7 @@ const addTx = async () => {
                   );
                   setJunkDismissed(true);
                 }}
-                className="text-[11px] font-bold underline underline-offset-2 text-black/50"
+                className="text-[11px] font-bold underline underline-offset-2 text-black/50 cursor-pointer cursor-pointer"
               >
                 關閉
               </button>
@@ -819,14 +819,14 @@ const addTx = async () => {
                 <button
                   onClick={() => openEdit(tx)}
                   aria-label="編輯"
-                  className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-black text-[14px]"
+                  className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-black text-[14px] cursor-pointer"
                 >
                   <FontAwesomeIcon icon={faPen} />
                 </button>
                 <button
                   onClick={() => delTx(tx.id)}
                   aria-label="刪除"
-                  className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-[#BB0015] text-[16px]"
+                  className="shrink-0 w-6 h-6 grid place-items-center text-black/40 hover:text-[#BB0015] text-[16px] cursor-pointer"
                 >
                   <FontAwesomeIcon icon={faXmark} />
                 </button>
@@ -860,19 +860,19 @@ const addTx = async () => {
                     setFCat(Object.keys(CATS).filter((k) => CATS[k].type === t)[0]);
                   }}
                   className={`flex-1 border-[3px] border-black py-2 text-[14px] font-black ${
-                    fType === t ? "bg-[#BB0015] text-white" : "bg-white"
-                  }`}
+                    fType === t ? "bg-[#BB0015] text-white" : "bg-white "
+                  }cursor-pointer`}
                 >
                   {t === "expense" ? "支出" : "收入"}
                 </button>
               ))}
             </div>
 
-            <label className="block text-[12px] font-bold mb-1.5">分類</label>
+            <label className="block text-[12px] font-bold mb-1.5  cursor-pointer ">分類</label>
             <select
               value={fCat}
               onChange={(e) => setFCat(e.target.value)}
-              className={`${FIELD} mb-4`}
+              className={`${FIELD} mb-4 cursor-pointer`}
             >
               {catsOfType.map((k) => (
                 <option key={k} value={k}>
@@ -912,13 +912,13 @@ const addTx = async () => {
                 setShowAdd(false);
                 setEditingId(null);
               }}
-                className={`${BTN} flex-1 bg-white py-2.5 text-[14px] font-bold`}
+                className={`${BTN} flex-1 bg-white py-2.5 text-[14px] font-bold cursor-pointer`}
               >
                 取消
               </button>
               <button
                 onClick={addTx}
-                className={`${BTN} flex-1 bg-[#BB0015] text-white py-2.5 text-[14px] font-black`}
+                className={`${BTN} flex-1 bg-[#BB0015] text-white py-2.5 text-[14px] font-black cursor-pointer`}
               >
                 {editingId ? "儲存" : "記帳 & 餵食"}
               </button>
@@ -958,7 +958,7 @@ const addTx = async () => {
             <div className="flex gap-2.5">
               <button
                 onClick={() => setShowBudget(false)}
-                className={`${BTN} flex-1 bg-white py-2.5 text-[14px] font-bold`}
+                className={`${BTN} flex-1 bg-white py-2.5 text-[14px] font-bold cursor-pointer`}
               >
                 取消
               </button>
@@ -975,7 +975,7 @@ const addTx = async () => {
                   setShowBudget(false);
                   setJunkDismissed(false);
                 }}
-                className={`${BTN} flex-1 bg-[#BB0015] text-white py-2.5 text-[14px] font-black`}
+                className={`${BTN} flex-1 bg-[#BB0015] text-white py-2.5 text-[14px] font-black cursor-pointer`}
               >
                 儲存
               </button>
@@ -1003,7 +1003,7 @@ const addTx = async () => {
             <div className="flex gap-2">
               <button
                 onClick={() => setJunkDismissed(true)}
-                className="flex-1 border-[3px] border-black bg-white py-2.5 text-[13px] font-bold"
+                className="flex-1 border-[3px] border-black bg-white py-2.5 text-[13px] font-bold cursor-pointer"
               >
                 先不用
               </button>
@@ -1014,7 +1014,7 @@ const addTx = async () => {
                     console.error("[lia] 吃土模式儲存失敗", e),
                   );
                 }}
-                className="flex-1 border-[3px] border-black bg-[#BB0015] text-white py-2.5 text-[13px] font-black"
+                className="flex-1 border-[3px] border-black bg-[#BB0015] text-white py-2.5 text-[13px] font-black cursor-pointer"
               >
                 開啟
               </button>
