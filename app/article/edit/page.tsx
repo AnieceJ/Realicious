@@ -7,6 +7,17 @@ import Cookies from "js-cookie";
 import { useToast } from "../_components/article_toast";
 import AmbientBackground from "@/components/AmbientBackground";
 
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
+
 interface SubCategory {
 	id: number;
 	sub_category_name: string;
@@ -159,6 +170,13 @@ export default function ArticleEditPage() {
 		}
 	}
 
+	// label for currently selected subcategory
+	const selectedLabel = subCategoryId
+		? (categories
+				.flatMap((c) => c.sub_category)
+				.find((s) => String(s.id) === subCategoryId)?.sub_category_name ?? "")
+		: "";
+
 	if (isArticleLoading) {
 		return (
 			<div className="p-12 text-center text-xl font-bold">
@@ -217,32 +235,48 @@ export default function ArticleEditPage() {
 							>
 								文章分類
 							</label>
-							<select
-								id="article-category"
-								className="h-11 w-full border-2 border-black bg-white px-3 text-base outline-none focus:bg-amber-50 focus:ring-2 focus:ring-black disabled:cursor-not-allowed disabled:bg-zinc-100"
-								value={subCategoryId}
-								onChange={(event) => setSubCategoryId(event.target.value)}
-								disabled={isCategoriesLoading}
-							>
-								<option value="">
-									{isCategoriesLoading ? "分類載入中..." : "請選擇分類"}
-								</option>
-								{categories.map((category) => (
-									<optgroup
-										key={category.category_name}
-										label={category.category_name}
+							<DropdownMenu>
+								<DropdownMenuTrigger
+									className={`h-11 w-full border-2 border-black bg-white px-3 text-base outline-none flex items-center justify-between ${isCategoriesLoading ? "cursor-not-allowed opacity-60" : ""}`}
+									disabled={isCategoriesLoading}
+								>
+									<span
+										className={`${selectedLabel ? "text-black" : "text-zinc-400"}`}
 									>
-										{category.sub_category.map((subCategory) => (
-											<option
-												key={subCategory.id}
-												value={subCategory.id.toString()}
-											>
-												{subCategory.sub_category_name}
-											</option>
+										{isCategoriesLoading
+											? "分類載入中..."
+											: selectedLabel || "請選擇分類"}
+									</span>
+									<ChevronDown className="ml-2" />
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="start"
+									sideOffset={6}
+									className="w-(--anchor-width)"
+								>
+									<DropdownMenuRadioGroup
+										value={subCategoryId}
+										onValueChange={(value) => setSubCategoryId(String(value))}
+									>
+										{categories.map((category) => (
+											<div key={category.category_name}>
+												<DropdownMenuLabel className="text-sm">
+													{category.category_name}
+												</DropdownMenuLabel>
+												{category.sub_category.map((sub) => (
+													<DropdownMenuRadioItem
+														className="text-sm  hover:border-black hover:border"
+														key={sub.id}
+														value={String(sub.id)}
+													>
+														{sub.sub_category_name}
+													</DropdownMenuRadioItem>
+												))}
+											</div>
 										))}
-									</optgroup>
-								))}
-							</select>
+									</DropdownMenuRadioGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</section>
 					</div>
 					<section>
