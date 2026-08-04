@@ -93,18 +93,16 @@ const ChickGround = forwardRef<HTMLDivElement, Props>(function ChickGround(
 
   const dead = mood === "dead"; // 用「真實」mood 判斷是不是幽靈
 
-  // ★ 幽靈抓不住(虛體),吃土也不給拎。只有健康時能拖。
-  const canGrab = mood !== "junk" && !dead;
+  // ★ 幽靈抓不住(虛體)。只有健康時能拖。
+  const canGrab = !dead;
 
   // 顯示的狀態:
-  //   被拎(健康)→ held
-  //   幽靈被點     → surprised 播一次
-  //   其他         → 原本的 mood
-  const shownMood: PetMood = grabbed
-    ? "held"
-    : ghostBlip
-      ? "surprised"
-      : mood;
+  //   幽靈被點 → surprised 播一次
+  //   其他     → 原本的 mood
+  // 註:拖動時「不」切成 held 姿勢——因為配件(衣服)在 held 那列是空白的,
+  //    切 held 會讓衣服整個消失/掉隊。改成保持正常姿勢、連衣服一起「板板正正」
+  //    被整塊拖走(拖動只是移動位置,不改姿勢),這樣穿戴著也能一起拖。
+  const shownMood: PetMood = ghostBlip ? "surprised" : mood;
 
   const junk = shownMood === "junk";
 
