@@ -21,18 +21,23 @@ export default function Footer() {
 							探索美食，聰明消費，享受每一刻。
 						</p>
 					</div>
-
-					{/* Contact */}
-					<div>
-						<h3 className="text-white font-bold text-lg font-pixel">
-							Contact Us
-						</h3>
-						<div className="mt-2 space-y-1 text-xs">
-							<p>Email：realicious2026@gmail.com</p>
-							<p>電話：(02) 6631-6588</p>
-							<p>地址：台北市復興南路一段390號2樓</p>
-						</div>
+				{/* Project */}
+				<div>
+					<h3 className="text-white font-bold text-lg font-pixel">
+						Project
+					</h3>
+					<div className="mt-2 space-y-1 text-xs">
+						<p>作品集展示專案</p>
+						<a
+							href="https://github.com/AnieceJ/Realicious"
+							target="_blank"
+							rel="noreferrer"
+							className="underline hover:text-yellow-300"
+						>
+							GitHub Repository
+						</a>
 					</div>
+				</div>
 
 					{/* Social */}
 					<div>

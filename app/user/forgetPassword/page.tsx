@@ -35,16 +35,11 @@ const API_URL = `${BASE_URL}/user/api`;
     handleSubmit,
     trigger,
     getValues,
-    setValue,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(forgetPasswordSchema),
     defaultValues: { email: "", code: "" },
   });
-
-const testA = () => {
-    setValue("email", "hua870320@gmail.com", { shouldValidate: true });
-  };
 
   const scene = "forgot-password";
 
@@ -113,7 +108,7 @@ const testA = () => {
           const email = data.email; // 或者是從你前端 state 拿到的 email
           closeAlert();
           // 2. 跳轉時，把 token 和 email 用 Query String 帶到重設密碼頁面
-          // 網址會變成：/user/resetPassword?token=xxxx&email=xxx@example.com
+          // 網址會變成：/user/resetPassword?token=xxxx&email=<email>
           router.replace(
             `/user/resetPassword?token=${token}&email=${encodeURIComponent(email)}`,
           );
@@ -132,7 +127,7 @@ const testA = () => {
   return (
     <Container>
       <div className="w-110 h-180 bg-[#FCF9F6] sm:border-2 flex flex-col items-center sm:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-        <h1 onClick={testA} className="flex items-center justify-center text-[24px] my-10">
+        <h1 className="flex items-center justify-center text-[24px] my-10">
           <FaUnlockKeyhole className="mr-2" />
           忘記密碼
         </h1>
