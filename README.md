@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Realicious
 
-## Getting Started
+Realicious 是整合美食文章、餐券商城、即時聊天室與飲食記帳的餐飲生活平台。本 repository 為履歷展示用前端版本，已移除個人資料與正式服務憑證，並串接獨立部署的展示後端與資料庫。
 
-First, run the development server:
+## Online Demo
+
+- Website: [https://realicious.vercel.app](https://realicious.vercel.app)
+- Demo account: `demo@example.com`
+- Demo password: `qwe123`
+
+> 展示環境不啟用 Google OAuth、電子郵件寄送與第三方金流；請使用上方示範帳號體驗會員功能。
+
+## Features
+
+- 美食文章瀏覽、收藏與會員文章管理
+- 餐券商城、購物車、結帳與訂單管理
+- Socket.IO 即時聊天室
+- 飲食與消費記帳
+- 會員註冊、登入及個人資料管理
+
+## Tech Stack
+
+- Next.js 16 / React 19 / TypeScript
+- Tailwind CSS / Bootstrap
+- Socket.IO Client
+- Vercel
+- Backend: Express / Socket.IO / Prisma / MySQL on Railway
+
+## Local Development
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
+cp .env.example .env.local
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+預設開啟 [http://localhost:3000](http://localhost:3000)。本機後端預設位於 `http://localhost:3001`，也可以在 `.env.local` 設定：
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+正式環境的 API 網址由 Vercel environment variable 管理，不會提交到 Git。
 
-## Learn More
+## Project Background
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+本 repository 是由[原始團隊專案](https://github.com/wei-c-c/Realicious)整理出的履歷展示版本。履歷或面試說明時，請依實際參與內容標示個人負責範圍。
