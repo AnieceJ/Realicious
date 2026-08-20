@@ -4,7 +4,7 @@ import QuantityPicker from "../../_components/QuantityPicker";
 import { removeFromCart, updateQty, type CartItem } from "@/lib/shop/cart";
 import { useConfirm } from "../../_components/ConfirmModal";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const FALLBACK_IMAGE = "/images/optimized/food-placeholder.webp";
 
 function getImageUrl(imagePath: string) {
