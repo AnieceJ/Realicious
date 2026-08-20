@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import type { CartItem } from "@/lib/shop/cart";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const MAX_VISIBLE = 3;
 
 export default function CheckoutOrderList({ items }: { items: CartItem[] }) {
@@ -18,7 +19,7 @@ export default function CheckoutOrderList({ items }: { items: CartItem[] }) {
             <div className="flex min-w-0 items-center gap-3">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center bg-[#FFF0B8] text-sm sm:h-20 sm:w-20">
                 {item.main_img ? (
-                  <img src={`http://localhost:3001${item.main_img}`} alt={item.name} className="w-full h-full object-cover" />
+                  <img src={`${API_BASE}${item.main_img}`} alt={item.name} className="w-full h-full object-cover" />
                 ) : (
                   <span>商品照片</span>
                 )}

@@ -6,6 +6,8 @@ import { addFavorite, removeFavorite } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 interface FeaturedProductSectionProps {
   products: Product[];
   favoritedProductIds: number[];
@@ -97,7 +99,7 @@ export default function FeaturedProductSection({
                 className="relative w-full h-full flex-shrink-0 block"
               >
                 <img
-                  src={`http://localhost:3001${p.main_img}`}
+                  src={`${API_BASE}${p.main_img}`}
                   alt={p.name}
                   className="w-full h-full object-cover object-center"
                 />

@@ -8,6 +8,8 @@ import PageHeader from "@/app/_components/PageHeader";
 import { useToast } from "@/app/shop/_components/Toast";
 import ConfirmRemoveFavoriteDialog from "@/app/shop/_components/ConfirmRemoveFavoriteDialog";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function ShopFavorites() {
   const { user } = useUser();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -56,7 +58,7 @@ export default function ShopFavorites() {
                 <Link href={`/shop/products/${fav.product_id}`} className="block h-40 overflow-hidden">
                   {fav.product_img && (
                     <img
-                      src={`http://localhost:3001${fav.product_img}`}
+                      src={`${API_BASE}${fav.product_img}`}
                       alt={fav.product_name}
                       className="w-full h-full object-cover"
                     />

@@ -19,6 +19,8 @@ import { RiLoginBoxLine } from "react-icons/ri";
 import PasswordToggleIcon from "../_components/PasswordToggleIcon";
 import Banner from './_componets/banner'
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function Login() {
   const router = useRouter();
   const { login } = useUser();
@@ -207,7 +209,7 @@ export default function Login() {
           <h2 className="text-[20px] my-8">--OR--</h2>
           <div className="flex justify-center items-center">
             <Link
-              href={`http://localhost:3001/user/api/auth/google?next=${encodeURIComponent(nextPath)}`}
+              href={`${API_BASE}/user/api/auth/google?next=${encodeURIComponent(nextPath)}`}
               className={`${button_shadow} w-40 h-15 mx-2 flex justify-center items-center -translate-x-0.5 -translate-y-0.5 hover:translate-x-0 hover:translate-y-0`}
             >
               <Image

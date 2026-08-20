@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import type { ProductImage } from "@/lib/shop/product";
 
-const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const EMPTY_IMAGES: ProductImage[] = [];
 
 // 商品副圖尚未完整建立前，先以商城已上傳的 Demo 食物圖補足縮圖互動。

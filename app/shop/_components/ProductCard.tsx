@@ -6,7 +6,7 @@ import { addFavorite, removeFavorite } from "@/lib/shop/favorites";
 import { useUser } from "@/app/context/user";
 import { useToast } from "./Toast";
 
-const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const FALLBACK_IMAGE = `${API_BASE}/images/optimized/吃到飽.webp`;
 
 export default function ProductCard({

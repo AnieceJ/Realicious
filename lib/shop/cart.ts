@@ -20,7 +20,7 @@ export type AddToCartResult = {
   reachedLimit: boolean;
 };
 
-const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const GUEST_STORAGE_KEY = "realicious-guest-cart";
 const LEGACY_STORAGE_KEY = "realicious-cart";
 const ACTIVE_USER_KEY = "realicious-cart-active-user";

@@ -14,7 +14,7 @@ const TYPE_LABEL: Record<string, string> = {
   cash: "現金折價",
 };
 
-const API_BASE = "http://localhost:3001";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 const FALLBACK_IMAGE = `${API_BASE}/images/optimized/吃到飽.webp`;
 
 function getImageUrl(imagePath: string) {

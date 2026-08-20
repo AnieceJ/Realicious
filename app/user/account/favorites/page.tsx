@@ -12,6 +12,8 @@ import ConfirmRemoveFavoriteDialog from "@/app/shop/_components/ConfirmRemoveFav
 import AccountEmptyState from "@/app/shop/_components/AccountEmptyState";
 import "@/app/shop/shop-theme.css";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function AccountFavorites() {
   const { user } = useUser();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -67,7 +69,7 @@ export default function AccountFavorites() {
                 <Link href={`/shop/products/${fav.product_id}`} className="block h-40 overflow-hidden">
                   {fav.product_img && (
                     <img
-                      src={`http://localhost:3001${fav.product_img}`}
+                      src={`${API_BASE}${fav.product_img}`}
                       alt={fav.product_name}
                       className="w-full h-full object-cover"
                     />

@@ -6,6 +6,8 @@ import Cookies from "js-cookie";
 
 import Container from "@/app/user/_components/container";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 interface Room {
   id: number;
   name: string;
@@ -64,7 +66,7 @@ export default function Chatroom() {
     const token = Cookies.get("token");
     if (!token) return;
 
-    socketRef.current = io("http://localhost:3001", {
+    socketRef.current = io(API_BASE, {
       auth: { token },
     });
 
@@ -148,7 +150,7 @@ export default function Chatroom() {
   const fetchRooms = async () => {
     const token = Cookies.get("token");
     try {
-      const res = await fetch("http://localhost:3001/user/api/chatrooms", {
+      const res = await fetch(`${API_BASE}/user/api/chatrooms`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const result = await res.json();
@@ -176,7 +178,7 @@ export default function Chatroom() {
 
     const token = Cookies.get("token");
     try {
-      const res = await fetch("http://localhost:3001/user/api/chatrooms", {
+      const res = await fetch(`${API_BASE}/user/api/chatrooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -240,7 +242,7 @@ export default function Chatroom() {
     const token = Cookies.get("token");
     try {
       const res = await fetch(
-        `http://localhost:3001/user/api/chatrooms/${roomId}`,
+        `${API_BASE}/user/api/chatrooms/${roomId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

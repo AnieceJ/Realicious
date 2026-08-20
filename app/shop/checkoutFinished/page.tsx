@@ -10,6 +10,8 @@ import { getLastOrder, type CartItem } from "@/lib/shop/cart";
 import { completeCheckoutSession } from "@/lib/shop/checkout";
 import { formatOrderNumber } from "@/lib/shop/order-number";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
 export default function CheckoutFinishedPage() {
   const searchParams = useSearchParams();
   const [items, setItems] = useState<CartItem[]>([]);
@@ -33,7 +35,7 @@ export default function CheckoutFinishedPage() {
         if (pendingId && !sessionStorage.getItem("confirm-sent-" + pendingId)) {
           sessionStorage.setItem("confirm-sent-" + pendingId, "1");
           const token = Cookies.get("token");
-          fetch(`http://localhost:3001/payment/confirm/${pendingId}`, {
+          fetch(`${API_BASE}/payment/confirm/${pendingId}`, {
             method: "PUT",
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }).catch(() => {});
